@@ -2,6 +2,7 @@
 	import { onNavigate } from '$app/navigation';
 	import favicon from '$lib/assets/favicon.svg';
 	import { ModeWatcher } from 'mode-watcher';
+	import { Toaster } from 'svelte-sonner';
 	import './layout.css';
 
 	let { children } = $props();
@@ -19,7 +20,13 @@
 	});
 </script>
 
+<!-- Dark / Light theme watcher -->
 <ModeWatcher />
+
+<!-- Global Toast Notification Engine -->
+<Toaster position="top-right" richColors closeButton />
+
+<!-- Render route content -->
 <svelte:head><link rel="icon" href={favicon} /></svelte:head>
 <div
 	class="min-h-screen bg-background text-foreground antialiased selection:bg-primary selection:text-primary-foreground"
