@@ -1,5 +1,5 @@
 // src/lib/server/db/schema.ts
-import { boolean, pgTable, text, timestamp } from 'drizzle-orm/pg-core';
+import { boolean, integer, pgTable, text, timestamp } from 'drizzle-orm/pg-core';
 import { z } from 'zod';
 
 // 1. USER TABLE
@@ -65,6 +65,19 @@ export const projects = pgTable('projects', {
 	slug: text('slug').notNull(),
 	userId: text('user_id').references(() => user.id, { onDelete: 'set null' }),
 	createdAt: timestamp('created_at').notNull().defaultNow()
+});
+
+// 6. FILES
+export const files = pgTable('files', {
+	id: text('id')
+		.primaryKey()
+		.$defaultFn(() => crypto.randomUUID()), //  Auto-generates UUID
+	url: text('url').notNull(),
+	key: text('key').notNull(),
+	name: text('name').notNull(),
+	size: integer('size').notNull(),
+	userId: text('user_id').references(() => user.id, { onDelete: 'cascade' }), //  Nullable for safety
+	createdAt: timestamp('created_at').defaultNow().notNull()
 });
 
 // Zod Schema for Superforms validation

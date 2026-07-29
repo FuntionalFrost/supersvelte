@@ -1,6 +1,7 @@
 // src/lib/server/api.ts
 import { auth } from '$lib/server/auth';
 import { db } from '$lib/server/db';
+import { getProjects, invalidateProjectsCache } from '$lib/server/db/queries';
 import { projects } from '$lib/server/db/schema';
 import { checkRateLimit } from '$lib/server/ratelimit';
 import { Hono } from 'hono';
@@ -8,24 +9,46 @@ import { streamSSE } from 'hono/streaming';
 
 const projectsApp = new Hono()
 	.get('/', async (c) => {
-		const allProjects = await db.select().from(projects);
-		return c.json({ projects: allProjects });
+		// ⚡ Cached Query Layer
+		const { data, source } = await getProjects();
+		return c.json({ projects: data, source });
 	})
 	.post('/', async (c) => {
-		return c.json({ success: true });
-	});
+		const body = await c.req.json();
+		const name = body.name || 'New Project';
 
+		//  Generate a URL-friendly slug to satisfy Drizzle's required 'slug' column
+		const slug =
+			body.slug ||
+			name
+				.toLowerCase()
+				.trim()
+				.replace(/[\s\W-]+/g, '-')
+				.concat('-', crypto.randomUUID().slice(0, 8));
+
+		// 1. Insert into Neon Postgres via Drizzle
+		const [newProject] = await db
+			.insert(projects)
+			.values({
+				name,
+				slug //  'slug' is now provided!
+			})
+			.returning();
+
+		// 2. 🧹 Invalidate stale Redis cache
+		await invalidateProjectsCache();
+
+		return c.json({ success: true, project: newProject });
+	});
 export const app = new Hono()
 	.basePath('/api')
 	.route('/projects', projectsApp)
 
-	// 🛡️ Rate-Limited Route
+	// Rate Limiting Route
 	.get('/rate-limited-test', async (c) => {
-		// Extract IP address from request headers or default to localhost
 		const ip = c.req.header('x-forwarded-for') ?? c.req.header('x-real-ip') ?? '127.0.0.1';
 		const result = await checkRateLimit(ip);
 
-		// If rate limit is exceeded, return 429 HTTP status
 		if (!result.success) {
 			return c.json(
 				{
@@ -48,7 +71,7 @@ export const app = new Hono()
 		});
 	})
 
-	// Realtime SSE
+	// Realtime SSE Route
 	.get('/realtime', async (c) => {
 		const session = await auth.api.getSession({ headers: c.req.raw.headers });
 		if (!session) return c.json({ error: 'Unauthorized' }, 401);

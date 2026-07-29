@@ -1,48 +1,38 @@
 // src/lib/realtime.svelte.ts
-export interface HeartbeatPayload {
+import { toast } from 'svelte-sonner';
+
+export interface RealtimeEvent {
+	type: string;
+	payload: Record<string, unknown>;
 	timestamp: string;
-	pingCount: number;
 }
 
 export class RealtimeStream {
-	// Reactive Svelte 5 state
-	status = $state<'connecting' | 'connected' | 'error'>('connecting');
-	lastPayload = $state<HeartbeatPayload | null>(null);
-	history = $state<HeartbeatPayload[]>([]);
+	events = $state<RealtimeEvent[]>([]);
+	status = $state<'connecting' | 'connected' | 'disconnected'>('connecting');
+	lastHeartbeat = $state<string | null>(null);
 
-	private eventSource: EventSource | null = null;
+	constructor(endpoint = '/api/realtime') {
+		$effect(() => {
+			const eventSource = new EventSource(endpoint);
 
-	constructor(endpoint: string = '/api/realtime') {
-		if (typeof window !== 'undefined') {
-			this.connect(endpoint);
-		}
-	}
+			eventSource.onopen = () => (this.status = 'connected');
+			eventSource.onerror = () => (this.status = 'disconnected');
 
-	private connect(endpoint: string) {
-		this.eventSource = new EventSource(endpoint);
+			eventSource.addEventListener('heartbeat', (e) => {
+				const data = JSON.parse(e.data);
+				this.lastHeartbeat = data.timestamp;
+			});
 
-		this.eventSource.onopen = () => {
-			this.status = 'connected';
-		};
+			eventSource.addEventListener('app-event', (e) => {
+				const data: RealtimeEvent = JSON.parse(e.data);
+				this.events = [data, ...this.events];
 
-		// Listen for named SSE event 'heartbeat'
-		this.eventSource.addEventListener('heartbeat', (event) => {
-			try {
-				const data: HeartbeatPayload = JSON.parse(event.data);
-				this.lastPayload = data;
-				this.history = [data, ...this.history.slice(0, 9)]; // Keep last 10
-			} catch (err) {
-				console.error('Failed to parse SSE payload:', err);
-			}
+				if (data.type === 'PROJECT_CREATED') toast.success('⚡ Realtime: Project created!');
+				if (data.type === 'FILE_UPLOADED') toast.info('⚡ Realtime: New file uploaded!');
+			});
+
+			return () => eventSource.close();
 		});
-
-		this.eventSource.onerror = () => {
-			this.status = 'error';
-		};
-	}
-
-	close() {
-		this.eventSource?.close();
-		this.status = 'error';
 	}
 }

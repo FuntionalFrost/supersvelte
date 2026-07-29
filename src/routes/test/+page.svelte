@@ -14,7 +14,10 @@
 
 	let { data } = $props();
 
-	// Instantiate Superforms with Toast feedback on submit/error
+	// 1. Instantiate Realtime Stream Class Rune
+	const realtime = new RealtimeStream();
+
+	// 2. Superforms Setup
 	// svelte-ignore state_referenced_locally
 	const projectSuperForm = superForm(data.form, {
 		onUpdated({ form }) {
@@ -32,19 +35,18 @@
 		enhance: projectEnhance
 	} = projectSuperForm;
 
-	// Realtime stream rune
-	const realtime = new RealtimeStream();
-
+	// 3. Client-Side Hono RPC Test
 	let rpcLoading = $state(false);
+	let liveRpcStatus = $state<string | null>(null);
 
-	// Client-side Hono RPC Test with Toast Notifications
 	async function testHonoRpc() {
 		rpcLoading = true;
 		try {
 			const res = await api.api.projects.$get();
 			if (res.ok) {
 				const json = await res.json();
-				toast.success(`RPC Success (200 OK): Loaded ${json.projects.length} project(s)`);
+				liveRpcStatus = `Success: Loaded ${json.projects.length} project(s) directly from RPC`;
+				toast.success(liveRpcStatus);
 			} else {
 				toast.error(`RPC Error (${res.status}): ${res.statusText}`);
 			}
@@ -54,15 +56,16 @@
 			rpcLoading = false;
 		}
 	}
+
+	// 4. UploadThing Client Setup
 	let uploadedFileUrl = $state<string | null>(null);
 	let isUploading = $state(false);
 
-	// 👈 Use createUploader with typed error parameter
 	const uploader = createUploadThing('imageUploader', {
 		onClientUploadComplete: (res) => {
 			isUploading = false;
 			if (res && res[0]) {
-				uploadedFileUrl = res[0].url;
+				uploadedFileUrl = res[0].ufsUrl || res[0].url;
 				toast.success('Image uploaded successfully!');
 			}
 		},
@@ -80,22 +83,21 @@
 		}
 	}
 
-	// Rate Limit Test
+	// 5. Rate Limit Test
 	let rateLimitMessage = $state<string | null>(null);
+
 	async function testRateLimit() {
 		try {
 			const res = await api.api['rate-limited-test'].$get();
 			const json = await res.json();
 			rateLimitMessage = JSON.stringify(json, null, 2);
 
-			// 1. Ensure json is a valid non-null object before using 'in'
 			if (json && typeof json === 'object') {
 				if (res.ok && 'message' in json && typeof json.message === 'string') {
 					toast.success(json.message);
 				} else if ('error' in json && typeof json.error === 'string') {
 					toast.error(json.error);
 				} else {
-					// Fallback for unexpected object shapes
 					toast.info(`Request completed with status ${res.status}`);
 				}
 			} else {
@@ -118,7 +120,6 @@
 				Delighters.
 			</p>
 		</div>
-		<!--  Theme Toggle Button -->
 		<ThemeToggle />
 	</div>
 
@@ -229,7 +230,6 @@
 					No projects found. Add one above to test write capabilities.
 				</p>
 			{:else}
-				<!--  use:autoAnimate handles smooth adding/removing animations -->
 				<ul use:autoAnimate class="space-y-2">
 					{#each data.existingProjects as project (project.id)}
 						<li
@@ -273,59 +273,60 @@
 			<div>
 				<h2 class="text-lg font-semibold">3. Client-Side Hono RPC Test</h2>
 				<p class="text-xs text-muted-foreground">
-					Tests end-to-end client fetch via <code>hc&lt;AppType&gt;()</code>
+					Preloaded status from <code>+page.ts</code>:
+					<span class="font-mono text-primary">{data.rpcDiagnostics.status}</span>
 				</p>
 			</div>
 			<Button variant="outline" size="sm" onclick={testHonoRpc} disabled={rpcLoading}>
 				{rpcLoading ? 'Testing...' : 'Ping Hono API'}
 			</Button>
 		</div>
+		{#if liveRpcStatus}
+			<p class="font-mono text-xs text-emerald-500">{liveRpcStatus}</p>
+		{/if}
 	</section>
 
-	<!-- 4. REALTIME SSE STREAM -->
+	<!-- 4. REALTIME SSE STREAM (POWERED BY CLASS RUNE) -->
 	<section class="space-y-4 rounded-xl border border-border bg-card p-5">
 		<div class="flex items-center justify-between">
-			<div>
-				<h2 class="flex items-center gap-2 text-lg font-semibold">
-					<span
-						class="size-2.5 rounded-full {realtime.status === 'connected'
-							? 'animate-pulse bg-emerald-500'
-							: 'bg-destructive'}"
-					></span>
-					4. Realtime SSE Stream (Vercel Ready)
-				</h2>
-				<p class="text-xs text-muted-foreground">
-					Live server-pushed updates via Hono SSE and Svelte 5 Runes.
-				</p>
-			</div>
-			<span class="rounded border border-border bg-muted px-2 py-1 font-mono text-xs uppercase">
-				{realtime.status}
+			<h3 class="text-lg font-semibold">4. Realtime Event Stream</h3>
+			<span
+				class="rounded-full px-2 py-1 font-mono text-xs
+        {realtime.status === 'connected'
+					? 'border border-green-500/20 bg-green-500/10 text-green-500'
+					: ''}
+        {realtime.status === 'connecting'
+					? 'border border-amber-500/20 bg-amber-500/10 text-amber-500'
+					: ''}
+        {realtime.status === 'disconnected'
+					? 'border border-red-500/20 bg-red-500/10 text-red-500'
+					: ''}"
+			>
+				● {realtime.status}
+				{realtime.lastHeartbeat ? `(${realtime.lastHeartbeat})` : ''}
 			</span>
 		</div>
 
-		{#if realtime.lastPayload}
-			<div class="space-y-1 rounded-md border border-border bg-muted p-3 font-mono text-xs">
-				<p><strong class="text-foreground">Last Ping:</strong> {realtime.lastPayload.timestamp}</p>
-				<p>
-					<strong class="text-foreground">Total Pings Received:</strong>
-					{realtime.lastPayload.pingCount}
-				</p>
-			</div>
-
-			<div class="space-y-1 border-t border-border pt-2">
-				<p class="text-xs font-medium text-muted-foreground">Recent Stream History:</p>
-				<!--  use:autoAnimate animates stream item insertions -->
-				<ul use:autoAnimate class="space-y-1">
-					{#each realtime.history as item (item.pingCount)}
-						<li class="flex justify-between font-mono text-xs text-muted-foreground">
-							<span>Ping #{item.pingCount}</span>
-							<span>{item.timestamp}</span>
-						</li>
-					{/each}
-				</ul>
-			</div>
+		{#if realtime.events.length === 0}
+			<p class="text-xs text-muted-foreground italic">
+				No events received yet. Create a project or upload a file to broadcast a message...
+			</p>
 		{:else}
-			<p class="text-xs text-muted-foreground italic">Connecting to live stream...</p>
+			<div class="max-h-60 space-y-2 overflow-y-auto font-mono text-xs">
+				{#each realtime.events as event, i (i)}
+					<div class="flex flex-col gap-1 rounded border border-border bg-muted/50 p-2.5">
+						<div class="flex justify-between font-bold text-primary">
+							<span>{event.type}</span>
+							<span class="font-normal text-muted-foreground">{event.timestamp}</span>
+						</div>
+						<pre class="overflow-x-auto text-[11px] text-muted-foreground">{JSON.stringify(
+								event.payload,
+								null,
+								2
+							)}</pre>
+					</div>
+				{/each}
+			</div>
 		{/if}
 	</section>
 
