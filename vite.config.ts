@@ -1,7 +1,6 @@
 import adapter from '@sveltejs/adapter-auto';
 import { sveltekit } from '@sveltejs/kit/vite';
 import tailwindcss from '@tailwindcss/vite';
-import { triggerkit } from 'triggerkit';
 import { defineConfig } from 'vite';
 
 export default defineConfig({
@@ -24,7 +23,6 @@ export default defineConfig({
 					config.include.push('../drizzle.config.ts');
 				}
 			}
-		}),
-		triggerkit()
+		})
 	]
 });
