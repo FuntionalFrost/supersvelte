@@ -1,12 +1,12 @@
 // src/routes/test/+page.ts
-import { api } from '$lib/api-client';
+import { client } from '$lib/api-client';
 
 export const load = async ({ fetch, data }) => {
 	let initialRpcStatus: string;
 	let initialRpcCount = 0;
 
 	try {
-		const res = await api.api.projects.$get({ fetch });
+		const res = await client.api.projects.$get({ fetch });
 		if (res.ok) {
 			const json = await res.json();
 			initialRpcStatus = '200 OK (Loaded via +page.ts)';

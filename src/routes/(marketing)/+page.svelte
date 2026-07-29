@@ -1,6 +1,7 @@
 <!-- src/routes/(marketing)/+page.svelte -->
 <script lang="ts">
 	import { resolve } from '$app/paths';
+	import CodeComparison from '$lib/components/CodeComparison.svelte';
 	import { matrices, type Mode } from '$lib/config/comparison';
 	import {
 		ArrowRight,
@@ -79,43 +80,54 @@
 	<section class="border-b border-border/40 bg-muted/30 py-16">
 		<div class="container mx-auto max-w-6xl px-4">
 			<div class="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-6">
+				<!-- 1. Svelte 5 (Amber) -->
 				<div
-					class="group flex flex-col items-center gap-2 rounded-xl border border-border/60 bg-card p-4 text-center transition-all duration-300 hover:-translate-y-1 hover:border-primary/50 hover:shadow-lg hover:shadow-primary/5"
+					class="group flex flex-col items-center gap-2 rounded-xl border border-border/60 bg-card p-4 text-center transition-all duration-300 hover:-translate-y-1 hover:border-amber-400/50 hover:shadow-lg hover:shadow-amber-400/10"
 				>
 					<Zap class="size-6 text-amber-400 transition-transform group-hover:scale-110" />
 					<span class="text-xs font-bold">Svelte 5</span>
 					<span class="text-[11px] text-muted-foreground">Fine-grained Runes</span>
 				</div>
+
+				<!-- 2. Hono RPC (Cyan) -->
 				<div
-					class="group flex flex-col items-center gap-2 rounded-xl border border-border/60 bg-card p-4 text-center transition-all duration-300 hover:-translate-y-1 hover:border-primary/50 hover:shadow-lg hover:shadow-primary/5"
+					class="group flex flex-col items-center gap-2 rounded-xl border border-border/60 bg-card p-4 text-center transition-all duration-300 hover:-translate-y-1 hover:border-cyan-400/50 hover:shadow-lg hover:shadow-cyan-400/10"
 				>
 					<Cpu class="size-6 text-cyan-400 transition-transform group-hover:scale-110" />
 					<span class="text-xs font-bold">Hono RPC</span>
 					<span class="text-[11px] text-muted-foreground">0-Codegen API</span>
 				</div>
+
+				<!-- 3. Drizzle + Neon (Emerald) -->
 				<div
-					class="group flex flex-col items-center gap-2 rounded-xl border border-border/60 bg-card p-4 text-center transition-all duration-300 hover:-translate-y-1 hover:border-primary/50 hover:shadow-lg hover:shadow-primary/5"
+					class="group flex flex-col items-center gap-2 rounded-xl border border-border/60 bg-card p-4 text-center transition-all duration-300 hover:-translate-y-1 hover:border-emerald-400/50 hover:shadow-lg hover:shadow-emerald-400/10"
 				>
 					<Database class="size-6 text-emerald-400 transition-transform group-hover:scale-110" />
 					<span class="text-xs font-bold">Drizzle + Neon</span>
 					<span class="text-[11px] text-muted-foreground">Serverless Postgres</span>
 				</div>
+
+				<!-- 4. Better Auth (Indigo) -->
 				<div
-					class="group flex flex-col items-center gap-2 rounded-xl border border-border/60 bg-card p-4 text-center transition-all duration-300 hover:-translate-y-1 hover:border-primary/50 hover:shadow-lg hover:shadow-primary/5"
+					class="group flex flex-col items-center gap-2 rounded-xl border border-border/60 bg-card p-4 text-center transition-all duration-300 hover:-translate-y-1 hover:border-indigo-400/50 hover:shadow-lg hover:shadow-indigo-400/10"
 				>
 					<ShieldCheck class="size-6 text-indigo-400 transition-transform group-hover:scale-110" />
 					<span class="text-xs font-bold">Better Auth</span>
 					<span class="text-[11px] text-muted-foreground">Sessions & Social</span>
 				</div>
+
+				<!-- 5. Upstash Redis (Red) -->
 				<div
-					class="group flex flex-col items-center gap-2 rounded-xl border border-border/60 bg-card p-4 text-center transition-all duration-300 hover:-translate-y-1 hover:border-primary/50 hover:shadow-lg hover:shadow-primary/5"
+					class="group flex flex-col items-center gap-2 rounded-xl border border-border/60 bg-card p-4 text-center transition-all duration-300 hover:-translate-y-1 hover:border-red-400/50 hover:shadow-lg hover:shadow-red-400/10"
 				>
 					<Cloud class="size-6 text-red-400 transition-transform group-hover:scale-110" />
 					<span class="text-xs font-bold">Upstash Redis</span>
 					<span class="text-[11px] text-muted-foreground">Cache & SSE Queue</span>
 				</div>
+
+				<!-- 6. Resend & UT (Pink) -->
 				<div
-					class="group flex flex-col items-center gap-2 rounded-xl border border-border/60 bg-card p-4 text-center transition-all duration-300 hover:-translate-y-1 hover:border-primary/50 hover:shadow-lg hover:shadow-primary/5"
+					class="group flex flex-col items-center gap-2 rounded-xl border border-border/60 bg-card p-4 text-center transition-all duration-300 hover:-translate-y-1 hover:border-pink-400/50 hover:shadow-lg hover:shadow-pink-400/10"
 				>
 					<Mail class="size-6 text-pink-400 transition-transform group-hover:scale-110" />
 					<span class="text-xs font-bold">Resend & UT</span>
@@ -286,6 +298,8 @@
 			</div>
 		</div>
 	</section>
+
+	<CodeComparison />
 
 	<!-- 5. FOOTER CTA -->
 	<footer class="border-t border-border/40 bg-card py-16 text-center">

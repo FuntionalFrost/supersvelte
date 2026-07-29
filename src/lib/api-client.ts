@@ -8,4 +8,4 @@ export function createApiClient(customFetch?: typeof fetch) {
 }
 
 // Client-side default instance
-export const api = createApiClient();
+export const client = createApiClient();

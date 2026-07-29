@@ -42,3 +42,5 @@ export const ourFileRouter = {
 			return { url: file.ufsUrl, fileId: insertedFile.id };
 		})
 } satisfies FileRouter;
+
+export type OurFileRouter = typeof ourFileRouter;

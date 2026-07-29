@@ -1,9 +1,10 @@
-// src/lib/server/api.ts
+// src/lib/server/index.ts
 import { auth } from '$lib/server/auth';
 import { db } from '$lib/server/db';
 import { getProjects, invalidateProjectsCache } from '$lib/server/db/queries';
 import { projects } from '$lib/server/db/schema';
 import { checkRateLimit } from '$lib/server/ratelimit';
+import { eq } from 'drizzle-orm';
 import { Hono } from 'hono';
 import { streamSSE } from 'hono/streaming';
 
@@ -39,10 +40,28 @@ const projectsApp = new Hono()
 		await invalidateProjectsCache();
 
 		return c.json({ success: true, project: newProject });
+	})
+	.delete('/:id', async (c) => {
+		const id = c.req.param('id');
+
+		// 1. Delete from Neon Postgres via Drizzle
+		await db.delete(projects).where(eq(projects.id, id));
+
+		// 2. 🧹 Invalidate Redis cache so stale lists don't persist
+		await invalidateProjectsCache();
+
+		return c.json({ success: true, deletedId: id });
 	});
+
 export const app = new Hono()
 	.basePath('/api')
 	.route('/projects', projectsApp)
+
+	// Add the echo endpoint here:
+	.post('/echo', async (c) => {
+		const { message } = await c.req.json();
+		return c.json({ echo: message, length: message?.length ?? 0 });
+	})
 
 	// Rate Limiting Route
 	.get('/rate-limited-test', async (c) => {

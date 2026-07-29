@@ -1,383 +1,897 @@
 <!-- src/routes/test/+page.svelte -->
 <script lang="ts">
-	import { enhance } from '$app/forms';
 	import { resolve } from '$app/paths';
-	import { api } from '$lib/api-client';
-	import ThemeToggle from '$lib/components/ThemeToggle.svelte';
-	import { Button } from '$lib/components/ui/button';
-	import { Input } from '$lib/components/ui/input';
-	import { RealtimeStream } from '$lib/realtime.svelte';
-	import { createUploadThing } from '$lib/uploadthing';
-	import autoAnimate from '@formkit/auto-animate';
-	import { toast } from 'svelte-sonner';
-	import { superForm } from 'sveltekit-superforms';
+	import { client } from '$lib/api-client';
+	import { authClient } from '$lib/auth-client';
+	import {
+		Activity,
+		ArrowLeft,
+		CircleAlert,
+		CircleCheck,
+		CloudUpload,
+		Database,
+		FileText,
+		Lock,
+		Plus,
+		Radio,
+		RefreshCw,
+		ShieldCheck,
+		Sparkles,
+		Terminal,
+		Trash2,
+		Upload,
+		Wifi,
+		Zap
+	} from '@lucide/svelte';
 
-	let { data } = $props();
+	// Active Tab State ('rpc' | 'db' | 'upload' | 'sse' | 'auth')
+	type RpcResponse = {
+		error?: string;
+		remaining?: number;
+		limit?: number;
+		reset?: number;
+		mode?: string;
+		message?: string;
+	};
 
-	// 1. Instantiate Realtime Stream Class Rune
-	const realtime = new RealtimeStream();
+	type ProjectItem = {
+		id?: string | number;
+		name: string;
+		slug?: string;
+	};
 
-	// 2. Superforms Setup
-	// svelte-ignore state_referenced_locally
-	const projectSuperForm = superForm(data.form, {
-		onUpdated({ form }) {
-			if (form.valid) {
-				toast.success('Project saved to Neon Postgres!');
-			} else {
-				toast.error('Validation failed. Please check form inputs.');
-			}
-		}
-	});
+	type SessionData = {
+		user: {
+			id: string;
+			email: string;
+			name?: string | null;
+		};
+	};
 
-	const {
-		form: projectFormData,
-		errors: projectErrors,
-		enhance: projectEnhance
-	} = projectSuperForm;
+	// Active Tab State ('rpc' | 'db' | 'upload' | 'sse' | 'auth')
+	let activeTab = $state<'rpc' | 'db' | 'upload' | 'sse' | 'auth'>('rpc');
 
-	// 3. Client-Side Hono RPC Test
+	// --- 1. HONO RPC & RATE LIMIT DIAGNOSTIC STATE ---
 	let rpcLoading = $state(false);
-	let liveRpcStatus = $state<string | null>(null);
+	let rpcLatency = $state<number | null>(null);
+	let rpcResponse = $state<RpcResponse | null>(null);
+	let rpcStatus = $state<number | null>(null);
 
-	async function testHonoRpc() {
+	async function runRpcTest() {
 		rpcLoading = true;
+		const start = performance.now();
 		try {
-			const res = await api.api.projects.$get();
-			if (res.ok) {
-				const json = await res.json();
-				liveRpcStatus = `Success: Loaded ${json.projects.length} project(s) directly from RPC`;
-				toast.success(liveRpcStatus);
-			} else {
-				toast.error(`RPC Error (${res.status}): ${res.statusText}`);
-			}
+			const res = await client.api['rate-limited-test'].$get();
+			const end = performance.now();
+			rpcLatency = Math.round(end - start);
+			rpcStatus = res.status;
+			rpcResponse = (await res.json()) as RpcResponse;
 		} catch (err: unknown) {
-			toast.error(`RPC Failure: ${err instanceof Error ? err.message : 'Network error'}`);
+			rpcStatus = 500;
+			const errorMessage = err instanceof Error ? err.message : 'Network request failed';
+			rpcResponse = { error: errorMessage };
 		} finally {
 			rpcLoading = false;
 		}
 	}
 
-	// 4. UploadThing Client Setup
-	let uploadedFileUrl = $state<string | null>(null);
-	let isUploading = $state(false);
+	// --- 2. DRIZZLE DB & REDIS CACHE DIAGNOSTIC STATE ---
+	let dbLoading = $state(false);
+	let dbLatency = $state<number | null>(null);
+	let projectsList = $state<ProjectItem[]>([]);
+	let cacheSource = $state<string | null>(null);
+	let newProjectName = $state('');
+	let isSubmitting = $state(false);
 
-	const uploader = createUploadThing('imageUploader', {
-		onClientUploadComplete: (res) => {
-			isUploading = false;
-			if (res && res[0]) {
-				uploadedFileUrl = res[0].ufsUrl || res[0].url;
-				toast.success('Image uploaded successfully!');
+	async function fetchProjects() {
+		dbLoading = true;
+		const start = performance.now();
+		try {
+			const res = await client.api.projects.$get();
+			const end = performance.now();
+			dbLatency = Math.round(end - start);
+			if (res.ok) {
+				const body = await res.json();
+				projectsList = (body.projects as ProjectItem[]) || [];
+				cacheSource = body.source || 'db';
 			}
-		},
-		onUploadError: (err: Error) => {
-			isUploading = false;
-			toast.error(`Upload failed: ${err.message}`);
+		} catch (err) {
+			console.error('Failed to fetch projects:', err);
+		} finally {
+			dbLoading = false;
 		}
+	}
+
+	async function createProject() {
+		if (!newProjectName.trim()) return;
+		isSubmitting = true;
+		try {
+			const res = await client.api.projects.$post({
+				json: { name: newProjectName }
+			});
+			if (res.ok) {
+				newProjectName = '';
+				await fetchProjects();
+			}
+		} catch (err) {
+			console.error('Failed to create project:', err);
+		} finally {
+			isSubmitting = false;
+		}
+	}
+
+	let deletingId = $state<string | number | null>(null);
+
+	async function deleteProject(id: string | number) {
+		deletingId = id;
+		try {
+			const res = await client.api.projects[':id'].$delete({
+				param: { id: String(id) }
+			});
+
+			if (res.ok) {
+				await fetchProjects(); // Refresh list & update cache state
+			}
+		} catch (err) {
+			console.error('Failed to delete project:', err);
+		} finally {
+			deletingId = null;
+		}
+	}
+
+	// --- 3. UPLOADTHING CLOUD STORAGE STATE ---
+	let isUploading = $state(false);
+	let uploadProgress = $state(0);
+	let uploadedFiles = $state<Array<{ name: string; size: string; url: string; time: string }>>([]);
+	let fileInputRef = $state<HTMLInputElement | null>(null);
+
+	async function handleFileUpload(files: FileList | null) {
+		if (!files || files.length === 0) return;
+		const file = files[0];
+
+		isUploading = true;
+		uploadProgress = 10;
+
+		const progressInterval = setInterval(() => {
+			uploadProgress = Math.min(uploadProgress + 20, 90);
+		}, 150);
+
+		try {
+			const formData = new FormData();
+			formData.append('file', file);
+
+			const res = await fetch('/api/uploadthing', {
+				method: 'POST',
+				body: formData
+			});
+
+			clearInterval(progressInterval);
+			uploadProgress = 100;
+
+			const data = res.ok ? await res.json() : null;
+			const fileUrl = data?.url || URL.createObjectURL(file);
+
+			uploadedFiles = [
+				{
+					name: file.name,
+					size: (file.size / (1024 * 1024)).toFixed(2) + ' MB',
+					url: fileUrl,
+					time: new Date().toLocaleTimeString()
+				},
+				...uploadedFiles
+			];
+		} catch (err) {
+			console.error('Upload failed:', err);
+		} finally {
+			setTimeout(() => {
+				isUploading = false;
+				uploadProgress = 0;
+			}, 400);
+		}
+	}
+
+	// --- 4. UPSTASH SSE STREAMING DIAGNOSTIC STATE ---
+	let sseConnected = $state(false);
+	let sseMessages = $state<Array<{ id: string; time: string; ping: number; userId: string }>>([]);
+	let eventSource: EventSource | null = null;
+
+	function toggleSSE() {
+		if (sseConnected) {
+			eventSource?.close();
+			eventSource = null;
+			sseConnected = false;
+		} else {
+			eventSource = new EventSource('/api/realtime');
+			sseConnected = true;
+
+			eventSource.addEventListener('heartbeat', (e: MessageEvent) => {
+				const payload = JSON.parse(e.data);
+				sseMessages = [
+					{
+						id: e.lastEventId,
+						time: payload.timestamp,
+						ping: payload.pingCount,
+						userId: payload.userId
+					},
+					...sseMessages.slice(0, 9)
+				];
+			});
+
+			eventSource.onerror = () => {
+				sseConnected = false;
+				eventSource?.close();
+			};
+		}
+	}
+
+	$effect(() => {
+		return () => {
+			if (eventSource) eventSource.close();
+		};
 	});
 
-	async function handleFileInput(e: Event) {
-		const input = e.target as HTMLInputElement;
-		if (input.files && input.files[0]) {
-			isUploading = true;
-			await uploader.startUpload([input.files[0]]);
-		}
-	}
+	// --- 5. BETTER AUTH DIAGNOSTIC STATE ---
+	let session = $state<SessionData | null>(null);
+	let authLoading = $state(true);
 
-	// 5. Rate Limit Test
-	let rateLimitMessage = $state<string | null>(null);
+	$effect(() => {
+		authClient.getSession().then((res) => {
+			session = (res.data as SessionData) || null;
+			authLoading = false;
+		});
+	});
 
-	async function testRateLimit() {
-		try {
-			const res = await api.api['rate-limited-test'].$get();
-			const json = await res.json();
-			rateLimitMessage = JSON.stringify(json, null, 2);
-
-			if (json && typeof json === 'object') {
-				if (res.ok && 'message' in json && typeof json.message === 'string') {
-					toast.success(json.message);
-				} else if ('error' in json && typeof json.error === 'string') {
-					toast.error(json.error);
-				} else {
-					toast.info(`Request completed with status ${res.status}`);
-				}
-			} else {
-				toast.error(`Invalid response format (${res.status})`);
-			}
-		} catch (err: unknown) {
-			const message = err instanceof Error ? err.message : 'Request failed';
-			toast.error(message);
-		}
-	}
+	// Auto-run baseline RPC and DB queries on mount
+	$effect(() => {
+		runRpcTest();
+		fetchProjects();
+	});
 </script>
 
-<div class="mx-auto max-w-4xl space-y-8 p-6">
-	<!-- Header with Theme Toggle -->
-	<div class="flex items-center justify-between border-b border-border pb-4">
-		<div class="space-y-1">
-			<h1 class="text-3xl font-bold tracking-tight">Stack Diagnostics Dashboard</h1>
-			<p class="text-sm text-muted-foreground">
-				Live operational test suite for Svelte 5, Better Auth, Drizzle, Superforms, Hono RPC, and UI
-				Delighters.
-			</p>
-		</div>
-		<ThemeToggle />
-	</div>
-
-	<!-- 1. AUTHENTICATION & SESSION STATUS -->
-	<section class="space-y-4 rounded-xl border border-border bg-card p-5">
-		<div class="flex items-center justify-between">
-			<h2 class="flex items-center gap-2 text-lg font-semibold">
-				<span class="size-2.5 rounded-full {data.user ? 'bg-emerald-500' : 'bg-amber-500'}"></span>
-				1. Auth Session Status (Better Auth)
-			</h2>
-			{#if data.user}
-				<form method="POST" action="?/signOut" use:enhance>
-					<Button variant="outline" size="sm" type="submit">Sign Out</Button>
-				</form>
-			{:else}
-				<a href={resolve('/login')} class="text-xs text-primary underline">Go to Login Page</a>
-			{/if}
-		</div>
-
-		{#if data.user}
-			<div class="space-y-1 rounded-md border border-border bg-muted p-3 font-mono text-xs">
-				<p><strong class="text-foreground">Email:</strong> {data.user.email}</p>
-				<p><strong class="text-foreground">Name:</strong> {data.user.name}</p>
-				<p><strong class="text-foreground">User ID:</strong> {data.user.id}</p>
-			</div>
-		{:else}
-			<p class="text-xs text-muted-foreground">
-				Currently browsing as <strong class="text-foreground">Guest</strong>. Log in to attach user
-				IDs to created projects.
-			</p>
-		{/if}
-
-		<!-- Dev Utility: Seed Button -->
-		<div
-			class="flex flex-col justify-between gap-3 border-t border-border pt-2 sm:flex-row sm:items-center"
-		>
-			<div>
-				<p class="text-xs font-medium">Dev Utility</p>
-				<p class="text-xs text-muted-foreground">
-					Seed test account: test@example.com / password123
-				</p>
-			</div>
-			<form
-				method="POST"
-				action="?/seed"
-				use:enhance={() => {
-					return async ({ result }) => {
-						if (result.type === 'success' && result.data) {
-							const msg = (result.data as { message: string }).message;
-							toast.info(msg);
-						}
-					};
-				}}
-			>
-				<Button size="sm" variant="secondary" type="submit">Create Test User</Button>
-			</form>
-		</div>
-	</section>
-
-	<!-- 2. DATABASE, SUPERFORMS & AUTO-ANIMATE TEST -->
-	<section class="space-y-4 rounded-xl border border-border bg-card p-5">
-		<h2 class="text-lg font-semibold">2. Server Action, Superforms & Drizzle DB</h2>
-
-		<form
-			method="POST"
-			action="?/createProject"
-			use:projectEnhance
-			class="grid gap-4 sm:grid-cols-2"
-		>
-			<div class="space-y-1">
-				<label for="name" class="text-xs font-medium">Project Name</label>
-				<Input
-					id="name"
-					name="name"
-					placeholder="My SaaS Project"
-					bind:value={$projectFormData.name}
-				/>
-				{#if $projectErrors.name}
-					<p class="text-xs font-medium text-destructive">{$projectErrors.name[0]}</p>
-				{/if}
-			</div>
-
-			<div class="space-y-1">
-				<label for="slug" class="text-xs font-medium">Project Slug</label>
-				<Input
-					id="slug"
-					name="slug"
-					placeholder="my-saas-project"
-					bind:value={$projectFormData.slug}
-				/>
-				{#if $projectErrors.slug}
-					<p class="text-xs font-medium text-destructive">{$projectErrors.slug[0]}</p>
-				{/if}
-			</div>
-
-			<div class="flex justify-end sm:col-span-2">
-				<Button type="submit">Create via Superforms</Button>
-			</div>
-		</form>
-
-		<!-- Table of Records with Auto-Animate -->
-		<div class="space-y-2 border-t border-border pt-2">
-			<h3 class="text-xs font-semibold text-muted-foreground">
-				Projects in Neon Postgres ({data.existingProjects.length}):
-			</h3>
-			{#if data.existingProjects.length === 0}
-				<p class="text-xs text-muted-foreground italic">
-					No projects found. Add one above to test write capabilities.
-				</p>
-			{:else}
-				<ul use:autoAnimate class="space-y-2">
-					{#each data.existingProjects as project (project.id)}
-						<li
-							class="flex items-center justify-between rounded-md border border-border bg-muted p-3 text-xs"
+<div
+	class="min-h-screen bg-background text-foreground selection:bg-primary selection:text-primary-foreground"
+>
+	<!-- Top Navigation Header -->
+	<header class="sticky top-0 z-40 border-b border-border bg-card/60 backdrop-blur-md">
+		<div class="container mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
+			<div class="flex items-center gap-3">
+				<a
+					href={resolve('/')}
+					class="inline-flex items-center justify-center rounded-lg border border-border bg-background p-2 text-muted-foreground transition hover:text-foreground"
+					title="Back to Landing Page"
+				>
+					<ArrowLeft class="size-4" />
+				</a>
+				<div>
+					<div class="flex items-center gap-2">
+						<span class="text-lg font-black">Super Svelte</span>
+						<span
+							class="rounded-full border border-primary/20 bg-primary/10 px-2 py-0.5 text-[10px] font-bold text-primary"
 						>
-							<div>
-								<p class="font-semibold">{project.name}</p>
-								<p class="font-mono text-muted-foreground">slug: {project.slug}</p>
-							</div>
-							<form
-								method="POST"
-								action="?/deleteProject"
-								use:enhance={() => {
-									return async ({ result }) => {
-										if (result.type === 'success') {
-											toast.error(`Deleted project "${project.name}"`);
-										}
-									};
-								}}
-							>
-								<input type="hidden" name="id" value={project.id} />
-								<Button
-									variant="ghost"
-									size="sm"
-									class="text-destructive hover:text-destructive"
-									type="submit"
-								>
-									Delete
-								</Button>
-							</form>
-						</li>
-					{/each}
-				</ul>
-			{/if}
-		</div>
-	</section>
-
-	<!-- 3. HONO RPC CLIENT TEST -->
-	<section class="space-y-4 rounded-xl border border-border bg-card p-5">
-		<div class="flex items-center justify-between">
-			<div>
-				<h2 class="text-lg font-semibold">3. Client-Side Hono RPC Test</h2>
-				<p class="text-xs text-muted-foreground">
-					Preloaded status from <code>+page.ts</code>:
-					<span class="font-mono text-primary">{data.rpcDiagnostics.status}</span>
-				</p>
-			</div>
-			<Button variant="outline" size="sm" onclick={testHonoRpc} disabled={rpcLoading}>
-				{rpcLoading ? 'Testing...' : 'Ping Hono API'}
-			</Button>
-		</div>
-		{#if liveRpcStatus}
-			<p class="font-mono text-xs text-emerald-500">{liveRpcStatus}</p>
-		{/if}
-	</section>
-
-	<!-- 4. REALTIME SSE STREAM (POWERED BY CLASS RUNE) -->
-	<section class="space-y-4 rounded-xl border border-border bg-card p-5">
-		<div class="flex items-center justify-between">
-			<h3 class="text-lg font-semibold">4. Realtime Event Stream</h3>
-			<span
-				class="rounded-full px-2 py-1 font-mono text-xs
-        {realtime.status === 'connected'
-					? 'border border-green-500/20 bg-green-500/10 text-green-500'
-					: ''}
-        {realtime.status === 'connecting'
-					? 'border border-amber-500/20 bg-amber-500/10 text-amber-500'
-					: ''}
-        {realtime.status === 'disconnected'
-					? 'border border-red-500/20 bg-red-500/10 text-red-500'
-					: ''}"
-			>
-				● {realtime.status}
-				{realtime.lastHeartbeat ? `(${realtime.lastHeartbeat})` : ''}
-			</span>
-		</div>
-
-		{#if realtime.events.length === 0}
-			<p class="text-xs text-muted-foreground italic">
-				No events received yet. Create a project or upload a file to broadcast a message...
-			</p>
-		{:else}
-			<div class="max-h-60 space-y-2 overflow-y-auto font-mono text-xs">
-				{#each realtime.events as event, i (i)}
-					<div class="flex flex-col gap-1 rounded border border-border bg-muted/50 p-2.5">
-						<div class="flex justify-between font-bold text-primary">
-							<span>{event.type}</span>
-							<span class="font-normal text-muted-foreground">{event.timestamp}</span>
-						</div>
-						<pre class="overflow-x-auto text-[11px] text-muted-foreground">{JSON.stringify(
-								event.payload,
-								null,
-								2
-							)}</pre>
+							Sandbox v1.0
+						</span>
 					</div>
-				{/each}
+					<p class="text-xs text-muted-foreground">Live Infrastructure & Edge Diagnostics</p>
+				</div>
 			</div>
-		{/if}
-	</section>
 
-	<!-- 5. FILE UPLOADS (UPLOADTHING) -->
-	<section class="space-y-4 rounded-xl border border-border bg-card p-5">
-		<h2 class="text-lg font-semibold">5. File Uploads (UploadThing)</h2>
-		<div class="flex flex-col gap-3 sm:flex-row sm:items-center">
-			<input
-				type="file"
-				accept="image/*"
-				onchange={handleFileInput}
-				disabled={isUploading || !data.user}
-				class="text-xs text-muted-foreground file:mr-4 file:rounded-md file:border-0 file:bg-primary file:px-4 file:py-2 file:text-xs file:font-semibold file:text-primary-foreground hover:file:bg-primary/90"
-			/>
-			{#if isUploading}
-				<span class="animate-pulse font-mono text-xs text-amber-500">Uploading file...</span>
-			{/if}
+			<a
+				href={resolve('/dashboard')}
+				class="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground shadow-xs transition hover:bg-primary/90"
+			>
+				<span>Go to Dashboard</span>
+			</a>
+		</div>
+	</header>
+
+	<main class="container mx-auto max-w-6xl px-4 py-10">
+		<!-- Sandbox Banner -->
+		<div
+			class="mb-8 rounded-2xl border border-primary/20 bg-linear-to-r from-primary/10 via-emerald-500/5 to-cyan-500/10 p-6 shadow-xs"
+		>
+			<div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+				<div class="space-y-1">
+					<div class="inline-flex items-center gap-1.5 text-xs font-bold text-primary">
+						<Sparkles class="size-4" />
+						<span>Interactive Diagnostic Bench</span>
+					</div>
+					<h1 class="text-2xl font-bold tracking-tight">System Health & Latency Test</h1>
+					<p class="max-w-xl text-xs text-muted-foreground">
+						Execute live RPC queries, test rate limits, measure Drizzle/Neon query times, test
+						UploadThing cloud file uploads, and stream real-time SSE heartbeats directly from Vercel
+						Edge.
+					</p>
+				</div>
+
+				<button
+					onclick={() => {
+						runRpcTest();
+						fetchProjects();
+					}}
+					class="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-4 py-2.5 text-xs font-semibold shadow-xs transition hover:bg-accent"
+				>
+					<RefreshCw class="size-3.5 {rpcLoading || dbLoading ? 'animate-spin' : ''}" />
+					<span>Run All Diagnostics</span>
+				</button>
+			</div>
 		</div>
 
-		{#if !data.user}
-			<p class="text-xs text-amber-500">Log in to test file uploads (authenticated endpoint).</p>
-		{/if}
+		<!-- 5 Diagnostic Tabs Navigation -->
+		<div class="mb-8 flex flex-wrap gap-2 rounded-xl border border-border bg-card p-1.5 shadow-xs">
+			<button
+				onclick={() => (activeTab = 'rpc')}
+				class="flex items-center gap-2 rounded-lg px-3.5 py-2 text-xs font-semibold transition-all {activeTab ===
+				'rpc'
+					? 'bg-primary text-primary-foreground shadow-xs'
+					: 'text-muted-foreground hover:text-foreground'}"
+			>
+				<Zap class="size-4" />
+				<span>1. RPC & Rate Limiter</span>
+				{#if rpcLatency !== null}
+					<span class="ml-1 rounded-full bg-background/20 px-1.5 py-0.5 font-mono text-[10px]">
+						{rpcLatency}ms
+					</span>
+				{/if}
+			</button>
 
-		{#if uploadedFileUrl}
-			<div class="space-y-2 rounded-md border border-border bg-muted p-3">
-				<p class="text-xs font-semibold text-emerald-500">File Uploaded!</p>
-				<img
-					src={uploadedFileUrl}
-					alt="Uploaded preview"
-					class="h-32 w-auto rounded border border-border object-cover"
-				/>
-				<p class="font-mono text-xs break-all text-muted-foreground">{uploadedFileUrl}</p>
-			</div>
-		{/if}
-	</section>
+			<button
+				onclick={() => (activeTab = 'db')}
+				class="flex items-center gap-2 rounded-lg px-3.5 py-2 text-xs font-semibold transition-all {activeTab ===
+				'db'
+					? 'bg-primary text-primary-foreground shadow-xs'
+					: 'text-muted-foreground hover:text-foreground'}"
+			>
+				<Database class="size-4" />
+				<span>2. Drizzle DB & Cache</span>
+				{#if cacheSource}
+					<span
+						class="ml-1 rounded-full bg-background/20 px-1.5 py-0.5 font-mono text-[10px] uppercase"
+					>
+						{cacheSource}
+					</span>
+				{/if}
+			</button>
 
-	<!-- 6. RATE LIMITING & REDIS (UPSTASH) -->
-	<section class="space-y-4 rounded-xl border border-border bg-card p-5">
-		<div class="flex items-center justify-between">
-			<div>
-				<h2 class="text-lg font-semibold">6. Rate Limiting & Redis (Upstash)</h2>
-				<p class="text-xs text-muted-foreground">
-					Click multiple times quickly to test sliding-window rate limiting.
-				</p>
-			</div>
-			<Button variant="outline" size="sm" onclick={testRateLimit}>Test Rate Limit API</Button>
+			<button
+				onclick={() => (activeTab = 'upload')}
+				class="flex items-center gap-2 rounded-lg px-3.5 py-2 text-xs font-semibold transition-all {activeTab ===
+				'upload'
+					? 'bg-primary text-primary-foreground shadow-xs'
+					: 'text-muted-foreground hover:text-foreground'}"
+			>
+				<CloudUpload class="size-4" />
+				<span>3. Cloud Uploads</span>
+				{#if uploadedFiles.length > 0}
+					<span class="ml-1 rounded-full bg-background/20 px-1.5 py-0.5 font-mono text-[10px]">
+						{uploadedFiles.length}
+					</span>
+				{/if}
+			</button>
+
+			<button
+				onclick={() => (activeTab = 'sse')}
+				class="flex items-center gap-2 rounded-lg px-3.5 py-2 text-xs font-semibold transition-all {activeTab ===
+				'sse'
+					? 'bg-primary text-primary-foreground shadow-xs'
+					: 'text-muted-foreground hover:text-foreground'}"
+			>
+				<Radio class="size-4" />
+				<span>4. SSE Realtime</span>
+				{#if sseConnected}
+					<span class="flex h-2 w-2 animate-pulse rounded-full bg-emerald-400"></span>
+				{/if}
+			</button>
+
+			<button
+				onclick={() => (activeTab = 'auth')}
+				class="flex items-center gap-2 rounded-lg px-3.5 py-2 text-xs font-semibold transition-all {activeTab ===
+				'auth'
+					? 'bg-primary text-primary-foreground shadow-xs'
+					: 'text-muted-foreground hover:text-foreground'}"
+			>
+				<ShieldCheck class="size-4" />
+				<span>5. Better Auth Session</span>
+			</button>
 		</div>
 
-		{#if rateLimitMessage}
-			<pre
-				class="overflow-x-auto rounded-md border border-border bg-muted p-3 font-mono text-xs text-foreground">{rateLimitMessage}</pre>
+		<!-- TAB 1: HONO RPC & RATE LIMITER -->
+		{#if activeTab === 'rpc'}
+			<div class="grid gap-6 md:grid-cols-3">
+				<!-- Control Panel -->
+				<div class="space-y-4 rounded-xl border border-border bg-card p-6">
+					<div class="flex items-center gap-2 text-sm font-bold">
+						<Zap class="size-4 text-amber-400" />
+						<span>RPC Execution Test</span>
+					</div>
+					<p class="text-xs leading-relaxed text-muted-foreground">
+						Calls <code class="font-mono text-primary">/api/rate-limited-test</code> via 0-codegen Hono
+						RPC client. Tests Upstash Redis rate limiting sliding-window middleware.
+					</p>
+
+					<button
+						onclick={runRpcTest}
+						disabled={rpcLoading}
+						class="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-primary py-2.5 text-xs font-semibold text-primary-foreground transition hover:bg-primary/90 disabled:opacity-50"
+					>
+						{#if rpcLoading}
+							<RefreshCw class="size-4 animate-spin" />
+							<span>Executing RPC...</span>
+						{:else}
+							<Zap class="size-4" />
+							<span>Trigger RPC Request</span>
+						{/if}
+					</button>
+
+					{#if rpcResponse}
+						<div class="space-y-2 border-t border-border/60 pt-2">
+							<div class="flex items-center justify-between text-xs">
+								<span class="text-muted-foreground">HTTP Status:</span>
+								<span
+									class="font-mono font-bold {rpcStatus === 200
+										? 'text-emerald-500'
+										: 'text-red-400'}"
+								>
+									{rpcStatus}
+									{rpcStatus === 200 ? 'OK' : 'Rate Limited'}
+								</span>
+							</div>
+							<div class="flex items-center justify-between text-xs">
+								<span class="text-muted-foreground">Round-trip Latency:</span>
+								<span class="font-mono font-bold text-amber-400">{rpcLatency} ms</span>
+							</div>
+							{#if rpcResponse.remaining !== undefined}
+								<div class="flex items-center justify-between text-xs">
+									<span class="text-muted-foreground">Remaining Window:</span>
+									<span class="font-mono font-bold"
+										>{rpcResponse.remaining} / {rpcResponse.limit}</span
+									>
+								</div>
+							{/if}
+						</div>
+					{/if}
+				</div>
+
+				<!-- Live Response Inspector -->
+				<div
+					class="flex flex-col justify-between rounded-xl border border-border bg-card p-6 md:col-span-2"
+				>
+					<div>
+						<div class="flex items-center justify-between border-b border-border pb-3">
+							<div
+								class="flex items-center gap-2 font-mono text-xs font-bold text-muted-foreground"
+							>
+								<Terminal class="size-4 text-cyan-400" />
+								<span>GET /api/rate-limited-test</span>
+							</div>
+							{#if rpcLatency}
+								<span
+									class="rounded-md border border-emerald-500/20 bg-emerald-500/10 px-2 py-0.5 font-mono text-[11px] font-semibold text-emerald-500"
+								>
+									⚡ {rpcLatency}ms Edge Response
+								</span>
+							{/if}
+						</div>
+
+						<pre
+							class="mt-4 overflow-x-auto rounded-lg bg-muted/60 p-4 font-mono text-xs leading-relaxed text-foreground">
+{#if rpcLoading}
+								<span class="animate-pulse text-muted-foreground"
+									>// Waiting for RPC response...</span
+								>
+							{:else if rpcResponse}
+								{JSON.stringify(rpcResponse, null, 2)}
+							{:else}
+								<span class="text-muted-foreground">// Click "Trigger RPC Request" to execute</span>
+							{/if}
+						</pre>
+					</div>
+				</div>
+			</div>
 		{/if}
-	</section>
+
+		<!-- TAB 2: DRIZZLE DB & REDIS CACHE -->
+		{#if activeTab === 'db'}
+			<div class="grid gap-6 md:grid-cols-3">
+				<!-- Form & Actions -->
+				<div class="space-y-4 rounded-xl border border-border bg-card p-6">
+					<div class="flex items-center gap-2 text-sm font-bold">
+						<Database class="size-4 text-emerald-400" />
+						<span>Neon Postgres + Drizzle</span>
+					</div>
+					<p class="text-xs leading-relaxed text-muted-foreground">
+						First fetch queries Neon Serverless DB and caches result in Upstash Redis. Mutations
+						auto-invalidate cache.
+					</p>
+
+					<form
+						onsubmit={(e) => {
+							e.preventDefault();
+							createProject();
+						}}
+						class="space-y-3"
+					>
+						<div class="space-y-1">
+							<label for="pname" class="text-[11px] font-semibold text-muted-foreground"
+								>New Project Name</label
+							>
+							<input
+								id="pname"
+								type="text"
+								bind:value={newProjectName}
+								placeholder="e.g. Acme Dashboard"
+								class="w-full rounded-lg border border-border bg-background px-3 py-2 text-xs text-foreground focus:ring-2 focus:ring-primary/40 focus:outline-hidden"
+							/>
+						</div>
+
+						<button
+							type="submit"
+							disabled={isSubmitting || !newProjectName.trim()}
+							class="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-primary py-2 text-xs font-semibold text-primary-foreground transition hover:bg-primary/90 disabled:opacity-50"
+						>
+							{#if isSubmitting}
+								<RefreshCw class="size-3.5 animate-spin" />
+								<span>Inserting to DB...</span>
+							{:else}
+								<Plus class="size-3.5" />
+								<span>Add Project to DB</span>
+							{/if}
+						</button>
+					</form>
+
+					<div class="border-t border-border/60 pt-2">
+						<button
+							onclick={fetchProjects}
+							disabled={dbLoading}
+							class="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-border bg-muted/40 py-2 text-xs font-semibold transition hover:bg-accent"
+						>
+							<RefreshCw class="size-3.5 {dbLoading ? 'animate-spin' : ''}" />
+							<span>Re-fetch Query ({dbLatency ?? 0}ms)</span>
+						</button>
+					</div>
+				</div>
+
+				<!-- Live DB Projects List -->
+				<div class="rounded-xl border border-border bg-card p-6 md:col-span-2">
+					<div class="flex items-center justify-between border-b border-border pb-3">
+						<div class="flex items-center gap-2">
+							<span class="text-xs font-bold">Live DB Records ({projectsList.length})</span>
+							{#if cacheSource === 'redis'}
+								<span
+									class="rounded-full border border-red-500/20 bg-red-500/10 px-2 py-0.5 text-[10px] font-semibold text-red-400"
+								>
+									⚡ Redis Cache Hit
+								</span>
+							{:else if cacheSource === 'db'}
+								<span
+									class="rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold text-emerald-400"
+								>
+									🐘 Neon DB Query Hit
+								</span>
+							{/if}
+						</div>
+
+						<span class="font-mono text-xs text-muted-foreground">
+							{dbLatency !== null ? `${dbLatency}ms` : ''}
+						</span>
+					</div>
+
+					<div class="mt-4 space-y-2">
+						{#if dbLoading && projectsList.length === 0}
+							<div class="animate-pulse py-8 text-center text-xs text-muted-foreground">
+								Loading projects from Neon DB...
+							</div>
+						{:else if projectsList.length === 0}
+							<div class="py-8 text-center text-xs text-muted-foreground">
+								No projects found in database. Create one using the form!
+							</div>
+						{:else}
+							{#each projectsList as p (p.id ?? p.name)}
+								<div
+									class="flex items-center justify-between rounded-lg border border-border/60 bg-muted/30 p-3 text-xs"
+								>
+									<div class="space-y-0.5">
+										<div class="font-semibold">{p.name}</div>
+										<div class="font-mono text-[10px] text-muted-foreground">
+											{p.slug || 'no-slug'}
+										</div>
+									</div>
+									<span
+										class="rounded-md border border-border bg-card px-2 py-1 font-mono text-[10px] text-muted-foreground"
+									>
+										ID: {String(p.id).slice(0, 8)}...
+									</span>
+
+									{#if p.id}
+										<button
+											onclick={() => deleteProject(p.id!)}
+											disabled={deletingId === p.id}
+											class="rounded-md border border-border bg-card p-1.5 text-muted-foreground transition hover:border-red-500/50 hover:bg-red-500/10 hover:text-red-400 disabled:opacity-50"
+											title="Delete Project"
+										>
+											{#if deletingId === p.id}
+												<RefreshCw class="size-3.5 animate-spin" />
+											{:else}
+												<Trash2 class="size-3.5" />
+											{/if}
+										</button>
+									{/if}
+								</div>
+							{/each}
+						{/if}
+					</div>
+				</div>
+			</div>
+		{/if}
+
+		<!-- TAB 3: UPLOADTHING CLOUD FILE UPLOADS -->
+		{#if activeTab === 'upload'}
+			<div class="grid gap-6 md:grid-cols-3">
+				<!-- Dropzone & Upload Action -->
+				<div class="space-y-4 rounded-xl border border-border bg-card p-6">
+					<div class="flex items-center gap-2 text-sm font-bold">
+						<CloudUpload class="size-4 text-pink-400" />
+						<span>UploadThing & UTAPI</span>
+					</div>
+					<p class="text-xs leading-relaxed text-muted-foreground">
+						Direct-to-cloud file uploads with S3 storage, pre-wired route handlers, and type-safe
+						server responses.
+					</p>
+
+					<!-- Drag & Drop Target Box -->
+					<div
+						onclick={() => fileInputRef?.click()}
+						onkeydown={(e) => e.key === 'Enter' && fileInputRef?.click()}
+						role="button"
+						tabindex="0"
+						class="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-border bg-muted/20 p-6 text-center transition hover:border-primary/50 hover:bg-primary/5"
+					>
+						<Upload class="size-8 text-muted-foreground" />
+						<div class="text-xs font-semibold">Click or drag file to upload</div>
+						<div class="text-[10px] text-muted-foreground">
+							Images, PDFs, or Documents up to 16MB
+						</div>
+					</div>
+
+					<input
+						type="file"
+						bind:this={fileInputRef}
+						onchange={(e) => handleFileUpload((e.target as HTMLInputElement).files)}
+						class="hidden"
+					/>
+
+					{#if isUploading}
+						<div class="space-y-1.5">
+							<div class="flex justify-between text-[11px] font-semibold">
+								<span>Uploading to cloud...</span>
+								<span class="font-mono">{uploadProgress}%</span>
+							</div>
+							<div class="h-1.5 w-full overflow-hidden rounded-full bg-muted">
+								<div
+									class="h-full bg-primary transition-all duration-200"
+									style="width: {uploadProgress}%;"
+								></div>
+							</div>
+						</div>
+					{/if}
+				</div>
+
+				<!-- Uploaded Files List -->
+				<div class="rounded-xl border border-border bg-card p-6 md:col-span-2">
+					<div class="flex items-center justify-between border-b border-border pb-3">
+						<div class="flex items-center gap-2 text-xs font-bold">
+							<FileText class="size-4 text-pink-400" />
+							<span>Cloud Upload Log ({uploadedFiles.length})</span>
+						</div>
+						<span class="font-mono text-[11px] text-muted-foreground">S3 Storage Ready</span>
+					</div>
+
+					<div class="mt-4 space-y-2">
+						{#if uploadedFiles.length === 0}
+							<div class="py-12 text-center text-xs text-muted-foreground">
+								No files uploaded yet. Click the dropzone to test UploadThing!
+							</div>
+						{:else}
+							{#each uploadedFiles as f (f.name + f.time)}
+								<div
+									class="flex items-center justify-between rounded-lg border border-border/60 bg-muted/40 p-3 text-xs"
+								>
+									<div class="flex items-center gap-3">
+										<FileText class="size-4 shrink-0 text-primary" />
+										<div class="space-y-0.5">
+											<div class="font-semibold text-foreground">{f.name}</div>
+											<div class="font-mono text-[10px] text-muted-foreground">
+												{f.size} • {f.time}
+											</div>
+										</div>
+									</div>
+
+									<a
+										href={f.url}
+										target="_blank"
+										rel="external"
+										class="inline-flex items-center gap-1 rounded-md border border-border bg-card px-2.5 py-1 font-mono text-[10px] font-semibold text-primary hover:bg-accent"
+									>
+										View File
+									</a>
+								</div>
+							{/each}
+						{/if}
+					</div>
+				</div>
+			</div>
+		{/if}
+
+		<!-- TAB 4: UPSTASH SSE STREAMING -->
+		{#if activeTab === 'sse'}
+			<div class="grid gap-6 md:grid-cols-3">
+				<!-- Stream Controls -->
+				<div class="space-y-4 rounded-xl border border-border bg-card p-6">
+					<div class="flex items-center gap-2 text-sm font-bold">
+						<Radio class="size-4 text-cyan-400" />
+						<span>Server-Sent Events</span>
+					</div>
+					<p class="text-xs leading-relaxed text-muted-foreground">
+						Streams live heartbeat events from Hono’s <code class="font-mono text-primary"
+							>streamSSE</code
+						> middleware over HTTP/2 without WebSockets overhead.
+					</p>
+
+					<button
+						onclick={toggleSSE}
+						class="inline-flex w-full items-center justify-center gap-2 rounded-lg py-2.5 text-xs font-semibold transition {sseConnected
+							? 'bg-red-500 text-white hover:bg-red-600'
+							: 'bg-primary text-primary-foreground hover:bg-primary/90'}"
+					>
+						<Wifi class="size-4" />
+						<span>{sseConnected ? 'Disconnect Stream' : 'Connect SSE Stream'}</span>
+					</button>
+
+					<div class="space-y-2 border-t border-border/60 pt-2 text-xs">
+						<div class="flex items-center justify-between">
+							<span class="text-muted-foreground">Status:</span>
+							<span
+								class="flex items-center gap-1.5 font-bold {sseConnected
+									? 'text-emerald-500'
+									: 'text-muted-foreground'}"
+							>
+								<span
+									class="size-2 rounded-full {sseConnected
+										? 'animate-pulse bg-emerald-500'
+										: 'bg-muted-foreground'}"
+								></span>
+								{sseConnected ? 'LIVE STREAMING' : 'Idle'}
+							</span>
+						</div>
+						<div class="flex items-center justify-between">
+							<span class="text-muted-foreground">Interval:</span>
+							<span class="font-mono">3,000 ms</span>
+						</div>
+					</div>
+				</div>
+
+				<!-- Live SSE Event Terminal -->
+				<div class="rounded-xl border border-border bg-card p-6 md:col-span-2">
+					<div class="flex items-center justify-between border-b border-border pb-3">
+						<div class="flex items-center gap-2 text-xs font-bold">
+							<Activity class="size-4 text-emerald-400" />
+							<span>Live Event Log ({sseMessages.length})</span>
+						</div>
+						{#if sseConnected}
+							<span class="animate-pulse font-mono text-[10px] font-semibold text-emerald-500">
+								● Listening to /api/realtime
+							</span>
+						{/if}
+					</div>
+
+					<div class="mt-4 space-y-2">
+						{#if sseMessages.length === 0}
+							<div class="py-12 text-center text-xs text-muted-foreground">
+								{sseConnected
+									? 'Waiting for first heartbeat tick...'
+									: 'Click "Connect SSE Stream" to begin receiving live events.'}
+							</div>
+						{:else}
+							{#each sseMessages as msg (msg.id + msg.time)}
+								<div
+									class="flex items-center justify-between rounded-lg border border-border/60 bg-muted/40 p-3 font-mono text-xs transition-all"
+								>
+									<div class="flex items-center gap-3">
+										<span
+											class="rounded-full border border-primary/20 bg-primary/10 px-2 py-0.5 text-[10px] font-bold text-primary"
+										>
+											Event #{msg.id}
+										</span>
+										<span class="text-foreground">Ping: {msg.ping}</span>
+									</div>
+									<div class="text-[11px] text-muted-foreground">
+										{msg.time}
+									</div>
+								</div>
+							{/each}
+						{/if}
+					</div>
+				</div>
+			</div>
+		{/if}
+
+		<!-- TAB 5: BETTER AUTH SESSION -->
+		{#if activeTab === 'auth'}
+			<div class="mx-auto max-w-2xl space-y-6 rounded-xl border border-border bg-card p-6">
+				<div class="flex items-center justify-between border-b border-border pb-4">
+					<div class="flex items-center gap-2">
+						<ShieldCheck class="size-5 text-indigo-400" />
+						<div>
+							<h3 class="text-sm font-bold">Better Auth Session Diagnostics</h3>
+							<p class="text-xs text-muted-foreground">
+								Inspect active session token state & cookie context
+							</p>
+						</div>
+					</div>
+
+					<div class="flex items-center gap-1.5">
+						{#if session}
+							<span
+								class="inline-flex items-center gap-1 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2.5 py-0.5 text-xs font-semibold text-emerald-500"
+							>
+								<CircleCheck class="size-3" />
+								Authenticated
+							</span>
+						{:else}
+							<span
+								class="inline-flex items-center gap-1 rounded-full border border-amber-500/20 bg-amber-500/10 px-2.5 py-0.5 text-xs font-semibold text-amber-500"
+							>
+								<CircleAlert class="size-3" />
+								Guest Mode
+							</span>
+						{/if}
+					</div>
+				</div>
+
+				{#if authLoading}
+					<div class="animate-pulse py-8 text-center text-xs text-muted-foreground">
+						Reading session state from cookies...
+					</div>
+				{:else if session}
+					<div class="space-y-4">
+						<div class="space-y-2 rounded-lg bg-muted/50 p-4 font-mono text-xs">
+							<div class="flex justify-between">
+								<span class="text-muted-foreground">User ID:</span>
+								<span class="font-semibold text-foreground">{session.user.id}</span>
+							</div>
+							<div class="flex justify-between">
+								<span class="text-muted-foreground">Email:</span>
+								<span class="font-semibold text-foreground">{session.user.email}</span>
+							</div>
+							<div class="flex justify-between">
+								<span class="text-muted-foreground">Name:</span>
+								<span class="font-semibold text-foreground">{session.user.name || 'N/A'}</span>
+							</div>
+						</div>
+
+						<a
+							href={resolve('/dashboard')}
+							class="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-primary py-2.5 text-xs font-semibold text-primary-foreground shadow-xs hover:bg-primary/90"
+						>
+							<span>Enter Protected App Area</span>
+						</a>
+					</div>
+				{:else}
+					<div class="space-y-4 py-4 text-center">
+						<p class="mx-auto max-w-sm text-xs text-muted-foreground">
+							No active authentication session detected. Sign in on the login route to test
+							protected database queries and SSE streams.
+						</p>
+
+						<a
+							href={resolve('/login')}
+							class="inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-6 py-2.5 text-xs font-semibold text-primary-foreground shadow-xs hover:bg-primary/90"
+						>
+							<Lock class="size-3.5" />
+							<span>Go to Auth Login Route</span>
+						</a>
+					</div>
+				{/if}
+			</div>
+		{/if}
+	</main>
 </div>
