@@ -1,22 +1,14 @@
 // src/hooks.server.ts
 import { building } from '$app/environment';
 import { auth } from '$lib/server/auth';
+import { checkRateLimit } from '$lib/server/ratelimit';
 import type { Handle } from '@sveltejs/kit';
-import { error } from '@sveltejs/kit';
-import { Ratelimit } from '@upstash/ratelimit';
-import { Redis } from '@upstash/redis';
+import { error, redirect } from '@sveltejs/kit';
 import { svelteKitHandler } from 'better-auth/svelte-kit';
 
-// 1. Initialize Upstash Rate Limiter (Safely checks for env variables)
-let ratelimit: Ratelimit | null = null;
-
-if (process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN) {
-	ratelimit = new Ratelimit({
-		redis: Redis.fromEnv(),
-		limiter: Ratelimit.slidingWindow(60, '1 m'), // 60 requests per minute
-		analytics: true
-	});
-}
+// 1. Define protected and guest-only route patterns
+const PROTECTED_ROUTES = ['/dashboard', '/settings', '/projects', '/admin'];
+const AUTH_ROUTES = ['/login', '/register', '/forgot-password'];
 
 export const handle: Handle = async ({ event, resolve }) => {
 	// 2. Guard against DB/Auth execution during build time
@@ -24,15 +16,14 @@ export const handle: Handle = async ({ event, resolve }) => {
 		return resolve(event);
 	}
 
-	// 3. Rate Limit sensitive routes (API & Auth)
-	if (
-		ratelimit &&
-		(event.url.pathname.startsWith('/api') || event.url.pathname.startsWith('/login'))
-	) {
-		const ip = event.getClientAddress();
-		const { success } = await ratelimit.limit(ip);
+	const pathname = event.url.pathname;
 
-		if (!success) {
+	// 3. Rate Limit sensitive routes using centralized ratelimit utility
+	if (pathname.startsWith('/api') || pathname.startsWith('/login')) {
+		const ip = event.getClientAddress();
+		const result = await checkRateLimit(ip);
+
+		if (!result.success) {
 			throw error(429, 'Too many requests. Please slow down.');
 		}
 	}
@@ -50,6 +41,21 @@ export const handle: Handle = async ({ event, resolve }) => {
 		event.locals.user = null;
 	}
 
-	// 5. Delegate request resolution and Better Auth route handling (/api/auth/*)
+	// 5. Route Protection & Redirect Guards
+	const isProtectedRoute = PROTECTED_ROUTES.some((route) => pathname.startsWith(route));
+	const isAuthRoute = AUTH_ROUTES.some((route) => pathname.startsWith(route));
+
+	// Redirect unauthenticated user trying to access protected routes
+	if (isProtectedRoute && !event.locals.user) {
+		const redirectTo = encodeURIComponent(pathname + event.url.search);
+		throw redirect(303, `/login?redirectTo=${redirectTo}`);
+	}
+
+	// Redirect authenticated user trying to access login/register
+	if (isAuthRoute && event.locals.user) {
+		throw redirect(303, '/dashboard');
+	}
+
+	// 6. Delegate request resolution & Better Auth internal route handling (/api/auth/*)
 	return svelteKitHandler({ event, resolve, auth, building });
 };

@@ -3,11 +3,12 @@ import { auth } from '$lib/server/auth';
 import { db } from '$lib/server/db';
 import { getProjects, invalidateProjectsCache } from '$lib/server/db/queries';
 import { insertProjectSchema, projects, user } from '$lib/server/db/schema';
+import { sendEmail } from '$lib/server/email';
 import { redis } from '$lib/server/ratelimit';
 import { fail, redirect } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
 import { superValidate } from 'sveltekit-superforms';
-import { zod4 as zod } from 'sveltekit-superforms/adapters'; // 👈 Use zod4 adapter
+import { zod4 as zod } from 'sveltekit-superforms/adapters'; // Use zod4 adapter
 
 export const load = async ({ locals }) => {
 	const form = await superValidate(zod(insertProjectSchema));
@@ -85,5 +86,23 @@ export const actions = {
 			headers: event.request.headers
 		});
 		throw redirect(303, '/login');
+	},
+
+	sendTestEmail: async ({ locals }) => {
+		if (!locals.user?.email) {
+			return fail(400, { message: 'Must be logged in to send a test email.' });
+		}
+
+		const res = await sendEmail({
+			to: locals.user.email,
+			subject: '🧪 Resend Stack Test Email',
+			html: `<h1>Test Successful!</h1><p>Sent to ${locals.user.email} via Resend.</p>`
+		});
+
+		if (res.success) {
+			return { emailSent: true, message: `Test email sent to ${locals.user.email}!` };
+		} else {
+			return fail(500, { message: 'Failed to send email via Resend.' });
+		}
 	}
 };
