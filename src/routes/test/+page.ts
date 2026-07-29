@@ -1,8 +1,7 @@
 // src/routes/test/+page.ts
 import { api } from '$lib/api-client';
-import type { PageLoad } from './$types';
 
-export const load: PageLoad = async ({ fetch, data }) => {
+export const load = async ({ fetch, data }) => {
 	let initialRpcStatus: string;
 	let initialRpcCount = 0;
 
