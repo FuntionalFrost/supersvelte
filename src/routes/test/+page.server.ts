@@ -32,7 +32,7 @@ export const actions = {
 			.values({
 				name: form.data.name,
 				slug: form.data.slug,
-				userId: event.locals.user?.id // 👈 Pass undefined if logged out
+				userId: event.locals.user?.id // Pass undefined if logged out
 			})
 			.returning();
 
