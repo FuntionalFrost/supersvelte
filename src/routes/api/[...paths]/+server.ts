@@ -1,12 +1,6 @@
 // src/routes/api/[...path]/+server.ts
 import { app } from '$lib/server/api';
-import type { RequestHandler } from '@sveltejs/kit';
+import type { RequestHandler } from './$types';
 
-// 🔑 Declare handler function passing SvelteKit requests to Hono
-const handler: RequestHandler = ({ request }) => app.fetch(request);
-
-export const GET = handler;
-export const POST = handler;
-export const PUT = handler;
-export const PATCH = handler;
-export const DELETE = handler;
+// Catch all HTTP methods (GET, POST, PUT, PATCH, DELETE, OPTIONS, HEAD)
+export const fallback: RequestHandler = ({ request }) => app.fetch(request);

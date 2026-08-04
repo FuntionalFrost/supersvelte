@@ -24,7 +24,9 @@
 		Zap
 	} from '@lucide/svelte';
 
-	// Active Tab State ('rpc' | 'db' | 'upload' | 'sse' | 'auth')
+	// 1. Reactive props from SvelteKit loaders
+	let { data } = $props();
+
 	type RpcResponse = {
 		error?: string;
 		remaining?: number;
@@ -83,6 +85,13 @@
 	let newProjectName = $state('');
 	let isSubmitting = $state(false);
 
+	// Sync projects from server load data safely
+	$effect(() => {
+		if (data.existingProjects) {
+			projectsList = data.existingProjects as ProjectItem[];
+		}
+	});
+
 	async function fetchProjects() {
 		dbLoading = true;
 		const start = performance.now();
@@ -130,7 +139,7 @@
 			});
 
 			if (res.ok) {
-				await fetchProjects(); // Refresh list & update cache state
+				await fetchProjects();
 			}
 		} catch (err) {
 			console.error('Failed to delete project:', err);
@@ -168,8 +177,8 @@
 			clearInterval(progressInterval);
 			uploadProgress = 100;
 
-			const data = res.ok ? await res.json() : null;
-			const fileUrl = data?.url || URL.createObjectURL(file);
+			const responseData = res.ok ? await res.json() : null;
+			const fileUrl = responseData?.url || URL.createObjectURL(file);
 
 			uploadedFiles = [
 				{
@@ -234,17 +243,24 @@
 	let session = $state<SessionData | null>(null);
 	let authLoading = $state(true);
 
+	// Sync session state from server load data and client SDK
 	$effect(() => {
+		if (data.user) {
+			session = { user: data.user as SessionData['user'] };
+			authLoading = false;
+		}
+
 		authClient.getSession().then((res) => {
-			session = (res.data as SessionData) || null;
+			if (res.data) {
+				session = res.data as SessionData;
+			}
 			authLoading = false;
 		});
 	});
 
-	// Auto-run baseline RPC and DB queries on mount
+	// Auto-run baseline RPC test on mount
 	$effect(() => {
 		runRpcTest();
-		fetchProjects();
 	});
 </script>
 

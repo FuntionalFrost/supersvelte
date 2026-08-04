@@ -6,7 +6,9 @@ export const load = async ({ fetch, data }) => {
 	let initialRpcCount = 0;
 
 	try {
-		const res = await client.api.projects.$get({ fetch });
+		// Pass query/request inputs as 1st arg, and { fetch } as 2nd arg (options)
+		const res = await client.api.projects.$get({}, { fetch });
+
 		if (res.ok) {
 			const json = await res.json();
 			initialRpcStatus = '200 OK (Loaded via +page.ts)';

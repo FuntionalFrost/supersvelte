@@ -1,4 +1,5 @@
 // src/routes/test/+page.server.ts
+import { dev } from '$app/environment';
 import { auth } from '$lib/server/auth';
 import { db } from '$lib/server/db';
 import { getProjects, invalidateProjectsCache } from '$lib/server/db/queries';
@@ -26,13 +27,16 @@ export const actions = {
 	createProject: async (event) => {
 		const form = await superValidate(event.request, zod(insertProjectSchema));
 		if (!form.valid) return fail(400, { form });
+		if (!event.locals.user) {
+			return fail(401, { form, message: 'You must be logged in to create a project.' });
+		}
 
 		const [newProject] = await db
 			.insert(projects)
 			.values({
 				name: form.data.name,
 				slug: form.data.slug,
-				userId: event.locals.user?.id // Pass undefined if logged out
+				userId: event.locals.user.id // Pass undefined if logged out
 			})
 			.returning();
 
@@ -52,7 +56,10 @@ export const actions = {
 		return { form };
 	},
 
-	deleteProject: async ({ request }) => {
+	deleteProject: async ({ request, locals }) => {
+		if (!locals.user) {
+			return fail(401, { message: 'You must be logged in to delete a project.' });
+		}
 		const formData = await request.formData();
 		const id = formData.get('id')?.toString();
 
@@ -65,6 +72,11 @@ export const actions = {
 	},
 
 	seed: async () => {
+		// 🔒 Only allow seeding during local development
+		if (!dev) {
+			return fail(403, { seeded: false, message: 'Seeding is disabled in production.' });
+		}
+
 		try {
 			await db.delete(user).where(eq(user.email, 'test@example.com'));
 			await auth.api.signUpEmail({
@@ -82,9 +94,20 @@ export const actions = {
 	},
 
 	signOut: async (event) => {
-		await auth.api.signOut({
-			headers: event.request.headers
+		// Request the raw Response object to capture 'Set-Cookie' header
+		const response = await auth.api.signOut({
+			headers: event.request.headers,
+			asResponse: true
 		});
+
+		// Forward 'Set-Cookie' headers to SvelteKit
+		const cookieHeader = response.headers.get('set-cookie');
+		if (cookieHeader) {
+			event.setHeaders({
+				'set-cookie': cookieHeader
+			});
+		}
+
 		throw redirect(303, '/login');
 	},
 
