@@ -1,5 +1,12 @@
-// src/routes/api/[...paths]/+server.ts
-import { app } from '$lib/server/api'; // Destructure named import
+// src/routes/api/[...path]/+server.ts
+import { app } from '$lib/server/api';
+import type { RequestHandler } from '@sveltejs/kit';
 
-// SvelteKit fallback handler forwards all HTTP verbs (GET, POST, PUT, DELETE, etc.) to Hono
-export const fallback = ({ request }) => app.fetch(request);
+// 🔑 Declare handler function passing SvelteKit requests to Hono
+const handler: RequestHandler = ({ request }) => app.fetch(request);
+
+export const GET = handler;
+export const POST = handler;
+export const PUT = handler;
+export const PATCH = handler;
+export const DELETE = handler;

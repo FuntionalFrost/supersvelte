@@ -2,18 +2,22 @@
 import { boolean, integer, pgTable, text, timestamp } from 'drizzle-orm/pg-core';
 import { z } from 'zod';
 
-// 1. USER TABLE
+// 1. USER TABLE (Includes Admin plugin fields)
 export const user = pgTable('user', {
 	id: text('id').primaryKey(),
 	name: text('name').notNull(),
 	email: text('email').notNull().unique(),
 	emailVerified: boolean('email_verified').notNull().default(false),
 	image: text('image'),
+	role: text('role').default('user'),
+	banned: boolean('banned').default(false),
+	banReason: text('ban_reason'),
+	banExpires: timestamp('ban_expires'),
 	createdAt: timestamp('created_at').notNull().defaultNow(),
 	updatedAt: timestamp('updated_at').notNull().defaultNow()
 });
 
-// 2. SESSION TABLE
+// 2. SESSION TABLE (Includes Organization active context field)
 export const session = pgTable('session', {
 	id: text('id').primaryKey(),
 	expiresAt: timestamp('expires_at').notNull(),
@@ -24,10 +28,11 @@ export const session = pgTable('session', {
 	userAgent: text('user_agent'),
 	userId: text('user_id')
 		.notNull()
-		.references(() => user.id, { onDelete: 'cascade' })
+		.references(() => user.id, { onDelete: 'cascade' }),
+	activeOrganizationId: text('active_organization_id')
 });
 
-// 3. ACCOUNT TABLE (Requires createdAt & updatedAt for Better Auth)
+// 3. ACCOUNT TABLE
 export const account = pgTable('account', {
 	id: text('id').primaryKey(),
 	accountId: text('account_id').notNull(),
@@ -56,7 +61,46 @@ export const verification = pgTable('verification', {
 	updatedAt: timestamp('updated_at').notNull().defaultNow()
 });
 
-// 5. PROJECTS TABLE
+// 5. ORGANIZATION TABLE
+export const organization = pgTable('organization', {
+	id: text('id').primaryKey(),
+	name: text('name').notNull(),
+	slug: text('slug').notNull().unique(),
+	logo: text('logo'),
+	metadata: text('metadata'),
+	createdAt: timestamp('created_at').notNull().defaultNow()
+});
+
+// 6. MEMBER TABLE
+export const member = pgTable('member', {
+	id: text('id').primaryKey(),
+	organizationId: text('organization_id')
+		.notNull()
+		.references(() => organization.id, { onDelete: 'cascade' }),
+	userId: text('user_id')
+		.notNull()
+		.references(() => user.id, { onDelete: 'cascade' }),
+	role: text('role').notNull().default('member'),
+	createdAt: timestamp('created_at').notNull().defaultNow()
+});
+
+// 7. INVITATION TABLE
+export const invitation = pgTable('invitation', {
+	id: text('id').primaryKey(),
+	organizationId: text('organization_id')
+		.notNull()
+		.references(() => organization.id, { onDelete: 'cascade' }),
+	email: text('email').notNull(),
+	role: text('role').default('member'),
+	status: text('status').notNull().default('pending'),
+	inviterId: text('inviter_id')
+		.notNull()
+		.references(() => user.id, { onDelete: 'cascade' }),
+	expiresAt: timestamp('expires_at').notNull(),
+	createdAt: timestamp('created_at').notNull().defaultNow()
+});
+
+// 8. PROJECTS TABLE (Linked to User & Organization)
 export const projects = pgTable('projects', {
 	id: text('id')
 		.primaryKey()
@@ -64,19 +108,25 @@ export const projects = pgTable('projects', {
 	name: text('name').notNull(),
 	slug: text('slug').notNull(),
 	userId: text('user_id').references(() => user.id, { onDelete: 'set null' }),
+	organizationId: text('organization_id').references(() => organization.id, {
+		onDelete: 'cascade'
+	}),
 	createdAt: timestamp('created_at').notNull().defaultNow()
 });
 
-// 6. FILES
+// 9. FILES TABLE
 export const files = pgTable('files', {
 	id: text('id')
 		.primaryKey()
-		.$defaultFn(() => crypto.randomUUID()), //  Auto-generates UUID
+		.$defaultFn(() => crypto.randomUUID()),
 	url: text('url').notNull(),
 	key: text('key').notNull(),
 	name: text('name').notNull(),
 	size: integer('size').notNull(),
-	userId: text('user_id').references(() => user.id, { onDelete: 'cascade' }), //  Nullable for safety
+	userId: text('user_id').references(() => user.id, { onDelete: 'cascade' }),
+	organizationId: text('organization_id').references(() => organization.id, {
+		onDelete: 'cascade'
+	}),
 	createdAt: timestamp('created_at').defaultNow().notNull()
 });
 

@@ -1,3 +1,4 @@
+// src/lib/server/auth.ts
 import { getRequestEvent } from '$app/server';
 import { env } from '$env/dynamic/private';
 import { db } from '$lib/server/db';
@@ -5,6 +6,7 @@ import * as schema from '$lib/server/db/schema';
 import { sendEmail } from '$lib/server/email';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { betterAuth } from 'better-auth/minimal';
+import { admin, organization } from 'better-auth/plugins';
 import { sveltekitCookies } from 'better-auth/svelte-kit';
 
 export const auth = betterAuth({
@@ -61,6 +63,25 @@ export const auth = betterAuth({
 			});
 		}
 	},
+	databaseHooks: {
+		user: {
+			create: {
+				after: async (user) => {
+					// Auto-create a default workspace for the new user
+					const orgName = `${user.name || 'Personal'}'s Workspace`;
+					const slug = `workspace-${user.id.slice(0, 8)}`;
+
+					await auth.api.createOrganization({
+						body: {
+							name: orgName,
+							slug: slug,
+							userId: user.id
+						}
+					});
+				}
+			}
+		}
+	},
 	socialProviders: {
 		github: {
 			clientId: env.GITHUB_CLIENT_ID,
@@ -68,6 +89,15 @@ export const auth = betterAuth({
 		}
 	},
 	plugins: [
+		admin({
+			defaultRole: 'user',
+			adminRole: 'admin'
+		}),
+		organization({
+			allowUserToCreateOrganization: true,
+			membershipLimit: 100,
+			creatorRole: 'owner'
+		}),
 		sveltekitCookies(getRequestEvent) // make sure this is the last plugin in the array
 	]
 });
