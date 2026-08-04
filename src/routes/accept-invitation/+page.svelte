@@ -54,7 +54,7 @@
 			<h2 class="text-base font-bold">Invitation Failed</h2>
 			<p class="text-xs text-muted-foreground">{errorMessage}</p>
 			<a
-				href={resolve('/app')}
+				href={resolve('/dashboard')}
 				class="mt-4 inline-block rounded-lg bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground"
 			>
 				Return to App

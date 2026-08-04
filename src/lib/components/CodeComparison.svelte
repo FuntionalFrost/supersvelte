@@ -9,26 +9,38 @@
 
 	const codeExamples = {
 		superSvelte: {
-			title: '⚡ Super Svelte (0-Codegen Hono RPC)',
-			subtitle: 'Single source of truth. Instant end-to-end type safety.',
-			server: `// src/lib/server/api/projects.ts
-import { Hono } from 'hono';
-import { zValidator } from '@hono/zod-validator';
-import { z } from 'zod';
+			title: '⚡ Super Svelte (@hono/zod-openapi)',
+			subtitle: 'Single source of truth. 0-codegen RPC + auto-generated OpenAPI 3.1 & Swagger UI.',
+			server: `// src/lib/server/api/index.ts
+import { createRoute, OpenAPIHono, z } from '@hono/zod-openapi';
 
-export const projectsApi = new Hono()
-  .post('/', zValidator('json', z.object({ name: z.string().min(1) })), async (c) => {
-    const { name } = c.req.valid('json');
-    const [project] = await db.insert(projects).values({ name }).returning();
-    return c.json({ success: true, project });
-  });`,
+export const app = new OpenAPIHono()
+  .basePath('/api')
+  .openapi(
+    createRoute({
+      method: 'post',
+      path: '/projects',
+      summary: 'Create Project',
+      request: {
+        body: { content: { 'application/json': { schema: z.object({ name: z.string().min(1) }) } } }
+      },
+      responses: {
+        200: { content: { 'application/json': { schema: ProjectSchema } }, description: 'Project Created' }
+      }
+    }),
+    async (c) => {
+      const { name } = c.req.valid('json');
+      const [project] = await db.insert(projects).values({ name }).returning();
+      return c.json({ success: true, project }, 200);
+    }
+  );`,
 			client: `<!-- src/routes/app/+page.svelte -->
 <script lang="ts">
   import { client } from '$lib/api-client';
 
   async function create() {
-    // 🎯 100% Autocompleted & Type-Checked (Inputs + Returns)!
-    // ZERO codegen steps, ZERO generated schema files.
+    // 🎯 100% Type-Safe RPC Call + Auto OpenAPI 3.1 Spec + Swagger UI!
+    // ZERO CLI codegen, ZERO generated schema files.
     const res = await client.api.projects.$post({ json: { name: 'Acme' } });
     const { project } = await res.json();
   }
@@ -116,7 +128,8 @@ async function createProject(data: CreateProjectInput): Promise<CreateProjectRes
 			</div>
 			<h2 class="text-3xl font-extrabold tracking-tight sm:text-4xl">See the DX Difference</h2>
 			<p class="mx-auto max-w-2xl text-sm text-muted-foreground sm:text-base">
-				Compare Super Svelte’s end-to-end Hono RPC against traditional TypeScript backend patterns.
+				Compare Super Svelte’s OpenAPI 3.1 & Hono RPC engine against traditional TypeScript backend
+				patterns.
 			</p>
 		</div>
 
@@ -189,7 +202,7 @@ async function createProject(data: CreateProjectInput): Promise<CreateProjectRes
 							class="flex items-center gap-1.5 font-mono text-[11px] font-semibold text-emerald-400/90"
 						>
 							<span class="size-1.5 rounded-full bg-emerald-400"></span>
-							1. Server Route Definition
+							1. OpenAPI Route Definition
 						</div>
 						<pre
 							class="overflow-x-auto rounded-xl border border-border/80 bg-background/90 p-4 font-mono text-xs leading-relaxed text-foreground"><code
@@ -217,7 +230,10 @@ async function createProject(data: CreateProjectInput): Promise<CreateProjectRes
 						<Check class="size-3" /> 0 Build Steps
 					</span>
 					<span class="inline-flex items-center gap-1 font-medium text-emerald-400">
-						<Check class="size-3" /> Infer Client Types
+						<Check class="size-3" /> Auto OpenAPI 3.1
+					</span>
+					<span class="inline-flex items-center gap-1 font-medium text-emerald-400">
+						<Check class="size-3" /> Interactive Swagger UI
 					</span>
 					<span class="inline-flex items-center gap-1 font-medium text-emerald-400">
 						<Check class="size-3" /> Web Standard Fetch
@@ -305,11 +321,11 @@ async function createProject(data: CreateProjectInput): Promise<CreateProjectRes
 			<div class="flex items-center gap-3">
 				<ShieldCheck class="size-8 shrink-0 text-primary" />
 				<div class="space-y-0.5">
-					<h4 class="text-sm font-bold">Why Hono RPC Beats Codegen Toolchains</h4>
+					<h4 class="text-sm font-bold">Why OpenAPI Hono RPC Beats Codegen Toolchains</h4>
 					<p class="text-xs text-muted-foreground">
-						TypeScript infers backend route contracts at edit time. Edit your Hono route and your
-						Svelte components get instant autocomplete with zero watcher binaries or code
-						generation.
+						TypeScript infers backend route contracts at edit time, while generating standard
+						OpenAPI 3.1 JSON schemas & Swagger UI docs at <code>/api/docs</code>. Zero build steps,
+						zero codegen binaries.
 					</p>
 				</div>
 			</div>

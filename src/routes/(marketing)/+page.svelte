@@ -18,8 +18,8 @@
 		Zap
 	} from '@lucide/svelte';
 
-	// Default directly to TS Batteries-Included Mode
-	let mode = $state<Mode>('ts-batteries');
+	// Default directly to SaaS Starters Mode
+	let mode = $state<Mode>('saas-starters');
 	let currentMatrix = $derived(matrices[mode]);
 </script>
 
@@ -53,7 +53,8 @@
 
 			<p class="mx-auto mt-2 max-w-2xl text-sm text-muted-foreground sm:text-base">
 				Stop assembling your stack from 15 npm packages. Super Svelte ships Auth, Neon DB, Redis
-				SSE, Uploads, and Resend out-of-the-box with sub-10ms edge cold starts.
+				SSE, OpenAPI 3.1 Hono RPC, Uploads, and Resend out-of-the-box with sub-10ms edge cold
+				starts.
 			</p>
 
 			<div class="mt-8 flex flex-col justify-center gap-4 sm:flex-row">
@@ -89,13 +90,13 @@
 					<span class="text-[11px] text-muted-foreground">Fine-grained Runes</span>
 				</div>
 
-				<!-- 2. Hono RPC (Cyan) -->
+				<!-- 2. Hono RPC & OpenAPI (Cyan) -->
 				<div
 					class="group flex flex-col items-center gap-2 rounded-xl border border-border/60 bg-card p-4 text-center transition-all duration-300 hover:-translate-y-1 hover:border-cyan-400/50 hover:shadow-lg hover:shadow-cyan-400/10"
 				>
 					<Cpu class="size-6 text-cyan-400 transition-transform group-hover:scale-110" />
-					<span class="text-xs font-bold">Hono RPC</span>
-					<span class="text-[11px] text-muted-foreground">0-Codegen API</span>
+					<span class="text-xs font-bold">Hono Zod RPC</span>
+					<span class="text-[11px] text-muted-foreground">Auto OpenAPI 3.1</span>
 				</div>
 
 				<!-- 3. Drizzle + Neon (Emerald) -->
@@ -173,11 +174,12 @@
 					>
 						<Cpu class="size-5" />
 					</div>
-					<h3 class="text-base font-semibold">0-Codegen Hono RPC</h3>
-					<p class="text-muted-relaxed text-xs leading-relaxed">
-						Call backend routes with pure TypeScript type inference. No GraphQL codegen, no custom <code
-							class="font-mono text-primary">.wasp</code
-						> DSL compilers, and zero starter-kit template bloat.
+					<h3 class="text-base font-semibold">0-Codegen Hono Zod RPC</h3>
+					<p class="text-xs leading-relaxed text-muted-foreground">
+						Call backend routes with pure TypeScript type inference, while automatically generating
+						OpenAPI 3.1 specs and Swagger UI docs at <code class="font-mono text-primary"
+							>/api/docs</code
+						>.
 					</p>
 				</div>
 
@@ -211,23 +213,41 @@
 				</div>
 				<h2 class="text-3xl font-bold tracking-tight sm:text-4xl">How Super Svelte Compares</h2>
 				<p class="mt-2 text-sm text-muted-foreground">
-					See how Super Svelte stacks up directly against other batteries-included TypeScript
-					solutions and classic monoliths.
+					See how Super Svelte stacks up directly against paid SaaS boilerplates, TypeScript
+					toolkits, and classic monoliths.
 				</p>
 
-				<!-- 2-Way Toggle -->
+				<!-- 3-Way Mode Toggle -->
 				<div
-					class="mt-8 inline-flex items-center justify-center rounded-lg border border-border bg-card p-1 shadow-sm"
+					class="mt-8 flex flex-wrap items-center justify-center gap-2 rounded-xl border border-border bg-card p-1.5 shadow-xs"
 				>
 					<button
-						onclick={() => (mode = 'ts-batteries')}
-						class="relative rounded-md px-4 py-2 text-xs font-semibold transition-all duration-200 {mode ===
-						'ts-batteries'
-							? 'bg-primary text-primary-foreground shadow-sm'
+						onclick={() => (mode = 'saas-starters')}
+						class="relative rounded-lg px-4 py-2 text-xs font-semibold transition-all duration-200 {mode ===
+						'saas-starters'
+							? 'bg-primary text-primary-foreground shadow-xs'
 							: 'text-muted-foreground hover:text-foreground'}"
 					>
-						<span>vs. Full-Stack TS Batteries (AdonisJS, Redwood, Wasp, Epic Stack)</span>
-						{#if mode === 'ts-batteries'}
+						<span>vs. SaaS Starters (Supastarter, Makerkit, Epic Stack)</span>
+						{#if mode === 'saas-starters'}
+							<span class="absolute -top-1 -right-1 flex h-2 w-2">
+								<span
+									class="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75"
+								></span>
+								<span class="relative inline-flex h-2 w-2 rounded-full bg-emerald-500"></span>
+							</span>
+						{/if}
+					</button>
+
+					<button
+						onclick={() => (mode = 'ts-frameworks')}
+						class="relative rounded-lg px-4 py-2 text-xs font-semibold transition-all duration-200 {mode ===
+						'ts-frameworks'
+							? 'bg-primary text-primary-foreground shadow-xs'
+							: 'text-muted-foreground hover:text-foreground'}"
+					>
+						<span>vs. TS Frameworks (AdonisJS, Redwood, Wasp)</span>
+						{#if mode === 'ts-frameworks'}
 							<span class="absolute -top-1 -right-1 flex h-2 w-2">
 								<span
 									class="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75"
@@ -239,17 +259,17 @@
 
 					<button
 						onclick={() => (mode = 'monoliths')}
-						class="rounded-md px-4 py-2 text-xs font-semibold transition-all duration-200 {mode ===
+						class="rounded-lg px-4 py-2 text-xs font-semibold transition-all duration-200 {mode ===
 						'monoliths'
-							? 'bg-primary text-primary-foreground shadow-sm'
+							? 'bg-primary text-primary-foreground shadow-xs'
 							: 'text-muted-foreground hover:text-foreground'}"
 					>
-						vs. Classic Monoliths (Laravel, Rails, Django, .NET)
+						<span>vs. Backend Monoliths (Laravel, Rails, Django, .NET)</span>
 					</button>
 				</div>
 			</div>
 
-			<!-- Unified Table (DRY) -->
+			<!-- Unified Table -->
 			<div class="mt-12 overflow-x-auto rounded-xl border border-border bg-card shadow-sm">
 				<table class="w-full text-left text-xs">
 					<thead class="border-b border-border bg-muted/50 text-muted-foreground">
@@ -307,7 +327,8 @@
 			<h2 class="text-2xl font-bold sm:text-3xl">Ready to experience Super Svelte?</h2>
 			<p class="mt-2 text-sm text-muted-foreground">
 				Explore the live interactive diagnostic dashboard to test session auth, Hono RPC endpoints,
-				SSE real-time events, and Upstash Redis rate limiting.
+				OpenAPI Swagger docs at <code>/api/docs</code>, SSE real-time events, and Upstash Redis rate
+				limiting.
 			</p>
 			<div class="mt-6">
 				<a

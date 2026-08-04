@@ -1,6 +1,6 @@
 // src/lib/config/comparison.ts
 
-export type Mode = 'ts-batteries' | 'monoliths';
+export type Mode = 'saas-starters' | 'ts-frameworks' | 'monoliths';
 
 export type ColumnSpec = {
 	key: string;
@@ -20,15 +20,69 @@ export type MatrixConfig = {
 };
 
 export const matrices: Record<Mode, MatrixConfig> = {
-	// PRIMARY CATEGORY: Batteries-Included TypeScript Frameworks & Starters
-	'ts-batteries': {
+	// CATEGORY 1: Commercial & Open-Source SaaS Boilerplates
+	'saas-starters': {
+		columns: [
+			{ key: 'feature', label: 'Architectural Dimension' },
+			{ key: 'superSvelte', label: '🚀 Super Svelte', isPrimary: true, minWidth: 'min-w-[210px]' },
+			{ key: 'supastarter', label: 'Supastarter', minWidth: 'min-w-[150px]' },
+			{ key: 'makerkit', label: 'Makerkit', minWidth: 'min-w-[150px]' },
+			{ key: 'epicstack', label: 'Epic Stack (Remix)', minWidth: 'min-w-[160px]' }
+		],
+		rows: [
+			{
+				feature: 'License & Pricing Model',
+				superSvelte: '100% Free & Open-Source',
+				supastarter: '$199 - $299 Single/Multi License',
+				makerkit: '$299 - $799 Enterprise License',
+				epicstack: '100% Free & Open-Source'
+			},
+			{
+				feature: 'Reactivity & UI Engine',
+				superSvelte: 'Native Svelte 5 Runes ($state, 0 VDOM)',
+				supastarter: 'SvelteKit / Next.js (React/Svelte)',
+				makerkit: 'Next.js / Remix (React 19 VDOM)',
+				epicstack: 'Remix (React 19 Virtual DOM)'
+			},
+			{
+				feature: 'API Layer & OpenAPI Docs',
+				superSvelte: '0-Codegen Hono Zod RPC + Swagger UI',
+				supastarter: 'Standard SvelteKit / Next API Routes',
+				makerkit: 'Next.js Server Actions / Supabase SDK',
+				epicstack: 'Remix Loaders & Form Actions'
+			},
+			{
+				feature: 'Auth & Multi-Tenancy',
+				superSvelte: 'Better Auth (Native Org/Teams & Admin)',
+				supastarter: 'Supabase Auth / Lucia Auth',
+				makerkit: 'Supabase / Firebase Auth (Tightly coupled)',
+				epicstack: 'Custom cookie & session implementation'
+			},
+			{
+				feature: 'Database & ORM Paradigm',
+				superSvelte: 'Drizzle ORM + Serverless Neon Postgres',
+				supastarter: 'Prisma ORM + Supabase Postgres',
+				makerkit: 'Supabase Client / Postgres (RLS)',
+				epicstack: 'Prisma ORM + SQLite / Postgres'
+			},
+			{
+				feature: 'Infrastructure & Lock-in',
+				superSvelte: 'Zero Lock-in (Vercel, Cloudflare, VPS)',
+				supastarter: 'Moderate (Supabase / Provider dependent)',
+				makerkit: 'High Vendor Lock-in (Supabase/Firebase)',
+				epicstack: 'Fly.io Docker container deployment'
+			}
+		]
+	},
+
+	// CATEGORY 2: TypeScript Full-Stack Frameworks & Toolkits
+	'ts-frameworks': {
 		columns: [
 			{ key: 'feature', label: 'Architectural Dimension' },
 			{ key: 'superSvelte', label: '🚀 Super Svelte', isPrimary: true, minWidth: 'min-w-[210px]' },
 			{ key: 'adonis', label: 'AdonisJS', minWidth: 'min-w-[150px]' },
 			{ key: 'redwood', label: 'RedwoodJS', minWidth: 'min-w-[150px]' },
-			{ key: 'wasp', label: 'Wasp', minWidth: 'min-w-[150px]' },
-			{ key: 'epicstack', label: 'Epic Stack (Remix)', minWidth: 'min-w-[160px]' }
+			{ key: 'wasp', label: 'Wasp', minWidth: 'min-w-[150px]' }
 		],
 		rows: [
 			{
@@ -36,53 +90,47 @@ export const matrices: Record<Mode, MatrixConfig> = {
 				superSvelte: 'Native Svelte 5 Runes ($state, 0 VDOM)',
 				adonis: 'Inertia.js Glue or Decoupled SPA',
 				redwood: 'React 18/19 Virtual DOM',
-				wasp: 'React Virtual DOM',
-				epicstack: 'React 19 Virtual DOM'
+				wasp: 'React Virtual DOM'
 			},
 			{
-				feature: 'Boilerplate & Codegen',
-				superSvelte: '0 Codegen (Pure TypeScript & Hono RPC)',
-				adonis: 'Heavy CLI scaffolding & Controllers',
-				redwood: 'GraphQL Codegen & CLI Wrappers',
-				wasp: 'Requires custom .wasp DSL compiler',
-				epicstack: 'Massive starter template boilerplate'
+				feature: 'Type Safety & API Protocol',
+				superSvelte: '0-Codegen Hono RPC + Auto OpenAPI 3.1',
+				adonis: 'Controller REST Endpoints',
+				redwood: 'GraphQL Schema & CLI Codegen',
+				wasp: 'DSL Generated Actions & Queries'
 			},
 			{
-				feature: 'Edge & Cold Start Latency',
+				feature: 'Deployment Target & Latency',
 				superSvelte: '<10ms Edge Cold Start (Vercel/Cloudflare)',
 				adonis: 'Slow (Requires Node.js VPS / Docker)',
-				redwood: 'Moderate (AWS Lambda / Node)',
-				wasp: 'Slow (Requires Docker / VPS container)',
-				epicstack: 'Requires Fly.io VPS container deployment'
+				redwood: 'Moderate (AWS Lambda / Node Server)',
+				wasp: 'Slow (Requires Docker / VPS container)'
 			},
 			{
 				feature: 'Database & ORM Paradigm',
 				superSvelte: 'Drizzle ORM + Serverless Neon Postgres',
 				adonis: 'Lucid ORM (ActiveRecord pattern)',
 				redwood: 'Prisma ORM',
-				wasp: 'Prisma ORM (DSL Generated)',
-				epicstack: 'Prisma ORM + SQLite / Postgres'
+				wasp: 'Prisma ORM (DSL Generated)'
 			},
 			{
 				feature: 'Auth & Session Lifecycle',
 				superSvelte: 'Better Auth (Session + Social + DB Hooks)',
 				adonis: 'Adonis Auth (@adonisjs/auth)',
 				redwood: 'Redwood Auth Engine',
-				wasp: 'Built-in Wasp Auth',
-				epicstack: 'Custom cookie auth implementation'
+				wasp: 'Built-in Wasp Auth'
 			},
 			{
 				feature: 'Background Queues & Realtime',
 				superSvelte: 'Upstash SSE Event Queue + QStash',
 				adonis: 'Adonis Queue (BullMQ / Redis)',
 				redwood: 'Third-party integration required',
-				wasp: 'PgBoss / Postgres Workers',
-				epicstack: 'Third-party / Custom worker'
+				wasp: 'PgBoss / Postgres Workers'
 			}
 		]
 	},
 
-	// SECONDARY CATEGORY: Classic Full-Stack Monoliths
+	// CATEGORY 3: Classic Full-Stack Backend Monoliths
 	monoliths: {
 		columns: [
 			{ key: 'feature', label: 'Architectural Dimension' },
