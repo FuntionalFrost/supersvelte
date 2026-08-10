@@ -130,6 +130,29 @@ export const files = pgTable('files', {
 	createdAt: timestamp('created_at').defaultNow().notNull()
 });
 
+// 10. PADDLE CUSTOMERS TABLE (Linked to Better Auth User)
+export const customers = pgTable('customers', {
+	customerId: text('customer_id').primaryKey(), // Paddle Customer ID (ctm_01h...)
+	userId: text('user_id').references(() => user.id, { onDelete: 'set null' }),
+	email: text('email').notNull(),
+	createdAt: timestamp('created_at').notNull().defaultNow(),
+	updatedAt: timestamp('updated_at').notNull().defaultNow()
+});
+
+// 11. PADDLE PURCHASES TABLE (Linked to Customer & Better Auth User)
+export const purchases = pgTable('purchases', {
+	transactionId: text('transaction_id').primaryKey(), // Paddle Transaction ID (txn_01h...)
+	customerId: text('customer_id').references(() => customers.customerId, { onDelete: 'cascade' }),
+	userId: text('user_id').references(() => user.id, { onDelete: 'set null' }),
+	priceId: text('price_id').notNull(),
+	productId: text('product_id').notNull(),
+	status: text('status').notNull(), // e.g., 'completed'
+	createdAt: timestamp('created_at').notNull().defaultNow()
+});
+
+export type Customer = typeof customers.$inferSelect;
+export type Purchase = typeof purchases.$inferSelect;
+
 // Zod Schema for Superforms validation
 export const insertProjectSchema = z.object({
 	name: z.string().min(2, 'Name must be at least 2 characters'),

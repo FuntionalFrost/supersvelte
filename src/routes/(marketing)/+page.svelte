@@ -1,16 +1,17 @@
 <!-- src/routes/(marketing)/+page.svelte -->
 <script lang="ts">
 	import { resolve } from '$app/paths';
+	import { PUBLIC_PADDLE_PRO_PRICE_ID, PUBLIC_PADDLE_STANDARD_PRICE_ID } from '$env/static/public';
 	import CodeComparison from '$lib/components/CodeComparison.svelte';
+	import PaddleCheckout from '$lib/components/PaddleCheckout.svelte';
 	import SEO from '$lib/components/SEO.svelte';
-	import SuperSvelteCheckout from '$lib/components/SuperSvelteCheckout.svelte';
 	import { matrices, type Mode } from '$lib/config/comparison';
 	import {
 		Check,
+		CircleQuestionMark,
 		Cloud,
 		Cpu,
 		Database,
-		HelpCircle,
 		Mail,
 		Rocket,
 		ShieldCheck,
@@ -21,10 +22,6 @@
 
 	let mode = $state<Mode>('saas-starters');
 	let currentMatrix = $derived(matrices[mode]);
-
-	// Set your Merchant of Record Variant IDs here
-	const STARTER_VARIANT_ID = '123456';
-	const PRO_VARIANT_ID = '654321';
 
 	// Safe accessor helper to satisfy TypeScript dynamic key indexing
 	function getCellValue(row: Record<string, unknown>, key: string): string {
@@ -77,7 +74,7 @@
 					class="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-8 py-3.5 text-sm font-bold text-primary-foreground shadow-lg transition hover:scale-105 hover:bg-primary/90"
 				>
 					<Rocket class="size-4" />
-					<span>Get SuperSvelte — $99</span>
+					<span>Get SuperSvelte!</span>
 				</a>
 				<a
 					href={resolve('/test')}
@@ -275,7 +272,7 @@
 							>
 						</div>
 						<div class="mt-4 flex items-baseline gap-1">
-							<span class="text-4xl font-extrabold">$99</span>
+							<span class="text-4xl font-extrabold">€99</span>
 							<span class="text-xs text-muted-foreground">/ one-time</span>
 						</div>
 						<p class="mt-2 text-xs text-muted-foreground">
@@ -305,7 +302,10 @@
 					</div>
 
 					<div class="mt-8">
-						<SuperSvelteCheckout variantId={STARTER_VARIANT_ID} buttonText="Get Standard License" />
+						<PaddleCheckout
+							priceId={PUBLIC_PADDLE_STANDARD_PRICE_ID}
+							buttonText="Get Standard License"
+						/>
 					</div>
 				</div>
 
@@ -327,7 +327,7 @@
 							>
 						</div>
 						<div class="mt-4 flex items-baseline gap-1">
-							<span class="text-4xl font-extrabold">$199</span>
+							<span class="text-4xl font-extrabold">€199</span>
 							<span class="text-xs text-muted-foreground">/ one-time</span>
 						</div>
 						<p class="mt-2 text-xs text-muted-foreground">
@@ -354,7 +354,7 @@
 					</div>
 
 					<div class="mt-8">
-						<SuperSvelteCheckout variantId={PRO_VARIANT_ID} buttonText="Get Unlimited Pro" />
+						<PaddleCheckout priceId={PUBLIC_PADDLE_PRO_PRICE_ID} buttonText="Get Unlimited Pro" />
 					</div>
 				</div>
 			</div>
@@ -368,7 +368,7 @@
 				<div
 					class="mb-3 inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary"
 				>
-					<HelpCircle class="size-3.5" />
+					<CircleQuestionMark class="size-3.5" />
 					<span>Got Questions?</span>
 				</div>
 				<h2 class="text-3xl font-bold">Frequently Asked Questions</h2>

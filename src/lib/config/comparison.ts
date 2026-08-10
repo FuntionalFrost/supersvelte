@@ -32,9 +32,9 @@ export const matrices: Record<Mode, MatrixConfig> = {
 		rows: [
 			{
 				feature: 'License & Pricing Model',
-				superSvelte: '$99 - $199 One-Time (Lifetime)',
-				supastarter: '$199 - $299 Single/Multi License',
-				makerkit: '$299 - $799 Enterprise License',
+				superSvelte: '€99 - €199 One-Time (Lifetime)',
+				supastarter: '€349 - €799+ Solo/Startup',
+				makerkit: '$349 - $649 Pro/Teams',
 				epicstack: '100% Free & Open-Source'
 			},
 			{
