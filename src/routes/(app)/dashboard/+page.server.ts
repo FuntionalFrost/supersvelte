@@ -1,4 +1,4 @@
-// src/routes/app/+page.server.ts
+// src/routes/app/dashboard/+page.server.ts
 import { auth } from '$lib/server/auth';
 import { db } from '$lib/server/db';
 import * as schema from '$lib/server/db/schema';

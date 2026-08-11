@@ -2,13 +2,14 @@
 <script lang="ts">
 	import { PUBLIC_PADDLE_CLIENT_TOKEN, PUBLIC_PADDLE_ENV } from '$env/static/public';
 	import { ArrowRight, LoaderCircle, ShieldCheck } from '@lucide/svelte';
-	import { initializePaddle, type Paddle } from '@paddle/paddle-js';
+	import { initializePaddle, type InitializePaddleOptions, type Paddle } from '@paddle/paddle-js';
 	import { onMount } from 'svelte';
 
 	interface Props {
 		priceId: string;
 		buttonText?: string;
 		githubUsername?: string;
+		paddleCustomerId?: string | null;
 		class?: string;
 	}
 
@@ -16,6 +17,7 @@
 		priceId,
 		buttonText = 'Get SuperSvelte',
 		githubUsername = '',
+		paddleCustomerId = null,
 		class: className = ''
 	}: Props = $props();
 
@@ -23,10 +25,14 @@
 	let loading = $state(false);
 
 	onMount(async () => {
-		const paddleInstance = await initializePaddle({
+		// Strictly typed initialization options without 'any'
+		const initOptions: InitializePaddleOptions = {
 			environment: (PUBLIC_PADDLE_ENV as 'sandbox' | 'production') || 'sandbox',
-			token: PUBLIC_PADDLE_CLIENT_TOKEN
-		});
+			token: PUBLIC_PADDLE_CLIENT_TOKEN,
+			...(paddleCustomerId ? { pwCustomer: { id: paddleCustomerId } } : {})
+		};
+
+		const paddleInstance = await initializePaddle(initOptions);
 
 		if (paddleInstance) {
 			paddle = paddleInstance;
@@ -45,7 +51,7 @@
 			settings: {
 				displayMode: 'overlay',
 				theme: 'dark',
-				successUrl: `${window.location.origin}/test?payment=success`
+				successUrl: `${window.location.origin}/welcome?payment=success`
 			}
 		});
 
