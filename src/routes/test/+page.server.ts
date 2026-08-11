@@ -9,7 +9,7 @@ import { redis } from '$lib/server/ratelimit';
 import { fail, redirect } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
 import { superValidate } from 'sveltekit-superforms';
-import { zod4 as zod } from 'sveltekit-superforms/adapters'; // Use zod4 adapter
+import { zod4 as zod } from 'sveltekit-superforms/adapters';
 
 export const load = async ({ locals }) => {
 	const form = await superValidate(zod(insertProjectSchema));
@@ -36,7 +36,7 @@ export const actions = {
 			.values({
 				name: form.data.name,
 				slug: form.data.slug,
-				userId: event.locals.user.id // Pass undefined if logged out
+				userId: event.locals.user.id
 			})
 			.returning();
 
@@ -72,7 +72,6 @@ export const actions = {
 	},
 
 	seed: async () => {
-		// 🔒 Only allow seeding during local development
 		if (!dev) {
 			return fail(403, { seeded: false, message: 'Seeding is disabled in production.' });
 		}
@@ -94,17 +93,15 @@ export const actions = {
 	},
 
 	signOut: async (event) => {
-		// Request the raw Response object to capture 'Set-Cookie' header
 		const response = await auth.api.signOut({
 			headers: event.request.headers,
 			asResponse: true
 		});
 
-		// Forward 'Set-Cookie' headers to SvelteKit
-		const cookieHeader = response.headers.get('set-cookie');
-		if (cookieHeader) {
+		const setCookie = response.headers.get('set-cookie');
+		if (setCookie) {
 			event.setHeaders({
-				'set-cookie': cookieHeader
+				'set-cookie': setCookie
 			});
 		}
 

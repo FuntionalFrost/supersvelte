@@ -1,11 +1,11 @@
-// src/routes/app/dashboard/+page.server.ts
+// src/routes/(app)/dashboard/+page.server.ts
 import { auth } from '$lib/server/auth';
 import { db } from '$lib/server/db';
 import * as schema from '$lib/server/db/schema';
 import { redirect } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
 
-export const load = async ({ request }: { request: Request }) => {
+export const load = async ({ request }) => {
 	const session = await auth.api.getSession({
 		headers: request.headers
 	});
@@ -41,4 +41,22 @@ export const load = async ({ request }: { request: Request }) => {
 		organization,
 		projects: orgProjects
 	};
+};
+
+export const actions = {
+	signOut: async (event) => {
+		const response = await auth.api.signOut({
+			headers: event.request.headers,
+			asResponse: true
+		});
+
+		const setCookie = response.headers.get('set-cookie');
+		if (setCookie) {
+			event.setHeaders({
+				'set-cookie': setCookie
+			});
+		}
+
+		throw redirect(303, '/login');
+	}
 };

@@ -1,4 +1,4 @@
-// src/routes/login/+page.server.ts
+// src/routes/(auth)/login/+page.server.ts
 import { auth } from '$lib/server/auth';
 import { fail, redirect } from '@sveltejs/kit';
 import { setMessage, superValidate } from 'sveltekit-superforms';
@@ -10,13 +10,18 @@ const loginSchema = z.object({
 	password: z.string().min(6, 'Password must be at least 6 characters')
 });
 
-export const load = async () => {
+export const load = async ({ request }) => {
+	// Redirect already logged-in users away from /login
+	const session = await auth.api.getSession({ headers: request.headers });
+	if (session) {
+		throw redirect(303, '/dashboard');
+	}
+
 	const form = await superValidate(zod(loginSchema));
 	return { form };
 };
 
 export const actions = {
-	// ONLY 'default' should exist in this object
 	default: async (event) => {
 		const form = await superValidate(event.request, zod(loginSchema));
 		if (!form.valid) return fail(400, { form });
@@ -34,6 +39,6 @@ export const actions = {
 			return setMessage(form, message, { status: 400 });
 		}
 
-		throw redirect(303, '/test');
+		throw redirect(303, '/dashboard');
 	}
 };

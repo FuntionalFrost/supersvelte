@@ -15,8 +15,8 @@
 			</p>
 		</div>
 
-		<!-- Sign Out Action -->
-		<form method="POST" action="/test?/signOut" use:enhance>
+		<!-- Sign Out Action (Targets self) -->
+		<form method="POST" action="?/signOut" use:enhance>
 			<Button variant="outline" size="sm" type="submit">Sign Out</Button>
 		</form>
 	</div>
