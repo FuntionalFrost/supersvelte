@@ -1,5 +1,6 @@
 // src/lib/server/db/schema.ts
 import { boolean, integer, pgTable, text, timestamp } from 'drizzle-orm/pg-core';
+import crypto from 'node:crypto';
 import { z } from 'zod';
 
 // 1. USER TABLE (Includes Admin plugin fields)
@@ -144,8 +145,10 @@ export const purchases = pgTable('purchases', {
 	transactionId: text('transaction_id').primaryKey(), // Paddle Transaction ID (txn_01h...)
 	customerId: text('customer_id').references(() => customers.customerId, { onDelete: 'cascade' }),
 	userId: text('user_id').references(() => user.id, { onDelete: 'set null' }),
+	subscriptionId: text('subscription_id'), // Optional Paddle Subscription ID (sub_01h...)
 	priceId: text('price_id').notNull(),
 	productId: text('product_id').notNull(),
+	licenseKey: text('license_key').unique(), // Formatted License Key (SS-LIVE-XXXX-XXXX-XXXX)
 	status: text('status').notNull(), // e.g., 'completed'
 	createdAt: timestamp('created_at').notNull().defaultNow()
 });
@@ -158,3 +161,11 @@ export const insertProjectSchema = z.object({
 	name: z.string().min(2, 'Name must be at least 2 characters'),
 	slug: z.string().min(1, 'Slug is required')
 });
+
+/**
+ * Generates a formatted license key (e.g., SS-LIVE-A1B2-C3D4-E5F6)
+ */
+export function generateLicenseKey(prefix = 'SS-LIVE'): string {
+	const bytes = crypto.randomBytes(6).toString('hex').toUpperCase();
+	return `${prefix}-${bytes.slice(0, 4)}-${bytes.slice(4, 8)}-${bytes.slice(8, 12)}`;
+}

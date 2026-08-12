@@ -138,4 +138,4 @@ src/
         ├── +page.ts
         └── +page.svelte
 
-````
+```

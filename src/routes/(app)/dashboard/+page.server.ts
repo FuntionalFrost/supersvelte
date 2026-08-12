@@ -2,11 +2,11 @@
 import { auth } from '$lib/server/auth';
 import { db } from '$lib/server/db';
 import * as schema from '$lib/server/db/schema';
+import { setCookiesFromResponse } from '$lib/server/utils';
 import { redirect } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
 
 export const load = async ({ locals, request }) => {
-	// Guarded by (app)/+layout.server.ts, but checked for type safety
 	if (!locals.user || !locals.session) {
 		throw redirect(303, '/login');
 	}
@@ -21,13 +21,11 @@ export const load = async ({ locals, request }) => {
 		};
 	}
 
-	// Fetch Organization metadata
 	const organization = await auth.api.getFullOrganization({
 		headers: request.headers,
 		query: { organizationId: activeOrgId }
 	});
 
-	// Query DB projects belonging exclusively to this active workspace
 	const orgProjects = await db
 		.select()
 		.from(schema.projects)
@@ -47,12 +45,8 @@ export const actions = {
 			asResponse: true
 		});
 
-		const setCookie = response.headers.get('set-cookie');
-		if (setCookie) {
-			event.setHeaders({
-				'set-cookie': setCookie
-			});
-		}
+		// Clear session cookie via event.cookies API
+		setCookiesFromResponse(event, response);
 
 		throw redirect(303, '/login');
 	}
