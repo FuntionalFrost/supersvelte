@@ -1,12 +1,18 @@
 // src/routes/test/+page.ts
+import { dev } from '$app/environment';
 import { client } from '$lib/api-client';
+import { error } from '@sveltejs/kit';
 
 export const load = async ({ fetch, data }) => {
+	// 🔒 Security Guard: Prevent RPC execution in production
+	if (!dev) {
+		throw error(404, 'Not Found');
+	}
+
 	let initialRpcStatus: string;
 	let initialRpcCount = 0;
 
 	try {
-		// Pass query/request inputs as 1st arg, and { fetch } as 2nd arg (options)
 		const res = await client.api.projects.$get({}, { fetch });
 
 		if (res.ok) {
@@ -21,7 +27,7 @@ export const load = async ({ fetch, data }) => {
 	}
 
 	return {
-		...data, // Forwards 'form' and 'existingProjects' from +page.server.ts
+		...data,
 		rpcDiagnostics: {
 			status: initialRpcStatus,
 			count: initialRpcCount

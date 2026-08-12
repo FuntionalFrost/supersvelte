@@ -1,14 +1,22 @@
 <!-- src/routes/test/+page.svelte -->
 <script lang="ts">
 	import { resolve } from '$app/paths';
+	import {
+		PUBLIC_PADDLE_CLIENT_TOKEN,
+		PUBLIC_PADDLE_ENV,
+		PUBLIC_PADDLE_PRO_PRICE_ID,
+		PUBLIC_PADDLE_STANDARD_PRICE_ID
+	} from '$env/static/public';
 	import { client } from '$lib/api-client';
 	import { authClient } from '$lib/auth-client';
+	import PaddleCheckout from '$lib/components/PaddleCheckout.svelte';
 	import {
 		Activity,
 		ArrowLeft,
 		CircleAlert,
 		CircleCheck,
 		CloudUpload,
+		CreditCard,
 		Database,
 		FileText,
 		Lock,
@@ -50,8 +58,8 @@
 		};
 	};
 
-	// Active Tab State ('rpc' | 'db' | 'upload' | 'sse' | 'auth')
-	let activeTab = $state<'rpc' | 'db' | 'upload' | 'sse' | 'auth'>('rpc');
+	// Active Tab State ('rpc' | 'db' | 'upload' | 'sse' | 'auth' | 'paddle')
+	let activeTab = $state<'rpc' | 'db' | 'upload' | 'sse' | 'auth' | 'paddle'>('rpc');
 
 	// --- 1. HONO RPC & RATE LIMIT DIAGNOSTIC STATE ---
 	let rpcLoading = $state(false);
@@ -243,7 +251,6 @@
 	let session = $state<SessionData | null>(null);
 	let authLoading = $state(true);
 
-	// Sync session state from server load data and client SDK
 	$effect(() => {
 		if (data.user) {
 			session = { user: data.user as SessionData['user'] };
@@ -257,6 +264,9 @@
 			authLoading = false;
 		});
 	});
+
+	// --- 6. PADDLE CHECKOUT DIAGNOSTIC STATE ---
+	let testGithubUser = $state('octocat');
 
 	// Auto-run baseline RPC test on mount
 	$effect(() => {
@@ -314,8 +324,8 @@
 					<h1 class="text-2xl font-bold tracking-tight">System Health & Latency Test</h1>
 					<p class="max-w-xl text-xs text-muted-foreground">
 						Execute live RPC queries, test rate limits, measure Drizzle/Neon query times, test
-						UploadThing cloud file uploads, and stream real-time SSE heartbeats directly from Vercel
-						Edge.
+						UploadThing cloud file uploads, stream real-time SSE heartbeats, and test Paddle
+						checkout overlay triggers.
 					</p>
 				</div>
 
@@ -332,7 +342,7 @@
 			</div>
 		</div>
 
-		<!-- 5 Diagnostic Tabs Navigation -->
+		<!-- 6 Diagnostic Tabs Navigation -->
 		<div class="mb-8 flex flex-wrap gap-2 rounded-xl border border-border bg-card p-1.5 shadow-xs">
 			<button
 				onclick={() => (activeTab = 'rpc')}
@@ -406,14 +416,29 @@
 					: 'text-muted-foreground hover:text-foreground'}"
 			>
 				<ShieldCheck class="size-4" />
-				<span>5. Better Auth Session</span>
+				<span>5. Better Auth</span>
+			</button>
+
+			<button
+				onclick={() => (activeTab = 'paddle')}
+				class="flex items-center gap-2 rounded-lg px-3.5 py-2 text-xs font-semibold transition-all {activeTab ===
+				'paddle'
+					? 'bg-primary text-primary-foreground shadow-xs'
+					: 'text-muted-foreground hover:text-foreground'}"
+			>
+				<CreditCard class="size-4" />
+				<span>6. Paddle Billing</span>
+				<span
+					class="ml-1 rounded-full bg-background/20 px-1.5 py-0.5 font-mono text-[10px] uppercase"
+				>
+					{PUBLIC_PADDLE_ENV || 'sandbox'}
+				</span>
 			</button>
 		</div>
 
 		<!-- TAB 1: HONO RPC & RATE LIMITER -->
 		{#if activeTab === 'rpc'}
 			<div class="grid gap-6 md:grid-cols-3">
-				<!-- Control Panel -->
 				<div class="space-y-4 rounded-xl border border-border bg-card p-6">
 					<div class="flex items-center gap-2 text-sm font-bold">
 						<Zap class="size-4 text-amber-400" />
@@ -467,7 +492,6 @@
 					{/if}
 				</div>
 
-				<!-- Live Response Inspector -->
 				<div
 					class="flex flex-col justify-between rounded-xl border border-border bg-card p-6 md:col-span-2"
 				>
@@ -508,7 +532,6 @@
 		<!-- TAB 2: DRIZZLE DB & REDIS CACHE -->
 		{#if activeTab === 'db'}
 			<div class="grid gap-6 md:grid-cols-3">
-				<!-- Form & Actions -->
 				<div class="space-y-4 rounded-xl border border-border bg-card p-6">
 					<div class="flex items-center gap-2 text-sm font-bold">
 						<Database class="size-4 text-emerald-400" />
@@ -566,7 +589,6 @@
 					</div>
 				</div>
 
-				<!-- Live DB Projects List -->
 				<div class="rounded-xl border border-border bg-card p-6 md:col-span-2">
 					<div class="flex items-center justify-between border-b border-border pb-3">
 						<div class="flex items-center gap-2">
@@ -642,7 +664,6 @@
 		<!-- TAB 3: UPLOADTHING CLOUD FILE UPLOADS -->
 		{#if activeTab === 'upload'}
 			<div class="grid gap-6 md:grid-cols-3">
-				<!-- Dropzone & Upload Action -->
 				<div class="space-y-4 rounded-xl border border-border bg-card p-6">
 					<div class="flex items-center gap-2 text-sm font-bold">
 						<CloudUpload class="size-4 text-pink-400" />
@@ -653,7 +674,6 @@
 						server responses.
 					</p>
 
-					<!-- Drag & Drop Target Box -->
 					<div
 						onclick={() => fileInputRef?.click()}
 						onkeydown={(e) => e.key === 'Enter' && fileInputRef?.click()}
@@ -691,7 +711,6 @@
 					{/if}
 				</div>
 
-				<!-- Uploaded Files List -->
 				<div class="rounded-xl border border-border bg-card p-6 md:col-span-2">
 					<div class="flex items-center justify-between border-b border-border pb-3">
 						<div class="flex items-center gap-2 text-xs font-bold">
@@ -740,7 +759,6 @@
 		<!-- TAB 4: UPSTASH SSE STREAMING -->
 		{#if activeTab === 'sse'}
 			<div class="grid gap-6 md:grid-cols-3">
-				<!-- Stream Controls -->
 				<div class="space-y-4 rounded-xl border border-border bg-card p-6">
 					<div class="flex items-center gap-2 text-sm font-bold">
 						<Radio class="size-4 text-cyan-400" />
@@ -785,7 +803,6 @@
 					</div>
 				</div>
 
-				<!-- Live SSE Event Terminal -->
 				<div class="rounded-xl border border-border bg-card p-6 md:col-span-2">
 					<div class="flex items-center justify-between border-b border-border pb-3">
 						<div class="flex items-center gap-2 text-xs font-bold">
@@ -907,6 +924,117 @@
 						</a>
 					</div>
 				{/if}
+			</div>
+		{/if}
+
+		<!-- TAB 6: PADDLE BILLING & CHECKOUT DIAGNOSTICS -->
+		{#if activeTab === 'paddle'}
+			<div class="grid gap-6 md:grid-cols-3">
+				<!-- Config Inspector -->
+				<div class="space-y-4 rounded-xl border border-border bg-card p-6">
+					<div class="flex items-center gap-2 text-sm font-bold">
+						<CreditCard class="size-4 text-cyan-400" />
+						<span>Paddle MoR Environment</span>
+					</div>
+					<p class="text-xs leading-relaxed text-muted-foreground">
+						Tests global tax compliance, Paddle.js overlay client initialization, custom customData
+						metadata payload passing, and success redirect routing.
+					</p>
+
+					<div class="space-y-2 border-t border-border/60 pt-3 font-mono text-xs">
+						<div class="flex items-center justify-between">
+							<span class="text-muted-foreground">Environment:</span>
+							<span class="rounded bg-primary/10 px-2 py-0.5 font-bold text-primary uppercase">
+								{PUBLIC_PADDLE_ENV || 'sandbox'}
+							</span>
+						</div>
+						<div class="flex flex-col gap-1 pt-1">
+							<span class="text-[10px] text-muted-foreground">Client Token:</span>
+							<span class="truncate rounded bg-muted/60 p-1.5 text-[10px] text-foreground">
+								{PUBLIC_PADDLE_CLIENT_TOKEN || 'Not configured'}
+							</span>
+						</div>
+						<div class="flex flex-col gap-1 pt-1">
+							<span class="text-[10px] text-muted-foreground">Standard Price ID:</span>
+							<span class="truncate rounded bg-muted/60 p-1.5 text-[10px] text-foreground">
+								{PUBLIC_PADDLE_STANDARD_PRICE_ID || 'Not configured'}
+							</span>
+						</div>
+						<div class="flex flex-col gap-1 pt-1">
+							<span class="text-[10px] text-muted-foreground">Pro Price ID:</span>
+							<span class="truncate rounded bg-muted/60 p-1.5 text-[10px] text-foreground">
+								{PUBLIC_PADDLE_PRO_PRICE_ID || 'Not configured'}
+							</span>
+						</div>
+					</div>
+				</div>
+
+				<!-- Live Interactive Checkout Launcher -->
+				<div class="space-y-6 rounded-xl border border-border bg-card p-6 md:col-span-2">
+					<div class="flex items-center justify-between border-b border-border pb-3">
+						<div class="flex items-center gap-2">
+							<Sparkles class="size-4 text-emerald-400" />
+							<span class="text-xs font-bold">Live Checkout Overlay Test Bench</span>
+						</div>
+						<span class="font-mono text-[10px] text-muted-foreground">
+							Fulfillment URL: /welcome?payment=success
+						</span>
+					</div>
+
+					<!-- GitHub Handle Input for Metadata Testing -->
+					<div class="space-y-1.5">
+						<label for="gh-test" class="text-xs font-medium text-foreground">
+							Test Custom Metadata (<code class="text-primary">github_username</code>)
+						</label>
+						<input
+							id="gh-test"
+							type="text"
+							bind:value={testGithubUser}
+							placeholder="e.g. octocat"
+							class="w-full max-w-sm rounded-lg border border-border bg-background px-3 py-2 font-mono text-xs text-foreground focus:ring-2 focus:ring-primary/40 focus:outline-hidden"
+						/>
+						<p class="text-[11px] text-muted-foreground">
+							This string is attached to Paddle checkout customData and sent to <code
+								class="text-primary">inviteBuyerToGithub()</code
+							> on webhook delivery.
+						</p>
+					</div>
+
+					<!-- Test Overlay Component Cards -->
+					<div class="grid gap-4 sm:grid-cols-2">
+						<div
+							class="flex flex-col justify-between space-y-4 rounded-xl border border-border/80 bg-muted/20 p-4"
+						>
+							<div>
+								<h4 class="text-xs font-bold text-foreground">Standard Tier Checkout</h4>
+								<p class="mt-1 font-mono text-[11px] text-muted-foreground">
+									Price ID: {PUBLIC_PADDLE_STANDARD_PRICE_ID || 'pri_...'}
+								</p>
+							</div>
+							<PaddleCheckout
+								priceId={PUBLIC_PADDLE_STANDARD_PRICE_ID}
+								githubUsername={testGithubUser}
+								buttonText="Test Standard Checkout (€99)"
+							/>
+						</div>
+
+						<div
+							class="flex flex-col justify-between space-y-4 rounded-xl border border-border/80 bg-muted/20 p-4"
+						>
+							<div>
+								<h4 class="text-xs font-bold text-foreground">Pro Tier Checkout</h4>
+								<p class="mt-1 font-mono text-[11px] text-muted-foreground">
+									Price ID: {PUBLIC_PADDLE_PRO_PRICE_ID || 'pri_...'}
+								</p>
+							</div>
+							<PaddleCheckout
+								priceId={PUBLIC_PADDLE_PRO_PRICE_ID}
+								githubUsername={testGithubUser}
+								buttonText="Test Pro Checkout (€199)"
+							/>
+						</div>
+					</div>
+				</div>
 			</div>
 		{/if}
 	</main>

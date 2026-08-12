@@ -5,6 +5,7 @@
 	import CodeComparison from '$lib/components/CodeComparison.svelte';
 	import PaddleCheckout from '$lib/components/PaddleCheckout.svelte';
 	import SEO from '$lib/components/SEO.svelte';
+	import SuperSvelteVsOthers from '$lib/components/SuperSvelteVsOthers.svelte';
 	import { matrices, type Mode } from '$lib/config/comparison';
 	import {
 		Check,
@@ -358,6 +359,12 @@
 					</div>
 				</div>
 			</div>
+		</div>
+	</section>
+
+	<section class="border-t border-border/60 bg-muted/20 py-20">
+		<div class="container mx-auto px-4">
+			<SuperSvelteVsOthers />
 		</div>
 	</section>
 

@@ -14,10 +14,8 @@
 	} from '@lucide/svelte';
 	import { toast } from 'svelte-sonner';
 
-	// Organization state provided by Better Auth Svelte store/rune helper
 	const activeOrg = useActiveOrganization();
 
-	// Modal / Form States
 	let newOrgName = $state('');
 	let newOrgSlug = $state('');
 	let inviteEmail = $state('');
@@ -26,7 +24,6 @@
 	let isSendingInvite = $state(false);
 	let actionLoadingId = $state<string | null>(null);
 
-	// Multi-organization list for active user
 	let userOrgs = $state<Array<{ id: string; name: string; slug: string }>>([]);
 
 	async function loadUserOrgs() {
@@ -278,9 +275,9 @@
 								{#each $activeOrg.data.members || [] as member (member.id)}
 									<tr class="transition hover:bg-muted/20">
 										<td class="p-3.5 font-medium">
-											<div>{member.user.name || 'Team Member'}</div>
+											<div>{member.user?.name || 'Team Member'}</div>
 											<div class="font-mono text-[11px] text-muted-foreground">
-												{member.user.email}
+												{member.user?.email || 'N/A'}
 											</div>
 										</td>
 										<td class="p-3.5">

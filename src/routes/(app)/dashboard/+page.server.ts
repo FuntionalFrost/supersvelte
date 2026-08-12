@@ -5,20 +5,17 @@ import * as schema from '$lib/server/db/schema';
 import { redirect } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
 
-export const load = async ({ request }) => {
-	const session = await auth.api.getSession({
-		headers: request.headers
-	});
-
-	if (!session) {
-		throw redirect(307, '/login');
+export const load = async ({ locals, request }) => {
+	// Guarded by (app)/+layout.server.ts, but checked for type safety
+	if (!locals.user || !locals.session) {
+		throw redirect(303, '/login');
 	}
 
-	const activeOrgId = session.session.activeOrganizationId;
+	const activeOrgId = locals.session.activeOrganizationId;
 
 	if (!activeOrgId) {
 		return {
-			user: session.user,
+			user: locals.user,
 			organization: null,
 			projects: []
 		};
@@ -37,7 +34,7 @@ export const load = async ({ request }) => {
 		.where(eq(schema.projects.organizationId, activeOrgId));
 
 	return {
-		user: session.user,
+		user: locals.user,
 		organization,
 		projects: orgProjects
 	};

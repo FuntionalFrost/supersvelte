@@ -6,12 +6,17 @@ import { getProjects, invalidateProjectsCache } from '$lib/server/db/queries';
 import { insertProjectSchema, projects, user } from '$lib/server/db/schema';
 import { sendEmail } from '$lib/server/email';
 import { redis } from '$lib/server/ratelimit';
-import { fail, redirect } from '@sveltejs/kit';
+import { error, fail, redirect } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
 import { superValidate } from 'sveltekit-superforms';
 import { zod4 as zod } from 'sveltekit-superforms/adapters';
 
 export const load = async ({ locals }) => {
+	// 🔒 Security Guard: Disable /test route in production
+	if (!dev) {
+		throw error(404, 'Not Found');
+	}
+
 	const form = await superValidate(zod(insertProjectSchema));
 	const { data: existingProjects } = await getProjects();
 
@@ -25,6 +30,8 @@ export const load = async ({ locals }) => {
 
 export const actions = {
 	createProject: async (event) => {
+		if (!dev) throw error(404, 'Not Found');
+
 		const form = await superValidate(event.request, zod(insertProjectSchema));
 		if (!form.valid) return fail(400, { form });
 		if (!event.locals.user) {
@@ -57,6 +64,8 @@ export const actions = {
 	},
 
 	deleteProject: async ({ request, locals }) => {
+		if (!dev) throw error(404, 'Not Found');
+
 		if (!locals.user) {
 			return fail(401, { message: 'You must be logged in to delete a project.' });
 		}
@@ -93,6 +102,8 @@ export const actions = {
 	},
 
 	signOut: async (event) => {
+		if (!dev) throw error(404, 'Not Found');
+
 		const response = await auth.api.signOut({
 			headers: event.request.headers,
 			asResponse: true
@@ -109,6 +120,8 @@ export const actions = {
 	},
 
 	sendTestEmail: async ({ locals }) => {
+		if (!dev) throw error(404, 'Not Found');
+
 		if (!locals.user?.email) {
 			return fail(400, { message: 'Must be logged in to send a test email.' });
 		}
