@@ -2,87 +2,93 @@
 import { dev } from '$app/environment';
 import { auth } from '$lib/server/auth';
 import { db } from '$lib/server/db';
-import { getProjects, invalidateProjectsCache } from '$lib/server/db/queries';
 import { insertProjectSchema, projects, user } from '$lib/server/db/schema';
 import { sendEmail } from '$lib/server/email';
-import { redis } from '$lib/server/ratelimit';
-import { error, fail, redirect } from '@sveltejs/kit';
-import { eq } from 'drizzle-orm';
+import { setCookiesFromResponse } from '$lib/server/utils';
+import { fail, redirect } from '@sveltejs/kit';
+import { and, eq } from 'drizzle-orm';
 import { superValidate } from 'sveltekit-superforms';
 import { zod4 as zod } from 'sveltekit-superforms/adapters';
 
-export const load = async ({ locals }) => {
-	// 🔒 Security Guard: Disable /test route in production
-	if (!dev) {
-		throw error(404, 'Not Found');
-	}
+// Safe fallback mock projects for unauthenticated landing page visitors
+const MOCK_DEMO_PROJECTS = [
+	{ id: 'demo-1', name: 'Acme Analytics Platform', slug: 'acme-analytics' },
+	{ id: 'demo-2', name: 'Edge AI Gateway', slug: 'edge-ai-gateway' }
+];
 
+export const load = async ({ locals }) => {
 	const form = await superValidate(zod(insertProjectSchema));
-	const { data: existingProjects } = await getProjects();
+
+	let userProjects = MOCK_DEMO_PROJECTS;
+
+	// Only query real DB projects if the user is authenticated
+	if (locals.user) {
+		try {
+			// Logged-in users get their actual projects (or an empty array if 0)
+			userProjects = await db
+				.select({ id: projects.id, name: projects.name, slug: projects.slug })
+				.from(projects)
+				.where(eq(projects.userId, locals.user.id))
+				.limit(10);
+		} catch (err) {
+			console.error('Failed to load user projects:', err);
+		}
+	}
 
 	return {
 		form,
-		existingProjects,
-		user: locals.user,
-		session: locals.session
+		existingProjects: userProjects,
+		user: locals.user ?? null,
+		session: locals.session ?? null
 	};
 };
 
 export const actions = {
 	createProject: async (event) => {
-		if (!dev) throw error(404, 'Not Found');
-
 		const form = await superValidate(event.request, zod(insertProjectSchema));
 		if (!form.valid) return fail(400, { form });
+
 		if (!event.locals.user) {
-			return fail(401, { form, message: 'You must be logged in to create a project.' });
+			return fail(401, { form, message: 'Sign in to create persistent database records.' });
 		}
 
-		const [newProject] = await db
-			.insert(projects)
-			.values({
+		try {
+			await db.insert(projects).values({
 				name: form.data.name,
 				slug: form.data.slug,
 				userId: event.locals.user.id
-			})
-			.returning();
-
-		await invalidateProjectsCache();
-
-		if (redis) {
-			await redis.lpush(
-				'events:app',
-				JSON.stringify({
-					type: 'PROJECT_CREATED',
-					payload: newProject,
-					timestamp: new Date().toISOString()
-				})
-			);
+			});
+			return { form };
+		} catch {
+			return fail(500, { form, message: 'Failed to insert project into database.' });
 		}
-
-		return { form };
 	},
 
 	deleteProject: async ({ request, locals }) => {
-		if (!dev) throw error(404, 'Not Found');
-
 		if (!locals.user) {
-			return fail(401, { message: 'You must be logged in to delete a project.' });
+			return fail(401, { message: 'Must be logged in to delete.' });
 		}
+
 		const formData = await request.formData();
 		const id = formData.get('id')?.toString();
 
 		if (id) {
-			await db.delete(projects).where(eq(projects.id, id));
-			await invalidateProjectsCache();
+			// 🔒 Strictly enforce ownership check on delete
+			await db
+				.delete(projects)
+				.where(and(eq(projects.id, id), eq(projects.userId, locals.user.id)));
 		}
 
 		return { success: true };
 	},
 
 	seed: async () => {
+		// Prevent database wipes in production
 		if (!dev) {
-			return fail(403, { seeded: false, message: 'Seeding is disabled in production.' });
+			return fail(403, {
+				seeded: false,
+				message: 'Database seeding is disabled in public production mode.'
+			});
 		}
 
 		try {
@@ -95,33 +101,22 @@ export const actions = {
 				}
 			});
 			return { seeded: true, message: 'Fresh user created: test@example.com / password123' };
-		} catch (err: unknown) {
-			const msg = err instanceof Error ? err.message : 'Failed to seed user';
-			return { seeded: false, message: msg };
+		} catch {
+			return { seeded: false, message: 'Failed to seed user' };
 		}
 	},
 
 	signOut: async (event) => {
-		if (!dev) throw error(404, 'Not Found');
-
 		const response = await auth.api.signOut({
 			headers: event.request.headers,
 			asResponse: true
 		});
 
-		const setCookie = response.headers.get('set-cookie');
-		if (setCookie) {
-			event.setHeaders({
-				'set-cookie': setCookie
-			});
-		}
-
+		setCookiesFromResponse(event, response);
 		throw redirect(303, '/login');
 	},
 
 	sendTestEmail: async ({ locals }) => {
-		if (!dev) throw error(404, 'Not Found');
-
 		if (!locals.user?.email) {
 			return fail(400, { message: 'Must be logged in to send a test email.' });
 		}
@@ -134,8 +129,7 @@ export const actions = {
 
 		if (res.success) {
 			return { emailSent: true, message: `Test email sent to ${locals.user.email}!` };
-		} else {
-			return fail(500, { message: 'Failed to send email via Resend.' });
 		}
+		return fail(500, { message: 'Failed to send email.' });
 	}
 };
