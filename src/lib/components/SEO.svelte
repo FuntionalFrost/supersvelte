@@ -11,8 +11,8 @@
 	}
 
 	let {
-		title = 'SvelteAcademy | Master Svelte 5 and SvelteKit',
-		description = 'Interactive developer guides, primitives deep-dives, and architectural benchmarks for modern Svelte 5 development.',
+		title = 'SuperSvelte | The Batteries-Included Edge Svelte 5 Framework',
+		description = 'Launch Svelte 5 apps in hours with Better Auth, Drizzle, Neon Postgres, Upstash Redis, and OpenAPI Hono RPC.',
 		type = 'website',
 		image,
 		publishDate
@@ -21,7 +21,7 @@
 	let siteUrl = $derived(page.url.origin);
 	let canonicalUrl = $derived(page.url.href);
 
-	let fullTitle = $derived(title.includes('SvelteAcademy') ? title : `${title} — SvelteAcademy`);
+	let fullTitle = $derived(title.includes('SuperSvelte') ? title : `${title} — SuperSvelte`);
 
 	// Fallback to dynamic SVG OG image endpoint if no explicit image is provided
 	let ogImageUrl = $derived(
@@ -43,7 +43,7 @@
 	<meta property="og:title" content={fullTitle} />
 	<meta property="og:description" content={description} />
 	<meta property="og:image" content={ogImageUrl} />
-	<meta property="og:site_name" content="SvelteAcademy" />
+	<meta property="og:site_name" content="SuperSvelte" />
 
 	<!-- Twitter Cards -->
 	<meta name="twitter:card" content="summary_large_image" />

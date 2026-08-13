@@ -13,7 +13,6 @@
 		Users
 	} from '@lucide/svelte';
 	import { toast } from 'svelte-sonner';
-
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
@@ -77,7 +76,7 @@
 			return;
 		}
 		toast.success('Impersonating user...');
-		window.location.href = '/dashboard';
+		window.location.href = resolve('/dashboard');
 	}
 </script>
 
@@ -200,7 +199,7 @@
 									<td class="p-3.5 font-mono text-muted-foreground">
 										{new Date(user.createdAt).toLocaleDateString()}
 									</td>
-									<td class="p-3.5 text-right">
+									<td class="space-x-1 p-3.5 text-right">
 										<button
 											onclick={() => toggleBan(user.id, !!user.banned)}
 											disabled={actionLoadingId === user.id}

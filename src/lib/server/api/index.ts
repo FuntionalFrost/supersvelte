@@ -130,11 +130,11 @@ const projectsApp = new OpenAPIHono()
 		}
 	);
 
-// 3. BASE INSTANCE & OPENAPI REGISTRATION
-const baseApp = new OpenAPIHono();
+// 3. BASE API ROUTER CHAIN
+const api = new OpenAPIHono().basePath('/api');
 
-// Mount documentation directly on the OpenAPIHono instance
-baseApp.doc('/api/doc', {
+// OpenAPI 3.1 JSON Document
+api.doc('/doc', {
 	openapi: '3.1.0',
 	info: {
 		title: 'Super Svelte API Engine',
@@ -142,11 +142,11 @@ baseApp.doc('/api/doc', {
 	}
 });
 
-baseApp.get('/api/docs', swaggerUI({ url: '/api/doc' }));
+// Interactive Swagger UI
+api.get('/docs', swaggerUI({ url: '/api/doc' }));
 
 // 4. ROUTE CHAIN FOR RPC TYPE INFERENCE
-const routes = baseApp
-	.basePath('/api')
+const routes = api
 	.route('/projects', projectsApp)
 	.openapi(
 		createRoute({
@@ -239,6 +239,5 @@ const routes = baseApp
 	});
 
 // 5. EXPORTS
-// Exporting `routes` as `app` satisfies ESLint `no-unused-vars` and exports runtime routes for SvelteKit
 export { routes as app };
 export type AppType = typeof routes;

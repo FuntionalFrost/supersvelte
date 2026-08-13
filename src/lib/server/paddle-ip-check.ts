@@ -3,7 +3,7 @@ import { building } from '$app/environment';
 
 let cachedCidrs: string[] = [];
 let lastFetch = 0;
-const CACHE_TTL_MS = 1000 * 60 * 60 * 12; // Cache for 12 hours
+const CACHE_TTL_MS = 1000 * 60 * 60 * 12; // 12 Hours
 
 export async function getPaddleIpCidrs(): Promise<string[]> {
 	if (building) return [];
@@ -27,11 +27,27 @@ export async function getPaddleIpCidrs(): Promise<string[]> {
 	return cachedCidrs;
 }
 
-// Simple IP in CIDR check for /32 or standard subnets
+// Convert IPv4 string to 32-bit unsigned integer
+function ipToLong(ip: string): number {
+	return ip.split('.').reduce((acc, octet) => (acc << 8) + parseInt(octet, 10), 0) >>> 0;
+}
+
+// Bitwise IPv4 CIDR subnet match
 export function isIpAllowed(ip: string, cidrs: string[]): boolean {
-	if (!ip || cidrs.length === 0) return true; // Fallback to signature check if IP list unavailable
-	return cidrs.some((cidr) => {
-		const [range] = cidr.split('/');
-		return ip === range;
-	});
+	if (!ip || cidrs.length === 0) return true; // Fallback to signature check if list unavailable
+
+	try {
+		const ipNum = ipToLong(ip);
+
+		return cidrs.some((cidr) => {
+			const [range, prefixStr] = cidr.split('/');
+			const prefix = prefixStr ? parseInt(prefixStr, 10) : 32;
+			const mask = prefix === 0 ? 0 : (~0 << (32 - prefix)) >>> 0;
+			const rangeNum = ipToLong(range);
+
+			return (ipNum & mask) === (rangeNum & mask);
+		});
+	} catch {
+		return true; // Fallback to signature verification if IP parsing fails
+	}
 }

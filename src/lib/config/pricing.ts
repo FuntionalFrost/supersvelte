@@ -15,7 +15,7 @@ export const tiers: Tier[] = [
 		name: 'Standard',
 		badge: '1 Developer',
 		description: 'Perfect for solopreneurs launching a single product or SaaS.',
-		priceId: PUBLIC_PADDLE_STANDARD_PRICE_ID,
+		priceId: PUBLIC_PADDLE_STANDARD_PRICE_ID || '',
 		features: [
 			'Full Svelte 5 + Hono RPC Source Code',
 			'Better Auth (Session + Social Logins)',
@@ -29,7 +29,7 @@ export const tiers: Tier[] = [
 		name: 'Unlimited Pro',
 		badge: 'Unlimited Projects',
 		description: 'For agencies, serial founders, and team workflows.',
-		priceId: PUBLIC_PADDLE_PRO_PRICE_ID,
+		priceId: PUBLIC_PADDLE_PRO_PRICE_ID || '',
 		highlighted: true,
 		features: [
 			'Everything in Standard License',

@@ -1,5 +1,5 @@
-<!-- src/routes/accept-invitation/[id]/+page.svelte -->
 <script lang="ts">
+	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
 	import { authClient } from '$lib/auth-client';
@@ -9,27 +9,39 @@
 	let status = $state<'loading' | 'success' | 'error'>('loading');
 	let errorMessage = $state('');
 
-	onMount(async () => {
-		const invitationId = page.params.id;
-		if (!invitationId) {
-			status = 'error';
-			errorMessage = 'Invalid invitation link';
-			return;
+	onMount(() => {
+		let timeoutId: ReturnType<typeof setTimeout>;
+
+		async function accept() {
+			const invitationId = page.params.id;
+			if (!invitationId) {
+				status = 'error';
+				errorMessage = 'Invalid invitation link';
+				return;
+			}
+
+			const res = await authClient.organization.acceptInvitation({
+				invitationId
+			});
+
+			if (res.error) {
+				status = 'error';
+				errorMessage = res.error.message ?? 'Failed to accept invitation';
+			} else {
+				status = 'success';
+				timeoutId = setTimeout(() => {
+					// Use SvelteKit's router and path resolver
+					goto(resolve('/dashboard'));
+				}, 1500);
+			}
 		}
 
-		const res = await authClient.organization.acceptInvitation({
-			invitationId
-		});
+		accept();
 
-		if (res.error) {
-			status = 'error';
-			errorMessage = res.error.message ?? 'Failed to accept invitation';
-		} else {
-			status = 'success';
-			setTimeout(() => {
-				window.location.href = '/app';
-			}, 1500);
-		}
+		// Cleanup timeout if component unmounts prematurely
+		return () => {
+			if (timeoutId) clearTimeout(timeoutId);
+		};
 	});
 </script>
 
@@ -48,7 +60,7 @@
 		{:else if status === 'success'}
 			<CircleCheck class="mx-auto size-12 text-emerald-400" />
 			<h2 class="text-base font-bold">Invitation Accepted!</h2>
-			<p class="text-xs text-muted-foreground">Redirecting you to your workspace dashboard...</p>
+			<p class="text-xs text-muted-foreground">Redirecting you to your dashboard...</p>
 		{:else}
 			<CircleX class="mx-auto size-12 text-red-400" />
 			<h2 class="text-base font-bold">Invitation Failed</h2>

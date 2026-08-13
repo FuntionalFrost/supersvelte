@@ -1,5 +1,6 @@
 // src/lib/server/db/schema.ts
-import { boolean, integer, pgTable, text, timestamp } from 'drizzle-orm/pg-core';
+import { relations } from 'drizzle-orm';
+import { boolean, index, integer, pgTable, text, timestamp } from 'drizzle-orm/pg-core';
 import crypto from 'node:crypto';
 import { z } from 'zod';
 
@@ -19,48 +20,61 @@ export const user = pgTable('user', {
 });
 
 // 2. SESSION TABLE (Includes Organization active context field)
-export const session = pgTable('session', {
-	id: text('id').primaryKey(),
-	expiresAt: timestamp('expires_at').notNull(),
-	token: text('token').notNull().unique(),
-	createdAt: timestamp('created_at').notNull().defaultNow(),
-	updatedAt: timestamp('updated_at').notNull().defaultNow(),
-	ipAddress: text('ip_address'),
-	userAgent: text('user_agent'),
-	userId: text('user_id')
-		.notNull()
-		.references(() => user.id, { onDelete: 'cascade' }),
-	activeOrganizationId: text('active_organization_id')
-});
+export const session = pgTable(
+	'session',
+	{
+		id: text('id').primaryKey(),
+		expiresAt: timestamp('expires_at').notNull(),
+		token: text('token').notNull().unique(),
+		createdAt: timestamp('created_at').notNull().defaultNow(),
+		updatedAt: timestamp('updated_at').notNull().defaultNow(),
+		ipAddress: text('ip_address'),
+		userAgent: text('user_agent'),
+		userId: text('user_id')
+			.notNull()
+			.references(() => user.id, { onDelete: 'cascade' }),
+		impersonatedBy: text('impersonated_by'),
+		activeOrganizationId: text('active_organization_id')
+	},
+	(table) => [index('session_userId_idx').on(table.userId)]
+);
 
 // 3. ACCOUNT TABLE
-export const account = pgTable('account', {
-	id: text('id').primaryKey(),
-	accountId: text('account_id').notNull(),
-	providerId: text('provider_id').notNull(),
-	userId: text('user_id')
-		.notNull()
-		.references(() => user.id, { onDelete: 'cascade' }),
-	accessToken: text('access_token'),
-	refreshToken: text('refresh_token'),
-	idToken: text('id_token'),
-	accessTokenExpiresAt: timestamp('access_token_expires_at'),
-	refreshTokenExpiresAt: timestamp('refresh_token_expires_at'),
-	scope: text('scope'),
-	password: text('password'),
-	createdAt: timestamp('created_at').notNull().defaultNow(),
-	updatedAt: timestamp('updated_at').notNull().defaultNow()
-});
+export const account = pgTable(
+	'account',
+	{
+		id: text('id').primaryKey(),
+		accountId: text('account_id').notNull(),
+		providerId: text('provider_id').notNull(),
+		userId: text('user_id')
+			.notNull()
+			.references(() => user.id, { onDelete: 'cascade' }),
+		accessToken: text('access_token'),
+		refreshToken: text('refresh_token'),
+		idToken: text('id_token'),
+		accessTokenExpiresAt: timestamp('access_token_expires_at'),
+		refreshTokenExpiresAt: timestamp('refresh_token_expires_at'),
+		scope: text('scope'),
+		password: text('password'),
+		createdAt: timestamp('created_at').notNull().defaultNow(),
+		updatedAt: timestamp('updated_at').notNull().defaultNow()
+	},
+	(table) => [index('account_userId_idx').on(table.userId)]
+);
 
 // 4. VERIFICATION TABLE
-export const verification = pgTable('verification', {
-	id: text('id').primaryKey(),
-	identifier: text('identifier').notNull(),
-	value: text('value').notNull(),
-	expiresAt: timestamp('expires_at').notNull(),
-	createdAt: timestamp('created_at').notNull().defaultNow(),
-	updatedAt: timestamp('updated_at').notNull().defaultNow()
-});
+export const verification = pgTable(
+	'verification',
+	{
+		id: text('id').primaryKey(),
+		identifier: text('identifier').notNull(),
+		value: text('value').notNull(),
+		expiresAt: timestamp('expires_at').notNull(),
+		createdAt: timestamp('created_at').notNull().defaultNow(),
+		updatedAt: timestamp('updated_at').notNull().defaultNow()
+	},
+	(table) => [index('verification_identifier_idx').on(table.identifier)]
+);
 
 // 5. ORGANIZATION TABLE
 export const organization = pgTable('organization', {
@@ -73,35 +87,49 @@ export const organization = pgTable('organization', {
 });
 
 // 6. MEMBER TABLE
-export const member = pgTable('member', {
-	id: text('id').primaryKey(),
-	organizationId: text('organization_id')
-		.notNull()
-		.references(() => organization.id, { onDelete: 'cascade' }),
-	userId: text('user_id')
-		.notNull()
-		.references(() => user.id, { onDelete: 'cascade' }),
-	role: text('role').notNull().default('member'),
-	createdAt: timestamp('created_at').notNull().defaultNow()
-});
+export const member = pgTable(
+	'member',
+	{
+		id: text('id').primaryKey(),
+		organizationId: text('organization_id')
+			.notNull()
+			.references(() => organization.id, { onDelete: 'cascade' }),
+		userId: text('user_id')
+			.notNull()
+			.references(() => user.id, { onDelete: 'cascade' }),
+		role: text('role').notNull().default('member'),
+		createdAt: timestamp('created_at').notNull().defaultNow()
+	},
+	(table) => [
+		index('member_organizationId_idx').on(table.organizationId),
+		index('member_userId_idx').on(table.userId)
+	]
+);
 
 // 7. INVITATION TABLE
-export const invitation = pgTable('invitation', {
-	id: text('id').primaryKey(),
-	organizationId: text('organization_id')
-		.notNull()
-		.references(() => organization.id, { onDelete: 'cascade' }),
-	email: text('email').notNull(),
-	role: text('role').default('member'),
-	status: text('status').notNull().default('pending'),
-	inviterId: text('inviter_id')
-		.notNull()
-		.references(() => user.id, { onDelete: 'cascade' }),
-	expiresAt: timestamp('expires_at').notNull(),
-	createdAt: timestamp('created_at').notNull().defaultNow()
-});
+export const invitation = pgTable(
+	'invitation',
+	{
+		id: text('id').primaryKey(),
+		organizationId: text('organization_id')
+			.notNull()
+			.references(() => organization.id, { onDelete: 'cascade' }),
+		email: text('email').notNull(),
+		role: text('role').default('member'),
+		status: text('status').notNull().default('pending'),
+		inviterId: text('inviter_id')
+			.notNull()
+			.references(() => user.id, { onDelete: 'cascade' }),
+		expiresAt: timestamp('expires_at').notNull(),
+		createdAt: timestamp('created_at').notNull().defaultNow()
+	},
+	(table) => [
+		index('invitation_organizationId_idx').on(table.organizationId),
+		index('invitation_email_idx').on(table.email)
+	]
+);
 
-// 8. PROJECTS TABLE (Linked to User & Organization)
+// 8. PROJECTS TABLE
 export const projects = pgTable('projects', {
 	id: text('id')
 		.primaryKey()
@@ -131,40 +159,133 @@ export const files = pgTable('files', {
 	createdAt: timestamp('created_at').defaultNow().notNull()
 });
 
-// 10. PADDLE CUSTOMERS TABLE (Linked to Better Auth User)
+// 10. PADDLE CUSTOMERS TABLE
 export const customers = pgTable('customers', {
-	customerId: text('customer_id').primaryKey(), // Paddle Customer ID (ctm_01h...)
+	customerId: text('customer_id').primaryKey(),
 	userId: text('user_id').references(() => user.id, { onDelete: 'set null' }),
 	email: text('email').notNull(),
 	createdAt: timestamp('created_at').notNull().defaultNow(),
 	updatedAt: timestamp('updated_at').notNull().defaultNow()
 });
 
-// 11. PADDLE PURCHASES TABLE (Linked to Customer & Better Auth User)
+// 11. PADDLE PURCHASES TABLE
 export const purchases = pgTable('purchases', {
-	transactionId: text('transaction_id').primaryKey(), // Paddle Transaction ID (txn_01h...)
+	transactionId: text('transaction_id').primaryKey(),
 	customerId: text('customer_id').references(() => customers.customerId, { onDelete: 'cascade' }),
 	userId: text('user_id').references(() => user.id, { onDelete: 'set null' }),
-	subscriptionId: text('subscription_id'), // Optional Paddle Subscription ID (sub_01h...)
+	subscriptionId: text('subscription_id'),
 	priceId: text('price_id').notNull(),
 	productId: text('product_id').notNull(),
-	licenseKey: text('license_key').unique(), // Formatted License Key (SS-LIVE-XXXX-XXXX-XXXX)
-	status: text('status').notNull(), // e.g., 'completed'
+	licenseKey: text('license_key').unique(),
+	status: text('status').notNull(),
 	createdAt: timestamp('created_at').notNull().defaultNow()
 });
+
+// --- DRIZZLE RELATIONS DEFINITIONS ---
+
+export const userRelations = relations(user, ({ many }) => ({
+	sessions: many(session),
+	accounts: many(account),
+	members: many(member),
+	invitations: many(invitation),
+	projects: many(projects),
+	files: many(files)
+}));
+
+export const sessionRelations = relations(session, ({ one }) => ({
+	user: one(user, {
+		fields: [session.userId],
+		references: [user.id]
+	})
+}));
+
+export const accountRelations = relations(account, ({ one }) => ({
+	user: one(user, {
+		fields: [account.userId],
+		references: [user.id]
+	})
+}));
+
+export const organizationRelations = relations(organization, ({ many }) => ({
+	members: many(member),
+	invitations: many(invitation),
+	projects: many(projects),
+	files: many(files)
+}));
+
+export const memberRelations = relations(member, ({ one }) => ({
+	organization: one(organization, {
+		fields: [member.organizationId],
+		references: [organization.id]
+	}),
+	user: one(user, {
+		fields: [member.userId],
+		references: [user.id]
+	})
+}));
+
+export const invitationRelations = relations(invitation, ({ one }) => ({
+	organization: one(organization, {
+		fields: [invitation.organizationId],
+		references: [organization.id]
+	}),
+	user: one(user, {
+		fields: [invitation.inviterId],
+		references: [user.id]
+	})
+}));
+
+export const projectsRelations = relations(projects, ({ one }) => ({
+	user: one(user, {
+		fields: [projects.userId],
+		references: [user.id]
+	}),
+	organization: one(organization, {
+		fields: [projects.organizationId],
+		references: [organization.id]
+	})
+}));
+
+export const filesRelations = relations(files, ({ one }) => ({
+	user: one(user, {
+		fields: [files.userId],
+		references: [user.id]
+	}),
+	organization: one(organization, {
+		fields: [files.organizationId],
+		references: [organization.id]
+	})
+}));
+
+export const customersRelations = relations(customers, ({ one, many }) => ({
+	user: one(user, {
+		fields: [customers.userId],
+		references: [user.id]
+	}),
+	purchases: many(purchases)
+}));
+
+export const purchasesRelations = relations(purchases, ({ one }) => ({
+	customer: one(customers, {
+		fields: [purchases.customerId],
+		references: [customers.customerId]
+	}),
+	user: one(user, {
+		fields: [purchases.userId],
+		references: [user.id]
+	})
+}));
+
+// --- TYPES & HELPERS ---
 
 export type Customer = typeof customers.$inferSelect;
 export type Purchase = typeof purchases.$inferSelect;
 
-// Zod Schema for Superforms validation
 export const insertProjectSchema = z.object({
 	name: z.string().min(2, 'Name must be at least 2 characters'),
 	slug: z.string().min(1, 'Slug is required')
 });
 
-/**
- * Generates a formatted license key (e.g., SS-LIVE-A1B2-C3D4-E5F6)
- */
 export function generateLicenseKey(prefix = 'SS-LIVE'): string {
 	const bytes = crypto.randomBytes(6).toString('hex').toUpperCase();
 	return `${prefix}-${bytes.slice(0, 4)}-${bytes.slice(4, 8)}-${bytes.slice(8, 12)}`;

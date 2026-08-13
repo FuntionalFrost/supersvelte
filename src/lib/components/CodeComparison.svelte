@@ -1,5 +1,6 @@
 <!-- src/lib/components/CodeComparison.svelte -->
 <script lang="ts">
+	import { browser } from '$app/environment';
 	import {
 		competitorExamples,
 		superSvelteExample,
@@ -11,25 +12,34 @@
 	let activeCompetitor = $state<CompetitorKey>('nextjs');
 	let copiedSnippet = $state<string | null>(null);
 
-	// Shiki highlighted HTML states
+	// Pre-highlighted HTML cache
 	let superSvelteServerHtml = $state('');
 	let superSvelteClientHtml = $state('');
-	let competitorServerHtml = $state('');
-	let competitorClientHtml = $state('');
-	let isReady = $state(false);
 
-	// Module-scope highlighter singleton
-	const highlighterPromise = createHighlighter({
-		themes: ['github-dark'],
-		langs: ['svelte', 'typescript', 'javascript', 'html', 'css']
+	let competitorHtmlMap = $state<Record<CompetitorKey, { server: string; client: string }>>({
+		nextjs: { server: '', client: '' },
+		nestjs: { server: '', client: '' }
 	});
 
+	let isReady = $state(false);
+
 	let currentCompetitor = $derived(competitorExamples[activeCompetitor]);
+	// ⚡ Instant 0ms lookup derived directly from state cache
+	let currentCompetitorHtml = $derived(competitorHtmlMap[activeCompetitor]);
 
+	// Initialize Shiki and pre-highlight ALL snippets in a single fast pass (~2ms)
 	$effect(() => {
-		const comp = currentCompetitor;
+		if (!browser) return;
 
-		highlighterPromise.then((highlighter) => {
+		let isMounted = true;
+
+		createHighlighter({
+			themes: ['github-dark'],
+			langs: ['svelte', 'typescript', 'javascript', 'html', 'css']
+		}).then((highlighter) => {
+			if (!isMounted) return;
+
+			// 1. Highlight SuperSvelte
 			superSvelteServerHtml = highlighter.codeToHtml(superSvelteExample.server.trim(), {
 				lang: 'typescript',
 				theme: 'github-dark'
@@ -38,16 +48,37 @@
 				lang: 'svelte',
 				theme: 'github-dark'
 			});
-			competitorServerHtml = highlighter.codeToHtml(comp.server.trim(), {
+
+			// 2. Pre-highlight Next.js & NestJS upfront
+			const nextjsServer = highlighter.codeToHtml(competitorExamples.nextjs.server.trim(), {
 				lang: 'typescript',
 				theme: 'github-dark'
 			});
-			competitorClientHtml = highlighter.codeToHtml(comp.client.trim(), {
+			const nextjsClient = highlighter.codeToHtml(competitorExamples.nextjs.client.trim(), {
 				lang: 'typescript',
 				theme: 'github-dark'
 			});
+
+			const nestjsServer = highlighter.codeToHtml(competitorExamples.nestjs.server.trim(), {
+				lang: 'typescript',
+				theme: 'github-dark'
+			});
+			const nestjsClient = highlighter.codeToHtml(competitorExamples.nestjs.client.trim(), {
+				lang: 'typescript',
+				theme: 'github-dark'
+			});
+
+			competitorHtmlMap = {
+				nextjs: { server: nextjsServer, client: nextjsClient },
+				nestjs: { server: nestjsServer, client: nestjsClient }
+			};
+
 			isReady = true;
 		});
+
+		return () => {
+			isMounted = false;
+		};
 	});
 
 	function copyCode(key: string, text: string) {
@@ -227,8 +258,8 @@
 							Server Implementation
 						</div>
 						<div class="overflow-hidden rounded-lg border border-border/60 bg-[#0d1117]">
-							{#if isReady && competitorServerHtml}
-								{@html competitorServerHtml}
+							{#if isReady && currentCompetitorHtml.server}
+								{@html currentCompetitorHtml.server}
 							{:else}
 								<div class="animate-pulse space-y-2 bg-[#0d1117] p-3">
 									<div class="h-2.5 w-3/4 rounded bg-slate-800/60"></div>
@@ -247,8 +278,8 @@
 							Client Consumption
 						</div>
 						<div class="overflow-hidden rounded-lg border border-border/60 bg-[#0d1117]">
-							{#if isReady && competitorClientHtml}
-								{@html competitorClientHtml}
+							{#if isReady && currentCompetitorHtml.client}
+								{@html currentCompetitorHtml.client}
 							{:else}
 								<div class="animate-pulse space-y-2 bg-[#0d1117] p-3">
 									<div class="h-2.5 w-3/4 rounded bg-slate-800/60"></div>

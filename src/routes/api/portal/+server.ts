@@ -17,21 +17,22 @@ export const GET: RequestHandler = async ({ locals }) => {
 		throw error(404, 'No purchase record found for this account.');
 	}
 
-	try {
-		// Pass customerId as argument 1, and an empty array [] for subscriptionIds as argument 2
-		const portalSession = await paddle.customerPortalSessions.create(customerRecord.customerId, []);
+	let portalUrl: string;
 
-		const portalUrl = portalSession.urls.general.overview;
+	try {
+		// Mint session in try block
+		const portalSession = await paddle.customerPortalSessions.create(customerRecord.customerId, []);
+		portalUrl = portalSession.urls.general.overview;
 
 		if (!portalUrl) {
 			throw error(500, 'Could not generate Paddle portal URL.');
 		}
-
-		throw redirect(303, portalUrl);
 	} catch (err) {
-		// Avoid explicit 'any' cast to satisfy ESLint
-		if ((err as { status?: number })?.status === 303) throw err;
+		if ((err as { status?: number })?.status) throw err;
 		console.error('❌ Failed to mint Paddle customer portal session:', err);
 		throw error(500, 'Failed to create customer portal session.');
 	}
+
+	// Execute redirect outside try-catch
+	throw redirect(303, portalUrl);
 };

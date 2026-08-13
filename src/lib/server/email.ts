@@ -13,16 +13,21 @@ interface SendEmailOptions {
 export async function sendEmail({ to, subject, html }: SendEmailOptions) {
 	try {
 		const from = 'Acme <onboarding@resend.dev>';
-		const data = await resend.emails.send({
+		const res = await resend.emails.send({
 			from,
 			to,
 			subject,
 			html
 		});
 
-		return { success: true, data };
+		if (res.error) {
+			console.error('[Resend Email Error]:', res.error);
+			return { success: false, error: res.error };
+		}
+
+		return { success: true, data: res.data };
 	} catch (error) {
-		console.error('[Resend Email Error]:', error);
+		console.error('[Resend Email Exception]:', error);
 		return { success: false, error };
 	}
 }

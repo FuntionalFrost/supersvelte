@@ -2,9 +2,10 @@
 import { db } from '$lib/server/db';
 import { purchases } from '$lib/server/db/schema';
 import { error, type RequestHandler } from '@sveltejs/kit';
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 import fs from 'node:fs';
 import path from 'node:path';
+import { Readable } from 'node:stream';
 
 export const GET: RequestHandler = async ({ locals }) => {
 	// 1. Verify user is logged in
@@ -12,13 +13,12 @@ export const GET: RequestHandler = async ({ locals }) => {
 		throw error(401, 'Unauthorized. Please sign in to download source code.');
 	}
 
-	// 2. Verify active purchase in Neon DB
-	const userPurchases = await db
+	// 2. Verify active purchase directly in Neon SQL
+	const [activePurchase] = await db
 		.select()
 		.from(purchases)
-		.where(eq(purchases.userId, locals.user.id));
-
-	const activePurchase = userPurchases.find((p) => p.status === 'active');
+		.where(and(eq(purchases.userId, locals.user.id), eq(purchases.status, 'active')))
+		.limit(1);
 
 	if (!activePurchase) {
 		throw error(403, 'No active license found. Purchase a license to unlock downloads.');
@@ -36,11 +36,12 @@ export const GET: RequestHandler = async ({ locals }) => {
 		throw error(404, 'Source archive package is currently updating. Please try again shortly.');
 	}
 
-	// 4. Stream .zip archive to buyer
+	// 4. Convert Node ReadStream to standard Web ReadableStream
 	const fileStream = fs.createReadStream(zipPath);
+	const webStream = Readable.toWeb(fileStream);
 	const stat = fs.statSync(zipPath);
 
-	return new Response(fileStream as unknown as ReadableStream, {
+	return new Response(webStream as ReadableStream, {
 		headers: {
 			'Content-Type': 'application/zip',
 			'Content-Disposition': 'attachment; filename="supersvelte-boilerplate.zip"',
