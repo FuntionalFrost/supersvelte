@@ -1,13 +1,15 @@
 <!-- src/routes/+layout.svelte -->
 <script lang="ts">
 	import { onNavigate } from '$app/navigation';
-	import SEO from '$lib/components/SEO.svelte';
+	import { defaultMetaTags } from '$lib/config/seo';
 	import { ModeWatcher } from 'mode-watcher';
+	import { MetaTags } from 'svelte-meta-tags';
 	import { Toaster } from 'svelte-sonner';
 	import './layout.css';
 
 	let { children } = $props();
 
+	// Smooth page navigation with native View Transitions API
 	onNavigate((navigation) => {
 		if (!document.startViewTransition) return;
 		return new Promise((resolve) => {
@@ -19,13 +21,13 @@
 	});
 </script>
 
-<!-- Global Default SEO Fallback -->
-<SEO
-	title="SuperSvelte — The Batteries-Included Edge Svelte 5 Framework"
-	description="Launch Svelte 5 apps in hours with Better Auth, Drizzle, Neon Postgres, Upstash Redis, and OpenAPI Hono RPC."
-/>
+<!-- Global Site-Wide Meta Tags & OpenGraph -->
+<MetaTags {...defaultMetaTags} />
 
+<!-- Theme Watcher (Dark/Light mode persistence) -->
 <ModeWatcher />
+
+<!-- Global Notification Toast System -->
 <Toaster position="top-right" richColors closeButton />
 
 <div

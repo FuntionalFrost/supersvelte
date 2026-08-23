@@ -1,3 +1,5 @@
-# allow crawling everything by default
+# static/robots.txt
 User-agent: *
 Disallow:
+
+Sitemap: https://supersvelte.netlify.app/sitemap.xml

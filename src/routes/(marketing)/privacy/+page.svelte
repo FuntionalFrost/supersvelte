@@ -1,9 +1,13 @@
 <!-- src/routes/(marketing)/privacy/+page.svelte -->
 <script lang="ts">
-	import SEO from '$lib/components/SEO.svelte';
+	import { MetaTags } from 'svelte-meta-tags';
 </script>
 
-<SEO title="Privacy Policy — SuperSvelte" description="Privacy Policy for SuperSvelte." />
+<MetaTags
+	title="Privacy Policy"
+	description="Learn how SuperSvelte collects, processes, and protects your personal data and account information."
+	canonical="https://supersvelte.netlify.app/privacy"
+/>
 
 <div class="container mx-auto max-w-4xl px-4 py-16 text-foreground">
 	<h1 class="text-4xl font-extrabold tracking-tight">Privacy Policy</h1>

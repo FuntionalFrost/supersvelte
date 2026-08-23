@@ -1,11 +1,12 @@
 <!-- src/routes/(marketing)/terms/+page.svelte -->
 <script lang="ts">
-	import SEO from '$lib/components/SEO.svelte';
+	import { MetaTags } from 'svelte-meta-tags';
 </script>
 
-<SEO
-	title="Terms of Service — SuperSvelte"
-	description="Terms of Service for SuperSvelte boilerplate."
+<MetaTags
+	title="Terms of Service"
+	description="Read the terms of service, commercial licensing terms, and usage conditions for SuperSvelte."
+	canonical="https://supersvelte.netlify.app/terms"
 />
 
 <div class="container mx-auto max-w-4xl px-4 py-16 text-foreground">

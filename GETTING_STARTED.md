@@ -22,6 +22,7 @@ Ensure you have the following installed locally:
 git clone https://github.com/FuntionalFrost/supersvelte.git
 cd supersvelte
 pnpm install
+
 ```
 
 ### 2. Environment Variables Configuration
@@ -35,20 +36,21 @@ cp .env.example .env
 
 Open `.env` and fill in your keys:
 
-| Variable                          | Description                             | Where to Find                                  |
-| --------------------------------- | --------------------------------------- | ---------------------------------------------- |
-| `DATABASE_URL`                    | Neon PostgreSQL Connection String       | [Neon Console](https://neon.tech)              |
-| `BETTER_AUTH_SECRET`              | 32-byte secret for session tokens       | Run `openssl rand -hex 32`                     |
-| `PUBLIC_PADDLE_ENV`               | `"sandbox"` or `"production"`           | Paddle Dashboard                               |
-| `PUBLIC_PADDLE_CLIENT_TOKEN`      | Client token (`test_...` or `live_...`) | Developer tools → Authentication               |
-| `PUBLIC_PADDLE_STANDARD_PRICE_ID` | Standard tier price ID (`pri_...`)      | Catalog → Prices                               |
-| `PUBLIC_PADDLE_PRO_PRICE_ID`      | Pro tier price ID (`pri_...`)           | Catalog → Prices                               |
-| `PADDLE_API_KEY`                  | Server API Key (`pdl_api_...`)          | Developer tools → API keys                     |
-| `PADDLE_WEBHOOK_SECRET`           | Signing secret (`pdl_whsec_...`)        | Developer tools → Notifications                |
-| `UPSTASH_REDIS_REST_URL`          | Redis URL for rate limiting & SSE       | [Upstash Console](https://upstash.com)         |
-| `UPSTASH_REDIS_REST_TOKEN`        | Redis REST token                        | Upstash Console                                |
-| `RESEND_API_KEY`                  | Transactional email key                 | [Resend Console](https://resend.com)           |
-| `UPLOADTHING_TOKEN`               | S3 file storage secret token            | [UploadThing Console](https://uploadthing.com) |
+| Variable                          | Description                                                                                            | Where to Find                                  |
+| --------------------------------- | ------------------------------------------------------------------------------------------------------ | ---------------------------------------------- |
+| `ORIGIN`                          | Canonical App Base URL (`http://localhost:5173` locally, or `https://supersvelte.netlify.app` in prod) | Application deployment domain                  |
+| `DATABASE_URL`                    | Neon PostgreSQL Connection String                                                                      | [Neon Console](https://neon.tech)              |
+| `BETTER_AUTH_SECRET`              | 32-byte secret for session tokens                                                                      | Run `openssl rand -hex 32`                     |
+| `PUBLIC_PADDLE_ENV`               | `"sandbox"` or `"production"`                                                                          | Paddle Dashboard                               |
+| `PUBLIC_PADDLE_CLIENT_TOKEN`      | Client token (`test_...` or `live_...`)                                                                | Developer tools → Authentication               |
+| `PUBLIC_PADDLE_STANDARD_PRICE_ID` | Standard tier price ID (`pri_...`)                                                                     | Catalog → Prices                               |
+| `PUBLIC_PADDLE_PRO_PRICE_ID`      | Pro tier price ID (`pri_...`)                                                                          | Catalog → Prices                               |
+| `PADDLE_API_KEY`                  | Server API Key (`pdl_api_...`)                                                                         | Developer tools → API keys                     |
+| `PADDLE_WEBHOOK_SECRET`           | Signing secret (`pdl_whsec_...`)                                                                       | Developer tools → Notifications                |
+| `UPSTASH_REDIS_REST_URL`          | Redis URL for rate limiting & SSE                                                                      | [Upstash Console](https://upstash.com)         |
+| `UPSTASH_REDIS_REST_TOKEN`        | Redis REST token                                                                                       | Upstash Console                                |
+| `RESEND_API_KEY`                  | Transactional email key                                                                                | [Resend Console](https://resend.com)           |
+| `UPLOADTHING_TOKEN`               | S3 file storage secret token                                                                           | [UploadThing Console](https://uploadthing.com) |
 
 ---
 
@@ -74,7 +76,7 @@ pnpm dev
 
 ```
 
-Open <http://localhost:5173> in your browser.
+Open [http://localhost:5173](http://localhost:5173) in your browser.
 
 ---
 

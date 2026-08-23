@@ -1,4 +1,4 @@
-# 🚀 Super Svelte
+# 🚀 SuperSvelte
 
 > **The Batteries-Included, Zero-Codegen Full-Stack Svelte 5 Framework.**
 > Built with SvelteKit, Svelte 5 Runes, OpenAPI 3.1 Hono RPC, Better Auth, Paddle Payments, Neon Postgres, Drizzle ORM, and Upstash Redis.
@@ -7,7 +7,7 @@
 
 ## 📌 Overview
 
-**Super Svelte** is an enterprise-grade full-stack boilerplate engineered for speed, type safety, and zero-vendor-lock-in. It combines the reactivity of **Svelte 5 Runes** with an **OpenAPI 3.1 & Hono RPC** engine, providing instant end-to-end type safety without build watchers or CLI codegen steps.
+**SuperSvelte** is an enterprise-grade full-stack boilerplate engineered for speed, type safety, and zero-vendor-lock-in. It combines the reactivity of **Svelte 5 Runes** with an **OpenAPI 3.1 & Hono RPC** engine, providing instant end-to-end type safety without build watchers or CLI codegen steps.
 
 ### ✨ Key Highlights
 
@@ -27,7 +27,7 @@
 | Domain               | Technology                                                                                                           | Description                                                      |
 | :------------------- | :------------------------------------------------------------------------------------------------------------------- | :--------------------------------------------------------------- |
 | **Frontend**         | [SvelteKit](https://kit.svelte.dev/) & [Svelte 5](https://svelte.dev/)                                               | Runes reactivity, filesystem routing, and hybrid SSR             |
-| **Styling & UI**     | [Tailwind CSS](https://tailwindcss.com/) & [shadcn-svelte](https://shadcn-svelte.com/)                               | Accessible UI components with Lucide icons                       |
+| **Styling & UI**     | [Tailwind CSS v4](https://tailwindcss.com/) & [shadcn-svelte](https://shadcn-svelte.com/)                            | Accessible UI components with Lucide icons & OKLCH palette       |
 | **API Layer**        | [Hono](https://hono.dev/) & [@hono/zod-openapi](https://github.com/honojs/middleware/tree/main/packages/zod-openapi) | Type-safe OpenAPI RPC engine + Swagger UI                        |
 | **Payments & MoR**   | [Paddle](https://www.paddle.com/)                                                                                    | Global tax compliance, checkout overlay, and webhook fulfillment |
 | **Authentication**   | [Better Auth](https://www.better-auth.com/)                                                                          | Sessions, OAuth, Organizations, and DB hooks                     |
@@ -137,5 +137,4 @@ src/
         ├── +page.server.ts
         ├── +page.ts
         └── +page.svelte
-
 ```

@@ -1,11 +1,12 @@
 <!-- src/routes/(marketing)/refunds/+page.svelte -->
 <script lang="ts">
-	import SEO from '$lib/components/SEO.svelte';
+	import { MetaTags } from 'svelte-meta-tags';
 </script>
 
-<SEO
-	title="Refund Policy — SuperSvelte"
-	description="Refund Policy for SuperSvelte purchase licenses."
+<MetaTags
+	title="Refund Policy"
+	description="Review the 14-day refund policy and satisfaction guarantee for SuperSvelte licenses."
+	canonical="https://supersvelte.netlify.app/refunds"
 />
 
 <div class="container mx-auto max-w-4xl px-4 py-16 text-foreground">

@@ -1,7 +1,7 @@
 <!-- src/routes/(marketing)/welcome/+page.svelte -->
 <script lang="ts">
 	import { resolve } from '$app/paths';
-	import SEO from '$lib/components/SEO.svelte';
+	import { MetaTags } from 'svelte-meta-tags';
 	import {
 		ArrowRight,
 		Check,
@@ -26,9 +26,10 @@
 	}
 </script>
 
-<SEO
-	title="Welcome to SuperSvelte — Purchase Complete"
-	description="Your SuperSvelte transaction has been confirmed. Download source code or copy your license key."
+<MetaTags
+	title="Welcome to SuperSvelte!"
+	description="Getting started with your SuperSvelte license and GitHub repository access."
+	robots="noindex, nofollow"
 />
 
 <div class="container mx-auto max-w-4xl space-y-8 px-4 py-12 md:py-16">

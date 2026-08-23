@@ -71,6 +71,12 @@ importers:
       shiki:
         specifier: ^4.4.2
         version: 4.4.2
+      super-sitemap:
+        specifier: ^2.0.6
+        version: 2.0.6
+      svelte-meta-tags:
+        specifier: ^5.0.2
+        version: 5.0.2(svelte@5.56.8(@typescript-eslint/types@8.66.0))(typescript@6.0.3)
       svelte-sonner:
         specifier: ^1.1.1
         version: 1.1.1(svelte@5.56.8(@typescript-eslint/types@8.66.0))
@@ -2734,6 +2740,15 @@ packages:
     resolution: {integrity: sha512-xal3CZX1Xlo/k4ApwCFrHVACi9fBqJ7V+mwhBsuf/1IOKbBy098Fex+Wa/5QMubw09pSZ/u8EY8PWgevJsXp1A==}
     engines: {node: '>=6'}
 
+  schema-dts-lib@1.0.0:
+    resolution: {integrity: sha512-9MEO5vpQH9JdBioUupqluzxSYxPLjhmqRUudk15adUl/ypnRsM2/M1kN3AmVJQeG7nZqcL68H8JlGqQQT6vy9A==}
+    engines: {node: '>=14.0.0'}
+    peerDependencies:
+      typescript: '>=4.9.5'
+
+  schema-dts@2.0.0:
+    resolution: {integrity: sha512-t7NoCy3Rn5GHGx6p7s1qIYK/AeIb8ZxJNR9WUNFkwMv2CiiGZBmqqYWc2FlZVm5ZbiHMY4OvBWhj7QtyrFO2Jw==}
+
   semver@6.3.1:
     resolution: {integrity: sha512-BR7VvDCVHO+q2xBEWskxS6DJE1qRnb7DxzUrogb71CWoSficBxYsiAGd+Kl0mmq/MprG9yArRkyrQxTO6XjMzA==}
     hasBin: true
@@ -2797,6 +2812,9 @@ packages:
   style-to-object@1.0.14:
     resolution: {integrity: sha512-LIN7rULI0jBscWQYaSswptyderlarFkjQ+t79nzty8tcIAceVomEVlLzH5VP4Cmsv6MtKhs7qaAiwlcp+Mgaxw==}
 
+  super-sitemap@2.0.6:
+    resolution: {integrity: sha512-SnwRkm5X9+Jq2HDPbFemZwxGya1+r4nJQw30UTu/2jdW1J6HfEz5hrXhy2ktbW/esmv+wOr5xN7s/kojYtAXkg==}
+
   superstruct@2.0.2:
     resolution: {integrity: sha512-uV+TFRZdXsqXTL2pRvujROjdZQ4RAlBUS5BTh9IGm+jTqQntYThciG/qu57Gs69yjnVUSqdxF9YLmSnpupBW9A==}
     engines: {node: '>=14.0.0'}
@@ -2821,6 +2839,11 @@ packages:
     peerDependenciesMeta:
       svelte:
         optional: true
+
+  svelte-meta-tags@5.0.2:
+    resolution: {integrity: sha512-OkAcO7JKBzNGsRY8RE1mlVZYzuL9tS9S1zsV2PDp5cRhVJ4EN+Bu+bpNFHcMP3mBQAnpIRpsEteuBzlfiYjq1w==}
+    peerDependencies:
+      svelte: ^5.0.0
 
   svelte-sonner@1.1.1:
     resolution: {integrity: sha512-5cd3p7wa4cq0NsqslMwdlPb7x1JglEZ/GKrLePWNr5bCxR1nagAVrY01FRFrXfUGs41miLt3C327+8XJo5BzZw==}
@@ -5332,6 +5355,16 @@ snapshots:
     dependencies:
       mri: 1.2.0
 
+  schema-dts-lib@1.0.0(typescript@6.0.3):
+    dependencies:
+      typescript: 6.0.3
+
+  schema-dts@2.0.0(typescript@6.0.3):
+    dependencies:
+      schema-dts-lib: 1.0.0(typescript@6.0.3)
+    transitivePeerDependencies:
+      - typescript
+
   semver@6.3.1: {}
 
   semver@7.8.5: {}
@@ -5398,6 +5431,8 @@ snapshots:
     dependencies:
       inline-style-parser: 0.2.7
 
+  super-sitemap@2.0.6: {}
+
   superstruct@2.0.2:
     optional: true
 
@@ -5430,6 +5465,13 @@ snapshots:
       semver: 7.8.5
     optionalDependencies:
       svelte: 5.56.8(@typescript-eslint/types@8.66.0)
+
+  svelte-meta-tags@5.0.2(svelte@5.56.8(@typescript-eslint/types@8.66.0))(typescript@6.0.3):
+    dependencies:
+      schema-dts: 2.0.0(typescript@6.0.3)
+      svelte: 5.56.8(@typescript-eslint/types@8.66.0)
+    transitivePeerDependencies:
+      - typescript
 
   svelte-sonner@1.1.1(svelte@5.56.8(@typescript-eslint/types@8.66.0)):
     dependencies:

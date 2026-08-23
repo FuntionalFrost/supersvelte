@@ -4,7 +4,6 @@
 	import { PUBLIC_PADDLE_PRO_PRICE_ID, PUBLIC_PADDLE_STANDARD_PRICE_ID } from '$env/static/public';
 	import CodeComparison from '$lib/components/CodeComparison.svelte';
 	import PaddleCheckout from '$lib/components/PaddleCheckout.svelte';
-	import SEO from '$lib/components/SEO.svelte';
 	import SuperSvelteVsOthers from '$lib/components/SuperSvelteVsOthers.svelte';
 	import { matrices, type Mode } from '$lib/config/comparison';
 	import {
@@ -20,6 +19,7 @@
 		Terminal,
 		Zap
 	} from '@lucide/svelte';
+	import { MetaTags } from 'svelte-meta-tags';
 
 	let mode = $state<Mode>('saas-starters');
 	let currentMatrix = $derived(matrices[mode]);
@@ -30,9 +30,10 @@
 	}
 </script>
 
-<SEO
+<MetaTags
 	title="SuperSvelte — Ship Svelte 5 SaaS Apps at Light Speed"
 	description="The ultimate Svelte 5 production boilerplate. Features Better Auth, Drizzle ORM, Neon Postgres, Upstash Redis, UploadThing, and 0-codegen Hono Zod RPC."
+	canonical="https://supersvelte.netlify.app"
 />
 
 <div
@@ -49,12 +50,12 @@
 				class="mb-6 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-3.5 py-1 text-xs font-semibold text-primary shadow-xs"
 			>
 				<Sparkles class="size-3.5" />
-				<span>Super Svelte • Svelte 5 + Hono RPC + Neon</span>
+				<span>SuperSvelte • Svelte 5 + Hono RPC + Neon</span>
 			</div>
 
 			<h1 class="text-5xl font-black tracking-tight sm:text-7xl md:text-8xl">
-				Super <span
-					class="bg-linear-to-r from-primary via-emerald-400 to-cyan-500 bg-clip-text text-transparent"
+				Super<span
+					class="bg-linear-to-r from-emerald-300 via-teal-300 to-cyan-400 bg-clip-text text-transparent"
 					>Svelte</span
 				>
 			</h1>
@@ -64,9 +65,8 @@
 			</p>
 
 			<p class="mx-auto mt-2 max-w-2xl text-sm text-muted-foreground sm:text-base">
-				Stop assembling your stack from 15 npm packages. Super Svelte ships Auth, Neon DB, Redis
-				SSE, OpenAPI 3.1 Hono RPC, Uploads, and Resend out-of-the-box with sub-10ms edge cold
-				starts.
+				Stop assembling your stack from 15 npm packages. SuperSvelte ships Auth, Neon DB, Redis SSE,
+				OpenAPI 3.1 Hono RPC, Uploads, and Resend out-of-the-box with sub-10ms edge cold starts.
 			</p>
 
 			<div class="mt-8 flex flex-col justify-center gap-4 sm:flex-row">
@@ -148,9 +148,9 @@
 					<Sparkles class="size-3.5" />
 					<span>Direct Competitor Matrix</span>
 				</div>
-				<h2 class="text-3xl font-bold tracking-tight sm:text-4xl">How Super Svelte Compares</h2>
+				<h2 class="text-3xl font-bold tracking-tight sm:text-4xl">How SuperSvelte Compares</h2>
 				<p class="mt-2 text-sm text-muted-foreground">
-					See how Super Svelte stacks up directly against paid SaaS boilerplates, TypeScript
+					See how SuperSvelte stacks up directly against paid SaaS boilerplates, TypeScript
 					toolkits, and classic monoliths.
 				</p>
 
@@ -190,7 +190,7 @@
 			</div>
 
 			<!-- Unified Matrix Table -->
-			<div class="mt-12 overflow-x-auto rounded-xl border border-border bg-card shadow-sm">
+			<div class="mt-12 overflow-x-auto rounded-xl border border-border bg-card shadow-xs">
 				<table class="w-full text-left text-xs">
 					<thead class="border-b border-border bg-muted/50 text-muted-foreground">
 						<tr>
@@ -262,7 +262,7 @@
 			<div class="mx-auto mt-16 grid max-w-4xl grid-cols-1 gap-8 md:grid-cols-2">
 				<!-- Starter Tier -->
 				<div
-					class="flex flex-col justify-between rounded-2xl border border-border bg-card p-8 shadow-sm"
+					class="flex flex-col justify-between rounded-2xl border border-border bg-card p-8 shadow-xs"
 				>
 					<div>
 						<div class="flex items-center justify-between">
