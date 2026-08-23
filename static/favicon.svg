@@ -1,16 +1,33 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
-  <!-- Crisp light squircle background -->
-  <rect width="32" height="32" rx="9" fill="#e2e8f0" />
+  <style>
+    /* Default (Light OS / Light Tab Bar) -> Dark Badge with White Text */
+    :root {
+      --badge-bg: #090d16;
+      --badge-fg: #ffffff;
+    }
+
+    /* Dark OS / Dark Tab Bar -> Light Badge with Dark Text */
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --badge-bg: #e2e8f0;
+        --badge-fg: #090d16;
+      }
+    }
+
+    .badge-bg { fill: var(--badge-bg); }
+    .badge-fg { fill: var(--badge-fg); }
+  </style>
+
+  <rect class="badge-bg" width="32" height="32" rx="9" />
   
-  <!-- Centered bold "S5" text -->
   <text
+    class="badge-fg"
     x="16"
     y="22.5"
     font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
     font-weight="900"
     font-size="16"
     letter-spacing="-0.5px"
-    fill="#090d16"
     text-anchor="middle"
   >S5</text>
 </svg>
