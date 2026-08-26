@@ -1,5 +1,6 @@
 // src/routes/test/+page.server.ts
 import { dev } from '$app/environment';
+import { env } from '$env/dynamic/private';
 import { auth } from '$lib/server/auth';
 import { db } from '$lib/server/db';
 import { insertProjectSchema, projects, user } from '$lib/server/db/schema';
@@ -10,7 +11,6 @@ import { and, eq } from 'drizzle-orm';
 import { superValidate } from 'sveltekit-superforms';
 import { zod4 as zod } from 'sveltekit-superforms/adapters';
 
-// Safe fallback mock projects for unauthenticated landing page visitors
 const MOCK_DEMO_PROJECTS = [
 	{ id: 'demo-1', name: 'Acme Analytics Platform', slug: 'acme-analytics' },
 	{ id: 'demo-2', name: 'Edge AI Gateway', slug: 'edge-ai-gateway' }
@@ -21,10 +21,8 @@ export const load = async ({ locals }) => {
 
 	let userProjects = MOCK_DEMO_PROJECTS;
 
-	// Only query real DB projects if the user is authenticated
 	if (locals.user) {
 		try {
-			// Logged-in users get their actual projects (or an empty array if 0)
 			userProjects = await db
 				.select({ id: projects.id, name: projects.name, slug: projects.slug })
 				.from(projects)
@@ -39,7 +37,16 @@ export const load = async ({ locals }) => {
 		form,
 		existingProjects: userProjects,
 		user: locals.user ?? null,
-		session: locals.session ?? null
+		session: locals.session ?? null,
+		// Safely expose configuration booleans to client
+		systemStatus: {
+			database: !!env.DATABASE_URL,
+			polarSecret: !!env.POLAR_WEBHOOK_SECRET,
+			polarToken: !!env.POLAR_ACCESS_TOKEN,
+			qstashToken: !!env.QSTASH_TOKEN,
+			resendKey: !!env.RESEND_API_KEY,
+			githubToken: !!env.GITHUB_ADMIN_TOKEN
+		}
 	};
 };
 
@@ -73,7 +80,6 @@ export const actions = {
 		const id = formData.get('id')?.toString();
 
 		if (id) {
-			// 🔒 Strictly enforce ownership check on delete
 			await db
 				.delete(projects)
 				.where(and(eq(projects.id, id), eq(projects.userId, locals.user.id)));
@@ -83,7 +89,6 @@ export const actions = {
 	},
 
 	seed: async () => {
-		// Prevent database wipes in production
 		if (!dev) {
 			return fail(403, {
 				seeded: false,

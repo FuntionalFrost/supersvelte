@@ -50,7 +50,7 @@
 				<CreditCard class="size-5 text-primary" />
 				<h3 class="text-sm font-bold text-foreground">Billing & Licenses</h3>
 				<p class="text-xs text-muted-foreground">
-					Manage Paddle subscriptions, view invoices, or upgrade plans.
+					Manage Polar subscriptions, view invoices, or upgrade plans.
 				</p>
 			</div>
 			<div

@@ -130,36 +130,50 @@ export const invitation = pgTable(
 );
 
 // 8. PROJECTS TABLE
-export const projects = pgTable('projects', {
-	id: text('id')
-		.primaryKey()
-		.$defaultFn(() => crypto.randomUUID()),
-	name: text('name').notNull(),
-	slug: text('slug').notNull(),
-	userId: text('user_id').references(() => user.id, { onDelete: 'set null' }),
-	organizationId: text('organization_id').references(() => organization.id, {
-		onDelete: 'cascade'
-	}),
-	createdAt: timestamp('created_at').notNull().defaultNow()
-});
+export const projects = pgTable(
+	'projects',
+	{
+		id: text('id')
+			.primaryKey()
+			.$defaultFn(() => crypto.randomUUID()),
+		name: text('name').notNull(),
+		slug: text('slug').notNull(),
+		userId: text('user_id').references(() => user.id, { onDelete: 'set null' }),
+		organizationId: text('organization_id').references(() => organization.id, {
+			onDelete: 'cascade'
+		}),
+		createdAt: timestamp('created_at').notNull().defaultNow()
+	},
+	(table) => [
+		index('projects_userId_idx').on(table.userId),
+		index('projects_organizationId_idx').on(table.organizationId)
+	]
+);
 
 // 9. FILES TABLE
-export const files = pgTable('files', {
-	id: text('id')
-		.primaryKey()
-		.$defaultFn(() => crypto.randomUUID()),
-	url: text('url').notNull(),
-	key: text('key').notNull(),
-	name: text('name').notNull(),
-	size: integer('size').notNull(),
-	userId: text('user_id').references(() => user.id, { onDelete: 'cascade' }),
-	organizationId: text('organization_id').references(() => organization.id, {
-		onDelete: 'cascade'
-	}),
-	createdAt: timestamp('created_at').defaultNow().notNull()
-});
+export const files = pgTable(
+	'files',
+	{
+		id: text('id')
+			.primaryKey()
+			.$defaultFn(() => crypto.randomUUID()),
+		url: text('url').notNull(),
+		key: text('key').notNull(),
+		name: text('name').notNull(),
+		size: integer('size').notNull(),
+		userId: text('user_id').references(() => user.id, { onDelete: 'cascade' }),
+		organizationId: text('organization_id').references(() => organization.id, {
+			onDelete: 'cascade'
+		}),
+		createdAt: timestamp('created_at').defaultNow().notNull()
+	},
+	(table) => [
+		index('files_userId_idx').on(table.userId),
+		index('files_organizationId_idx').on(table.organizationId)
+	]
+);
 
-// 10. PADDLE CUSTOMERS TABLE
+// 10. POLAR CUSTOMERS TABLE
 export const customers = pgTable('customers', {
 	customerId: text('customer_id').primaryKey(),
 	userId: text('user_id').references(() => user.id, { onDelete: 'set null' }),
@@ -168,18 +182,25 @@ export const customers = pgTable('customers', {
 	updatedAt: timestamp('updated_at').notNull().defaultNow()
 });
 
-// 11. PADDLE PURCHASES TABLE
-export const purchases = pgTable('purchases', {
-	transactionId: text('transaction_id').primaryKey(),
-	customerId: text('customer_id').references(() => customers.customerId, { onDelete: 'cascade' }),
-	userId: text('user_id').references(() => user.id, { onDelete: 'set null' }),
-	subscriptionId: text('subscription_id'),
-	priceId: text('price_id').notNull(),
-	productId: text('product_id').notNull(),
-	licenseKey: text('license_key').unique(),
-	status: text('status').notNull(),
-	createdAt: timestamp('created_at').notNull().defaultNow()
-});
+// 11. POLAR PURCHASES & LICENSES TABLE
+export const purchases = pgTable(
+	'purchases',
+	{
+		transactionId: text('transaction_id').primaryKey(), // Polar order ID or checkout ID
+		customerId: text('customer_id').references(() => customers.customerId, { onDelete: 'cascade' }),
+		userId: text('user_id').references(() => user.id, { onDelete: 'set null' }),
+		subscriptionId: text('subscription_id'),
+		priceId: text('price_id'),
+		productId: text('product_id').notNull(),
+		licenseKey: text('license_key').unique(),
+		status: text('status').notNull(),
+		createdAt: timestamp('created_at').notNull().defaultNow()
+	},
+	(table) => [
+		index('purchases_userId_idx').on(table.userId),
+		index('purchases_customerId_idx').on(table.customerId)
+	]
+);
 
 // --- DRIZZLE RELATIONS DEFINITIONS ---
 
@@ -189,7 +210,8 @@ export const userRelations = relations(user, ({ many }) => ({
 	members: many(member),
 	invitations: many(invitation),
 	projects: many(projects),
-	files: many(files)
+	files: many(files),
+	purchases: many(purchases)
 }));
 
 export const sessionRelations = relations(session, ({ one }) => ({
@@ -280,6 +302,9 @@ export const purchasesRelations = relations(purchases, ({ one }) => ({
 
 export type Customer = typeof customers.$inferSelect;
 export type Purchase = typeof purchases.$inferSelect;
+export type Organization = typeof organization.$inferSelect;
+export type Member = typeof member.$inferSelect;
+export type Invitation = typeof invitation.$inferSelect;
 
 export const insertProjectSchema = z.object({
 	name: z.string().min(2, 'Name must be at least 2 characters'),

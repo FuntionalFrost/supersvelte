@@ -26,7 +26,7 @@
 			<h2 class="text-lg font-bold">2. Payment Processing</h2>
 			<p class="text-muted-foreground">
 				Payment details (credit card numbers, billing addresses, tax identification numbers) are
-				processed securely by Paddle.com. We do not store or transmit raw credit card or financial
+				processed securely by Polar.sh. We do not store or transmit raw credit card or financial
 				data on our servers.
 			</p>
 		</section>

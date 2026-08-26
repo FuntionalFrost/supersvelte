@@ -5,9 +5,9 @@
 		PUBLIC_POLAR_PRO_PRODUCT_ID,
 		PUBLIC_POLAR_STANDARD_PRODUCT_ID
 	} from '$env/static/public';
-	import PolarCheckout from '$lib/components/PolarCheckout.svelte';
 	import { client } from '$lib/api-client';
 	import { authClient } from '$lib/auth-client';
+	import PolarCheckout from '$lib/components/PolarCheckout.svelte';
 	import {
 		Activity,
 		ArrowLeft,
@@ -29,9 +29,8 @@
 		Wifi,
 		Zap
 	} from '@lucide/svelte';
-	import { POLAR_ACCESS_TOKEN, POLAR_ENVIRONMENT } from '$env/static/private';
 
-	// 1. Reactive props from SvelteKit loaders
+	// 1. Reactive props from SvelteKit loaders (includes safe systemStatus)
 	let { data } = $props();
 
 	type RpcResponse = {
@@ -57,8 +56,8 @@
 		};
 	};
 
-	// Active Tab State ('rpc' | 'db' | 'upload' | 'sse' | 'auth' | 'paddle')
-	let activeTab = $state<'rpc' | 'db' | 'upload' | 'sse' | 'auth' | 'paddle'>('rpc');
+	// Active Tab State ('rpc' | 'db' | 'upload' | 'sse' | 'auth' | 'polar')
+	let activeTab = $state<'rpc' | 'db' | 'upload' | 'sse' | 'auth' | 'polar'>('rpc');
 
 	// --- 1. HONO RPC & RATE LIMIT DIAGNOSTIC STATE ---
 	let rpcLoading = $state(false);
@@ -92,7 +91,6 @@
 	let newProjectName = $state('');
 	let isSubmitting = $state(false);
 
-	// Sync projects from server load data safely
 	$effect(() => {
 		if (data.existingProjects) {
 			projectsList = data.existingProjects as ProjectItem[];
@@ -264,10 +262,9 @@
 		});
 	});
 
-	// --- 6. PADDLE CHECKOUT DIAGNOSTIC STATE ---
+	// --- 6. POLAR CHECKOUT DIAGNOSTIC STATE ---
 	let testGithubUser = $state('octocat');
 
-	// Auto-run baseline RPC test on mount
 	$effect(() => {
 		runRpcTest();
 	});
@@ -289,7 +286,7 @@
 				</a>
 				<div>
 					<div class="flex items-center gap-2">
-						<span class="text-lg font-black">Super Svelte</span>
+						<span class="text-lg font-black">SuperSvelte</span>
 						<span
 							class="rounded-full border border-primary/20 bg-primary/10 px-2 py-0.5 text-[10px] font-bold text-primary"
 						>
@@ -323,8 +320,7 @@
 					<h1 class="text-2xl font-bold tracking-tight">System Health & Latency Test</h1>
 					<p class="max-w-xl text-xs text-muted-foreground">
 						Execute live RPC queries, test rate limits, measure Drizzle/Neon query times, test
-						UploadThing cloud file uploads, stream real-time SSE heartbeats, and test Paddle
-						checkout overlay triggers.
+						UploadThing file uploads, stream SSE heartbeats, and test Polar checkout triggers.
 					</p>
 				</div>
 
@@ -419,18 +415,18 @@
 			</button>
 
 			<button
-				onclick={() => (activeTab = 'paddle')}
+				onclick={() => (activeTab = 'polar')}
 				class="flex items-center gap-2 rounded-lg px-3.5 py-2 text-xs font-semibold transition-all {activeTab ===
-				'paddle'
+				'polar'
 					? 'bg-primary text-primary-foreground shadow-xs'
 					: 'text-muted-foreground hover:text-foreground'}"
 			>
 				<CreditCard class="size-4" />
-				<span>6. Paddle Billing</span>
+				<span>6. Polar Billing</span>
 				<span
 					class="ml-1 rounded-full bg-background/20 px-1.5 py-0.5 font-mono text-[10px] uppercase"
 				>
-					{POLAR_ENVIRONMENT || 'sandbox'}
+					{data.systemStatus?.polarToken ? 'Active' : 'Unset'}
 				</span>
 			</button>
 		</div>
@@ -445,7 +441,7 @@
 					</div>
 					<p class="text-xs leading-relaxed text-muted-foreground">
 						Calls <code class="font-mono text-primary">/api/rate-limited-test</code> via 0-codegen Hono
-						RPC client. Tests Upstash Redis rate limiting sliding-window middleware.
+						RPC client. Tests Upstash Redis sliding-window rate limiting.
 					</p>
 
 					<button
@@ -537,8 +533,8 @@
 						<span>Neon Postgres + Drizzle</span>
 					</div>
 					<p class="text-xs leading-relaxed text-muted-foreground">
-						First fetch queries Neon Serverless DB and caches result in Upstash Redis. Mutations
-						auto-invalidate cache.
+						Queries Neon Serverless DB and caches result in Upstash Redis. Mutations auto-invalidate
+						cache.
 					</p>
 
 					<form
@@ -666,7 +662,7 @@
 				<div class="space-y-4 rounded-xl border border-border bg-card p-6">
 					<div class="flex items-center gap-2 text-sm font-bold">
 						<CloudUpload class="size-4 text-pink-400" />
-						<span>UploadThing & UTAPI</span>
+						<span>UploadThing Storage</span>
 					</div>
 					<p class="text-xs leading-relaxed text-muted-foreground">
 						Direct-to-cloud file uploads with S3 storage, pre-wired route handlers, and type-safe
@@ -766,7 +762,7 @@
 					<p class="text-xs leading-relaxed text-muted-foreground">
 						Streams live heartbeat events from Hono’s <code class="font-mono text-primary"
 							>streamSSE</code
-						> middleware over HTTP/2 without WebSockets overhead.
+						> middleware over HTTP/2.
 					</p>
 
 					<button
@@ -910,8 +906,8 @@
 				{:else}
 					<div class="space-y-4 py-4 text-center">
 						<p class="mx-auto max-w-sm text-xs text-muted-foreground">
-							No active authentication session detected. Sign in on the login route to test
-							protected database queries and SSE streams.
+							No active authentication session detected. Sign in to test protected database queries
+							and SSE streams.
 						</p>
 
 						<a
@@ -926,41 +922,49 @@
 			</div>
 		{/if}
 
-		<!-- TAB 6: PADDLE BILLING & CHECKOUT DIAGNOSTICS -->
-		{#if activeTab === 'paddle'}
+		<!-- TAB 6: POLAR BILLING & CHECKOUT DIAGNOSTICS -->
+		{#if activeTab === 'polar'}
 			<div class="grid gap-6 md:grid-cols-3">
 				<!-- Config Inspector -->
 				<div class="space-y-4 rounded-xl border border-border bg-card p-6">
 					<div class="flex items-center gap-2 text-sm font-bold">
 						<CreditCard class="size-4 text-cyan-400" />
-						<span>Paddle MoR Environment</span>
+						<span>Polar Billing Diagnostics</span>
 					</div>
 					<p class="text-xs leading-relaxed text-muted-foreground">
-						Tests global tax compliance, Paddle.js overlay client initialization, custom customData
-						metadata payload passing, and success redirect routing.
+						Tests Polar SDK checkout creation, customer portal sessions, and webhook signature
+						verification.
 					</p>
 
 					<div class="space-y-2 border-t border-border/60 pt-3 font-mono text-xs">
 						<div class="flex items-center justify-between">
-							<span class="text-muted-foreground">Environment:</span>
-							<span class="rounded bg-primary/10 px-2 py-0.5 font-bold text-primary uppercase">
-								{POLAR_ENVIRONMENT || 'sandbox'}
+							<span class="text-muted-foreground">Polar API Token:</span>
+							<span
+								class="rounded px-2 py-0.5 font-bold {data.systemStatus?.polarToken
+									? 'bg-emerald-500/10 text-emerald-500'
+									: 'bg-red-500/10 text-red-400'}"
+							>
+								{data.systemStatus?.polarToken ? 'Configured ✅' : 'Missing ❌'}
+							</span>
+						</div>
+						<div class="flex items-center justify-between">
+							<span class="text-muted-foreground">Webhook Secret:</span>
+							<span
+								class="rounded px-2 py-0.5 font-bold {data.systemStatus?.polarSecret
+									? 'bg-emerald-500/10 text-emerald-500'
+									: 'bg-red-500/10 text-red-400'}"
+							>
+								{data.systemStatus?.polarSecret ? 'Configured ✅' : 'Missing ❌'}
 							</span>
 						</div>
 						<div class="flex flex-col gap-1 pt-1">
-							<span class="text-[10px] text-muted-foreground">Client Token:</span>
-							<span class="truncate rounded bg-muted/60 p-1.5 text-[10px] text-foreground">
-								{POLAR_ACCESS_TOKEN || 'Not configured'}
-							</span>
-						</div>
-						<div class="flex flex-col gap-1 pt-1">
-							<span class="text-[10px] text-muted-foreground">Standard Price ID:</span>
+							<span class="text-[10px] text-muted-foreground">Standard Product ID:</span>
 							<span class="truncate rounded bg-muted/60 p-1.5 text-[10px] text-foreground">
 								{PUBLIC_POLAR_STANDARD_PRODUCT_ID || 'Not configured'}
 							</span>
 						</div>
 						<div class="flex flex-col gap-1 pt-1">
-							<span class="text-[10px] text-muted-foreground">Pro Price ID:</span>
+							<span class="text-[10px] text-muted-foreground">Pro Product ID:</span>
 							<span class="truncate rounded bg-muted/60 p-1.5 text-[10px] text-foreground">
 								{PUBLIC_POLAR_PRO_PRODUCT_ID || 'Not configured'}
 							</span>
@@ -973,14 +977,13 @@
 					<div class="flex items-center justify-between border-b border-border pb-3">
 						<div class="flex items-center gap-2">
 							<Sparkles class="size-4 text-emerald-400" />
-							<span class="text-xs font-bold">Live Checkout Overlay Test Bench</span>
+							<span class="text-xs font-bold">Hosted Polar Checkout Test</span>
 						</div>
 						<span class="font-mono text-[10px] text-muted-foreground">
-							Fulfillment URL: /welcome?payment=success
+							Redirect URL: /welcome?checkout_id=...
 						</span>
 					</div>
 
-					<!-- GitHub Handle Input for Metadata Testing -->
 					<div class="space-y-1.5">
 						<label for="gh-test" class="text-xs font-medium text-foreground">
 							Test Custom Metadata (<code class="text-primary">github_username</code>)
@@ -993,21 +996,21 @@
 							class="w-full max-w-sm rounded-lg border border-border bg-background px-3 py-2 font-mono text-xs text-foreground focus:ring-2 focus:ring-primary/40 focus:outline-hidden"
 						/>
 						<p class="text-[11px] text-muted-foreground">
-							This string is attached to Paddle checkout customData and sent to <code
-								class="text-primary">inviteBuyerToGithub()</code
-							> on webhook delivery.
+							Sent in metadata to fulfill GitHub repository invitations on <code
+								class="text-primary">order.created</code
+							> webhooks.
 						</p>
 					</div>
 
-					<!-- Test Overlay Component Cards -->
+					<!-- Checkout Action Cards -->
 					<div class="grid gap-4 sm:grid-cols-2">
 						<div
 							class="flex flex-col justify-between space-y-4 rounded-xl border border-border/80 bg-muted/20 p-4"
 						>
 							<div>
-								<h4 class="text-xs font-bold text-foreground">Standard Tier Checkout</h4>
+								<h4 class="text-xs font-bold text-foreground">Standard License Checkout</h4>
 								<p class="mt-1 font-mono text-[11px] text-muted-foreground">
-									Price ID: {PUBLIC_POLAR_STANDARD_PRODUCT_ID || 'pri_...'}
+									Product: {PUBLIC_POLAR_STANDARD_PRODUCT_ID || 'prod_...'}
 								</p>
 							</div>
 							<PolarCheckout
@@ -1020,9 +1023,9 @@
 							class="flex flex-col justify-between space-y-4 rounded-xl border border-border/80 bg-muted/20 p-4"
 						>
 							<div>
-								<h4 class="text-xs font-bold text-foreground">Pro Tier Checkout</h4>
+								<h4 class="text-xs font-bold text-foreground">Pro License Checkout</h4>
 								<p class="mt-1 font-mono text-[11px] text-muted-foreground">
-									Price ID: {PUBLIC_POLAR_PRO_PRODUCT_ID || 'pri_...'}
+									Product: {PUBLIC_POLAR_PRO_PRODUCT_ID || 'prod_...'}
 								</p>
 							</div>
 							<PolarCheckout

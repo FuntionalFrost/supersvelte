@@ -34,9 +34,8 @@
 		<section>
 			<h2 class="text-lg font-bold">3. Merchant of Record</h2>
 			<p class="text-muted-foreground">
-				Our order process is conducted by our online reseller Paddle.com. Paddle.com is the Merchant
-				of Record for all our orders. Paddle handles all customer service inquiries, taxes, and
-				returns.
+				Our order process is conducted by our online reseller Polar.sh. Polar.sh is the Merchant of
+				Record for all our orders. Polar handles all customer service inquiries, taxes, and returns.
 			</p>
 		</section>
 

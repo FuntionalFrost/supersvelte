@@ -188,8 +188,7 @@
 				<div>
 					<p class="font-semibold text-foreground">Receipt & Tax Invoice</p>
 					<p class="mt-0.5 leading-relaxed text-muted-foreground">
-						Paddle (Merchant of Record) has emailed your official VAT receipt to your checkout
-						email.
+						Polar (Merchant of Record) has emailed your official VAT receipt to your checkout email.
 					</p>
 				</div>
 			</div>

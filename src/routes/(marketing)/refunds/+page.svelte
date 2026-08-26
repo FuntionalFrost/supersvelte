@@ -26,9 +26,9 @@
 		<section>
 			<h2 class="text-lg font-bold">2. How to Request a Refund</h2>
 			<p class="text-muted-foreground">
-				Because Paddle is our Merchant of Record, you can request a refund directly via Paddle's
-				Buyer Support portal or by contacting us with your order transaction ID. Upon issuing a
-				refund, your access to the private GitHub repository will be revoked.
+				Because Polar is our Merchant of Record, you can request a refund directly via Polar's Buyer
+				Support portal or by contacting us with your order transaction ID. Upon issuing a refund,
+				your access to the private GitHub repository will be revoked.
 			</p>
 		</section>
 	</div>
