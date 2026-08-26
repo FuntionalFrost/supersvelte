@@ -2,14 +2,12 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
 	import {
-		PUBLIC_PADDLE_CLIENT_TOKEN,
-		PUBLIC_PADDLE_ENV,
-		PUBLIC_PADDLE_PRO_PRICE_ID,
-		PUBLIC_PADDLE_STANDARD_PRICE_ID
+		PUBLIC_POLAR_PRO_PRODUCT_ID,
+		PUBLIC_POLAR_STANDARD_PRODUCT_ID
 	} from '$env/static/public';
+	import PolarCheckout from '$lib/components/PolarCheckout.svelte';
 	import { client } from '$lib/api-client';
 	import { authClient } from '$lib/auth-client';
-	import PaddleCheckout from '$lib/components/PaddleCheckout.svelte';
 	import {
 		Activity,
 		ArrowLeft,
@@ -31,6 +29,7 @@
 		Wifi,
 		Zap
 	} from '@lucide/svelte';
+	import { POLAR_ACCESS_TOKEN, POLAR_ENVIRONMENT } from '$env/static/private';
 
 	// 1. Reactive props from SvelteKit loaders
 	let { data } = $props();
@@ -431,7 +430,7 @@
 				<span
 					class="ml-1 rounded-full bg-background/20 px-1.5 py-0.5 font-mono text-[10px] uppercase"
 				>
-					{PUBLIC_PADDLE_ENV || 'sandbox'}
+					{POLAR_ENVIRONMENT || 'sandbox'}
 				</span>
 			</button>
 		</div>
@@ -945,25 +944,25 @@
 						<div class="flex items-center justify-between">
 							<span class="text-muted-foreground">Environment:</span>
 							<span class="rounded bg-primary/10 px-2 py-0.5 font-bold text-primary uppercase">
-								{PUBLIC_PADDLE_ENV || 'sandbox'}
+								{POLAR_ENVIRONMENT || 'sandbox'}
 							</span>
 						</div>
 						<div class="flex flex-col gap-1 pt-1">
 							<span class="text-[10px] text-muted-foreground">Client Token:</span>
 							<span class="truncate rounded bg-muted/60 p-1.5 text-[10px] text-foreground">
-								{PUBLIC_PADDLE_CLIENT_TOKEN || 'Not configured'}
+								{POLAR_ACCESS_TOKEN || 'Not configured'}
 							</span>
 						</div>
 						<div class="flex flex-col gap-1 pt-1">
 							<span class="text-[10px] text-muted-foreground">Standard Price ID:</span>
 							<span class="truncate rounded bg-muted/60 p-1.5 text-[10px] text-foreground">
-								{PUBLIC_PADDLE_STANDARD_PRICE_ID || 'Not configured'}
+								{PUBLIC_POLAR_STANDARD_PRODUCT_ID || 'Not configured'}
 							</span>
 						</div>
 						<div class="flex flex-col gap-1 pt-1">
 							<span class="text-[10px] text-muted-foreground">Pro Price ID:</span>
 							<span class="truncate rounded bg-muted/60 p-1.5 text-[10px] text-foreground">
-								{PUBLIC_PADDLE_PRO_PRICE_ID || 'Not configured'}
+								{PUBLIC_POLAR_PRO_PRODUCT_ID || 'Not configured'}
 							</span>
 						</div>
 					</div>
@@ -1008,13 +1007,12 @@
 							<div>
 								<h4 class="text-xs font-bold text-foreground">Standard Tier Checkout</h4>
 								<p class="mt-1 font-mono text-[11px] text-muted-foreground">
-									Price ID: {PUBLIC_PADDLE_STANDARD_PRICE_ID || 'pri_...'}
+									Price ID: {PUBLIC_POLAR_STANDARD_PRODUCT_ID || 'pri_...'}
 								</p>
 							</div>
-							<PaddleCheckout
-								priceId={PUBLIC_PADDLE_STANDARD_PRICE_ID}
-								githubUsername={testGithubUser}
-								buttonText="Test Standard Checkout (€99)"
+							<PolarCheckout
+								productId={PUBLIC_POLAR_STANDARD_PRODUCT_ID}
+								buttonText="Test Standard Checkout"
 							/>
 						</div>
 
@@ -1024,13 +1022,12 @@
 							<div>
 								<h4 class="text-xs font-bold text-foreground">Pro Tier Checkout</h4>
 								<p class="mt-1 font-mono text-[11px] text-muted-foreground">
-									Price ID: {PUBLIC_PADDLE_PRO_PRICE_ID || 'pri_...'}
+									Price ID: {PUBLIC_POLAR_PRO_PRODUCT_ID || 'pri_...'}
 								</p>
 							</div>
-							<PaddleCheckout
-								priceId={PUBLIC_PADDLE_PRO_PRICE_ID}
-								githubUsername={testGithubUser}
-								buttonText="Test Pro Checkout (€199)"
+							<PolarCheckout
+								productId={PUBLIC_POLAR_PRO_PRODUCT_ID}
+								buttonText="Test Pro Checkout"
 							/>
 						</div>
 					</div>

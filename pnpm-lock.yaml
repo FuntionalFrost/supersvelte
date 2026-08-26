@@ -26,12 +26,9 @@ importers:
       '@neondatabase/serverless':
         specifier: ^1.1.0
         version: 1.1.0
-      '@paddle/paddle-js':
-        specifier: ^1.6.4
-        version: 1.6.4
-      '@paddle/paddle-node-sdk':
-        specifier: ^3.10.0
-        version: 3.10.0
+      '@polar-sh/sdk':
+        specifier: ^0.49.0
+        version: 0.49.0
       '@uploadthing/svelte':
         specifier: ^7.3.3
         version: 7.3.3(svelte@5.56.8(@typescript-eslint/types@8.66.0))(uploadthing@7.7.4(tailwindcss@4.3.3))
@@ -1098,12 +1095,8 @@ packages:
   '@oxc-project/types@0.143.0':
     resolution: {integrity: sha512-u6JZdLBTLotrNC9Vd6vPssINdzcCzleKAH6EJKImQb7GtYvX5keN2dxkoK44stCc4tffE6QQRtZTXVSzsLUlWA==}
 
-  '@paddle/paddle-js@1.6.4':
-    resolution: {integrity: sha512-ncfnS6I8mCX6krZ3Sgz2iAYivGmhdI81yt9mT6prtPj4Ipd9J3M12LCJRUFL4FB7BYeeuV04c33RSEnbZUBCaA==}
-
-  '@paddle/paddle-node-sdk@3.10.0':
-    resolution: {integrity: sha512-njqp+L6e/2aR99EYh/Ulyu6B9sIyVERTFclGOznKmLZcy11pAwHoHyIgq1BUH1ybQH+YmJQmrrUQC/Rfg8JAAw==}
-    engines: {node: '>=20'}
+  '@polar-sh/sdk@0.49.0':
+    resolution: {integrity: sha512-9UYb70iKjJCtWYlu0OF5HLYBLmkxHwqr2RlXwuxXQgRGqq56IQWlVG+NO7e1YJ7I5GW0CBHhGIjRbQ9hYM6ycQ==}
 
   '@polka/url@1.0.0-next.29':
     resolution: {integrity: sha512-wwQAWhWSuHaag8c4q/KN/vCoeOJYshAIvMQwD4GpSb3OiZklFfvAgmj0VCBBImRpuF/aFgIRzllXlVX93Jevww==}
@@ -3871,9 +3864,10 @@ snapshots:
 
   '@oxc-project/types@0.143.0': {}
 
-  '@paddle/paddle-js@1.6.4': {}
-
-  '@paddle/paddle-node-sdk@3.10.0': {}
+  '@polar-sh/sdk@0.49.0':
+    dependencies:
+      standardwebhooks: 1.0.0
+      zod: 4.4.3
 
   '@polka/url@1.0.0-next.29': {}
 

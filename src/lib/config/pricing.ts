@@ -1,23 +1,15 @@
 // src/lib/config/pricing.ts
-import { PUBLIC_PADDLE_PRO_PRICE_ID, PUBLIC_PADDLE_STANDARD_PRICE_ID } from '$env/static/public';
+import { PUBLIC_POLAR_PRO_PRODUCT_ID, PUBLIC_POLAR_STANDARD_PRODUCT_ID } from '$env/static/public';
 
-export interface Tier {
-	name: 'Standard' | 'Unlimited Pro';
-	badge?: string;
-	description: string;
-	features: string[];
-	priceId: string;
-	highlighted?: boolean;
-}
-
-export const tiers: Tier[] = [
+export const pricingPlans = [
 	{
-		name: 'Standard',
-		badge: '1 Developer',
-		description: 'Perfect for solopreneurs launching a single product or SaaS.',
-		priceId: PUBLIC_PADDLE_STANDARD_PRICE_ID || '',
+		id: 'standard',
+		productId: PUBLIC_POLAR_STANDARD_PRODUCT_ID,
+		name: 'Standard License',
+		price: 99,
+		description: 'Perfect for solopreneurs launching a single product.',
 		features: [
-			'Full Svelte 5 + Hono RPC Source Code',
+			'Full Svelte 5 + Hono Source Code',
 			'Better Auth (Session + Social Logins)',
 			'Drizzle ORM + Neon Serverless Postgres',
 			'Upstash Redis Caching & Rate Limiting',
@@ -26,11 +18,12 @@ export const tiers: Tier[] = [
 		]
 	},
 	{
-		name: 'Unlimited Pro',
-		badge: 'Unlimited Projects',
+		id: 'pro',
+		productId: PUBLIC_POLAR_PRO_PRODUCT_ID,
+		name: 'Unlimited Pro License',
+		price: 199,
+		isPopular: true,
 		description: 'For agencies, serial founders, and team workflows.',
-		priceId: PUBLIC_PADDLE_PRO_PRICE_ID || '',
-		highlighted: true,
 		features: [
 			'Everything in Standard License',
 			'Unlimited Commercial Projects & Clients',

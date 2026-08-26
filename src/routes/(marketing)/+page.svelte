@@ -1,9 +1,12 @@
 <!-- src/routes/(marketing)/+page.svelte -->
 <script lang="ts">
 	import { resolve } from '$app/paths';
-	import { PUBLIC_PADDLE_PRO_PRICE_ID, PUBLIC_PADDLE_STANDARD_PRICE_ID } from '$env/static/public';
+	import {
+		PUBLIC_POLAR_PRO_PRODUCT_ID,
+		PUBLIC_POLAR_STANDARD_PRODUCT_ID
+	} from '$env/static/public';
 	import CodeComparison from '$lib/components/CodeComparison.svelte';
-	import PaddleCheckout from '$lib/components/PaddleCheckout.svelte';
+	import PolarCheckout from '$lib/components/PolarCheckout.svelte';
 	import SuperSvelteVsOthers from '$lib/components/SuperSvelteVsOthers.svelte';
 	import { matrices, type Mode } from '$lib/config/comparison';
 	import {
@@ -47,7 +50,7 @@
 
 		<div class="relative container mx-auto max-w-5xl px-4 text-center">
 			<div
-				class="mb-6 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-3.5 py-1 text-xs font-semibold text-primary shadow-xs"
+				class="mb-6 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-3.5 py-1 text-sm font-semibold text-primary shadow-xs"
 			>
 				<Sparkles class="size-3.5" />
 				<span>SuperSvelte • Svelte 5 + Hono RPC + Neon</span>
@@ -60,7 +63,7 @@
 				>
 			</h1>
 
-			<p class="mx-auto mt-4 max-w-xl text-lg font-medium text-foreground sm:text-xl">
+			<p class="mx-auto mt-4 max-w-xl text-sm font-medium text-foreground sm:text-xl">
 				The Batteries-Included Edge TS Framework
 			</p>
 
@@ -96,42 +99,42 @@
 					class="group flex flex-col items-center gap-2 rounded-xl border border-border/60 bg-card p-4 text-center transition-all duration-300 hover:-translate-y-1 hover:border-amber-400/50"
 				>
 					<Zap class="size-6 text-amber-400" />
-					<span class="text-xs font-bold">Svelte 5</span>
+					<span class="text-sm font-bold">Svelte 5</span>
 					<span class="text-[11px] text-muted-foreground">Fine-grained Runes</span>
 				</div>
 				<div
 					class="group flex flex-col items-center gap-2 rounded-xl border border-border/60 bg-card p-4 text-center transition-all duration-300 hover:-translate-y-1 hover:border-cyan-400/50"
 				>
 					<Cpu class="size-6 text-cyan-400" />
-					<span class="text-xs font-bold">Hono Zod RPC</span>
+					<span class="text-sm font-bold">Hono Zod RPC</span>
 					<span class="text-[11px] text-muted-foreground">Auto OpenAPI 3.1</span>
 				</div>
 				<div
 					class="group flex flex-col items-center gap-2 rounded-xl border border-border/60 bg-card p-4 text-center transition-all duration-300 hover:-translate-y-1 hover:border-emerald-400/50"
 				>
 					<Database class="size-6 text-emerald-400" />
-					<span class="text-xs font-bold">Drizzle + Neon</span>
+					<span class="text-sm font-bold">Drizzle + Neon</span>
 					<span class="text-[11px] text-muted-foreground">Serverless Postgres</span>
 				</div>
 				<div
 					class="group flex flex-col items-center gap-2 rounded-xl border border-border/60 bg-card p-4 text-center transition-all duration-300 hover:-translate-y-1 hover:border-indigo-400/50"
 				>
 					<ShieldCheck class="size-6 text-indigo-400" />
-					<span class="text-xs font-bold">Better Auth</span>
+					<span class="text-sm font-bold">Better Auth</span>
 					<span class="text-[11px] text-muted-foreground">Sessions & Social</span>
 				</div>
 				<div
 					class="group flex flex-col items-center gap-2 rounded-xl border border-border/60 bg-card p-4 text-center transition-all duration-300 hover:-translate-y-1 hover:border-red-400/50"
 				>
 					<Cloud class="size-6 text-red-400" />
-					<span class="text-xs font-bold">Upstash Redis</span>
+					<span class="text-sm font-bold">Upstash Redis</span>
 					<span class="text-[11px] text-muted-foreground">Cache & SSE Queue</span>
 				</div>
 				<div
 					class="group flex flex-col items-center gap-2 rounded-xl border border-border/60 bg-card p-4 text-center transition-all duration-300 hover:-translate-y-1 hover:border-pink-400/50"
 				>
 					<Mail class="size-6 text-pink-400" />
-					<span class="text-xs font-bold">Resend & UT</span>
+					<span class="text-sm font-bold">Resend & UT</span>
 					<span class="text-[11px] text-muted-foreground">Mail & Storage</span>
 				</div>
 			</div>
@@ -143,7 +146,7 @@
 		<div class="container mx-auto max-w-6xl px-4">
 			<div class="text-center">
 				<div
-					class="mb-3 inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary"
+					class="mb-3 inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-sm font-semibold text-primary"
 				>
 					<Sparkles class="size-3.5" />
 					<span>Direct Competitor Matrix</span>
@@ -160,7 +163,7 @@
 				>
 					<button
 						onclick={() => (mode = 'saas-starters')}
-						class="rounded-lg px-4 py-2 text-xs font-semibold transition-all {mode ===
+						class="rounded-lg px-4 py-2 text-sm font-semibold transition-all {mode ===
 						'saas-starters'
 							? 'bg-primary text-primary-foreground shadow-xs'
 							: 'text-muted-foreground hover:text-foreground'}"
@@ -170,7 +173,7 @@
 
 					<button
 						onclick={() => (mode = 'ts-frameworks')}
-						class="rounded-lg px-4 py-2 text-xs font-semibold transition-all {mode ===
+						class="rounded-lg px-4 py-2 text-sm font-semibold transition-all {mode ===
 						'ts-frameworks'
 							? 'bg-primary text-primary-foreground shadow-xs'
 							: 'text-muted-foreground hover:text-foreground'}"
@@ -180,7 +183,7 @@
 
 					<button
 						onclick={() => (mode = 'monoliths')}
-						class="rounded-lg px-4 py-2 text-xs font-semibold transition-all {mode === 'monoliths'
+						class="rounded-lg px-4 py-2 text-sm font-semibold transition-all {mode === 'monoliths'
 							? 'bg-primary text-primary-foreground shadow-xs'
 							: 'text-muted-foreground hover:text-foreground'}"
 					>
@@ -191,7 +194,7 @@
 
 			<!-- Unified Matrix Table -->
 			<div class="mt-12 overflow-x-auto rounded-xl border border-border bg-card shadow-xs">
-				<table class="w-full text-left text-xs">
+				<table class="w-full text-left text-sm">
 					<thead class="border-b border-border bg-muted/50 text-muted-foreground">
 						<tr>
 							{#each currentMatrix.columns as col (col.key)}
@@ -247,7 +250,7 @@
 		<div class="container mx-auto max-w-5xl px-4">
 			<div class="text-center">
 				<div
-					class="mb-3 inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary"
+					class="mb-3 inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-sm font-semibold text-primary"
 				>
 					<Zap class="size-3.5" />
 					<span>One-Time Payment • Lifetime Access</span>
@@ -266,7 +269,7 @@
 				>
 					<div>
 						<div class="flex items-center justify-between">
-							<h3 class="text-lg font-bold">Standard License</h3>
+							<h3 class="text-sm font-bold">Standard License</h3>
 							<span
 								class="rounded-md border border-border bg-muted px-2.5 py-0.5 font-mono text-[10px] font-bold"
 								>1 Developer</span
@@ -274,13 +277,13 @@
 						</div>
 						<div class="mt-4 flex items-baseline gap-1">
 							<span class="text-4xl font-extrabold">€99</span>
-							<span class="text-xs text-muted-foreground">/ one-time</span>
+							<span class="text-sm text-muted-foreground">/ one-time</span>
 						</div>
-						<p class="mt-2 text-xs text-muted-foreground">
+						<p class="mt-2 text-sm text-muted-foreground">
 							Perfect for solopreneurs launching a single product.
 						</p>
 
-						<ul class="mt-6 space-y-3 text-xs font-medium text-foreground/90">
+						<ul class="mt-6 space-y-3 text-sm font-medium text-foreground/90">
 							<li class="flex items-center gap-2">
 								<Check class="size-4 text-emerald-500" /> Full Svelte 5 + Hono Source Code
 							</li>
@@ -303,8 +306,8 @@
 					</div>
 
 					<div class="mt-8">
-						<PaddleCheckout
-							priceId={PUBLIC_PADDLE_STANDARD_PRICE_ID}
+						<PolarCheckout
+							productId={PUBLIC_POLAR_STANDARD_PRODUCT_ID}
 							buttonText="Get Standard License"
 						/>
 					</div>
@@ -321,7 +324,7 @@
 					</div>
 					<div>
 						<div class="flex items-center justify-between">
-							<h3 class="text-lg font-bold text-primary">Unlimited Pro License</h3>
+							<h3 class="text-sm font-bold text-primary">Unlimited Pro License</h3>
 							<span
 								class="rounded-md border border-primary/30 bg-primary/10 px-2.5 py-0.5 font-mono text-[10px] font-bold text-primary"
 								>Unlimited Projects</span
@@ -329,13 +332,13 @@
 						</div>
 						<div class="mt-4 flex items-baseline gap-1">
 							<span class="text-4xl font-extrabold">€199</span>
-							<span class="text-xs text-muted-foreground">/ one-time</span>
+							<span class="text-sm text-muted-foreground">/ one-time</span>
 						</div>
-						<p class="mt-2 text-xs text-muted-foreground">
+						<p class="mt-2 text-sm text-muted-foreground">
 							For agencies, serial founders, and team workflows.
 						</p>
 
-						<ul class="mt-6 space-y-3 text-xs font-medium text-foreground/90">
+						<ul class="mt-6 space-y-3 text-sm font-medium text-foreground/90">
 							<li class="flex items-center gap-2">
 								<Check class="size-4 text-emerald-500" /> Everything in Standard License
 							</li>
@@ -355,7 +358,7 @@
 					</div>
 
 					<div class="mt-8">
-						<PaddleCheckout priceId={PUBLIC_PADDLE_PRO_PRICE_ID} buttonText="Get Unlimited Pro" />
+						<PolarCheckout productId={PUBLIC_POLAR_PRO_PRODUCT_ID} buttonText="Test Pro Checkout" />
 					</div>
 				</div>
 			</div>
@@ -373,7 +376,7 @@
 		<div class="container mx-auto max-w-4xl px-4">
 			<div class="mb-12 text-center">
 				<div
-					class="mb-3 inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary"
+					class="mb-3 inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-sm font-semibold text-primary"
 				>
 					<CircleQuestionMark class="size-3.5" />
 					<span>Got Questions?</span>
@@ -381,7 +384,7 @@
 				<h2 class="text-3xl font-bold">Frequently Asked Questions</h2>
 			</div>
 
-			<div class="grid grid-cols-1 gap-6 text-xs md:grid-cols-2">
+			<div class="grid grid-cols-1 gap-6 text-sm md:grid-cols-2">
 				<div class="space-y-2 rounded-xl border border-border bg-card p-5">
 					<h3 class="text-sm font-bold text-foreground">What happens after I complete payment?</h3>
 					<p class="leading-relaxed text-muted-foreground">

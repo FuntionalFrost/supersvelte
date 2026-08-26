@@ -1,38 +1,54 @@
 // src/routes/api/portal/+server.ts
 import { db } from '$lib/server/db';
-import { paddle } from '$lib/server/paddle';
+import { purchases } from '$lib/server/db/schema';
+import { polar } from '$lib/server/polar';
 import { error, redirect, type RequestHandler } from '@sveltejs/kit';
+import { eq } from 'drizzle-orm';
 
 export const GET: RequestHandler = async ({ locals }) => {
-	const authUser = locals.user;
-	if (!authUser || !authUser.email) {
+	const user = locals.user;
+	if (!user || !user.email) {
 		throw redirect(303, '/login');
 	}
 
-	const customerRecord = await db.query.customers.findFirst({
-		where: (table, { eq, or }) => or(eq(table.userId, authUser.id), eq(table.email, authUser.email))
-	});
-
-	if (!customerRecord) {
-		throw error(404, 'No purchase record found for this account.');
-	}
-
-	let portalUrl: string;
-
 	try {
-		// Mint session in try block
-		const portalSession = await paddle.customerPortalSessions.create(customerRecord.customerId, []);
-		portalUrl = portalSession.urls.general.overview;
+		// 1. Retrieve the user's latest purchase record from DB
+		const userPurchases = await db
+			.select()
+			.from(purchases)
+			.where(eq(purchases.userId, user.id))
+			.limit(1);
 
-		if (!portalUrl) {
-			throw error(500, 'Could not generate Paddle portal URL.');
+		let customerId = userPurchases[0]?.customerId;
+
+		// 2. Fallback: Lookup customer in Polar by email if not found in local DB
+		if (!customerId) {
+			const customerList = await polar.customers.list({
+				email: user.email
+			});
+			customerId = customerList.result.items[0]?.id;
 		}
-	} catch (err) {
-		if ((err as { status?: number })?.status) throw err;
-		console.error('❌ Failed to mint Paddle customer portal session:', err);
-		throw error(500, 'Failed to create customer portal session.');
-	}
 
-	// Execute redirect outside try-catch
-	throw redirect(303, portalUrl);
+		if (!customerId) {
+			throw error(404, 'No Polar customer account found. Please complete a purchase first.');
+		}
+
+		// 3. Create the customer portal session
+		const session = await polar.customerSessions.create({
+			customerId
+		});
+
+		throw redirect(303, session.customerPortalUrl);
+	} catch (err) {
+		if (
+			err &&
+			typeof err === 'object' &&
+			'status' in err &&
+			(err as { status: number }).status === 303
+		) {
+			throw err;
+		}
+		console.error('Failed to create customer portal session:', err);
+		throw error(500, 'Unable to generate customer portal session.');
+	}
 };

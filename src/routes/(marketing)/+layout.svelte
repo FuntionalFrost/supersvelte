@@ -27,7 +27,7 @@
 			</a>
 
 			<!-- Nav Links -->
-			<nav class="hidden items-center gap-6 text-xs font-semibold text-muted-foreground md:flex">
+			<nav class="hidden items-center gap-6 text-sm font-semibold text-muted-foreground md:flex">
 				<a href="#features" class="transition hover:text-foreground">Stack & Specs</a>
 				<a href="#comparison" class="transition hover:text-foreground">Matrix</a>
 				<a href="#pricing" class="transition hover:text-foreground">Pricing</a>
@@ -39,13 +39,13 @@
 				<ThemeToggle />
 				<a
 					href={resolve('/login')}
-					class="text-xs font-semibold text-muted-foreground transition hover:text-foreground"
+					class="text-sm font-semibold text-muted-foreground transition hover:text-foreground"
 				>
 					Sign In
 				</a>
 				<a
 					href="#pricing"
-					class="inline-flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2 text-xs font-bold text-primary-foreground shadow-xs transition hover:bg-primary/90"
+					class="inline-flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2 text-sm font-bold text-primary-foreground shadow-xs transition hover:bg-primary/90"
 				>
 					<Rocket class="size-3.5" />
 					<span>Get SuperSvelte</span>
@@ -60,7 +60,7 @@
 	</main>
 
 	<!-- Marketing Footer -->
-	<footer class="border-t border-border/40 bg-card py-12 text-xs text-muted-foreground">
+	<footer class="border-t border-border/40 bg-card py-12 text-sm text-muted-foreground">
 		<div
 			class="container mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-4 sm:flex-row"
 		>
