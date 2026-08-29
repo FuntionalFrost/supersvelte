@@ -27,7 +27,6 @@
 	let mode = $state<Mode>('saas-starters');
 	let currentMatrix = $derived(matrices[mode]);
 
-	// Safe accessor helper to satisfy TypeScript dynamic key indexing
 	function getCellValue(row: Record<string, unknown>, key: string): string {
 		return String(row[key] ?? '');
 	}
@@ -157,7 +156,6 @@
 					toolkits, and classic monoliths.
 				</p>
 
-				<!-- 3-Way Mode Toggle -->
 				<div
 					class="mt-8 flex flex-wrap items-center justify-center gap-2 rounded-xl border border-border bg-card p-1.5 shadow-xs"
 				>
@@ -192,7 +190,6 @@
 				</div>
 			</div>
 
-			<!-- Unified Matrix Table -->
 			<div class="mt-12 overflow-x-auto rounded-xl border border-border bg-card shadow-xs">
 				<table class="w-full text-left text-sm">
 					<thead class="border-b border-border bg-muted/50 text-muted-foreground">
@@ -218,9 +215,9 @@
 							<tr class="transition-colors hover:bg-muted/40">
 								{#each currentMatrix.columns as col (col.key)}
 									{#if col.key === 'feature'}
-										<td class="p-4 font-semibold whitespace-nowrap text-foreground"
-											>{getCellValue(row, col.key)}</td
-										>
+										<td class="p-4 font-semibold whitespace-nowrap text-foreground">
+											{getCellValue(row, col.key)}
+										</td>
 									{:else if col.isPrimary}
 										<td
 											class="border-x border-primary/20 bg-primary/5 p-4 font-semibold text-primary"
@@ -272,8 +269,9 @@
 							<h3 class="text-sm font-bold">Standard License</h3>
 							<span
 								class="rounded-md border border-border bg-muted px-2.5 py-0.5 font-mono text-[10px] font-bold"
-								>1 Developer</span
 							>
+								1 Developer
+							</span>
 						</div>
 						<div class="mt-4 flex items-baseline gap-1">
 							<span class="text-4xl font-extrabold">€99</span>
@@ -327,8 +325,9 @@
 							<h3 class="text-sm font-bold text-primary">Unlimited Pro License</h3>
 							<span
 								class="rounded-md border border-primary/30 bg-primary/10 px-2.5 py-0.5 font-mono text-[10px] font-bold text-primary"
-								>Unlimited Projects</span
 							>
+								Unlimited Projects
+							</span>
 						</div>
 						<div class="mt-4 flex items-baseline gap-1">
 							<span class="text-4xl font-extrabold">€199</span>

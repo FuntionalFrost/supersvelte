@@ -1,8 +1,9 @@
+<!-- src/routes/test/+page.svelte -->
 <script lang="ts">
 	import { resolve } from '$app/paths';
 	import {
 		ArrowLeft,
-		CloudUpload,
+		Cloud,
 		CreditCard,
 		Database,
 		Radio,
@@ -11,6 +12,7 @@
 		Sparkles,
 		Zap
 	} from '@lucide/svelte';
+	import type { PageData } from './$types';
 
 	import AuthTab from './components/AuthTab.svelte';
 	import DbTab from './components/DbTab.svelte';
@@ -19,13 +21,11 @@
 	import SseTab from './components/SseTab.svelte';
 	import UploadTab from './components/UploadTab.svelte';
 
-	let { data } = $props();
+	let { data }: { data: PageData } = $props();
 
 	let activeTab = $state<'rpc' | 'db' | 'upload' | 'sse' | 'auth' | 'polar'>('rpc');
 	let rpcLatency = $state<number | null>(null);
 	let cacheSource = $state<string | null>(null);
-	let fileCount = $state<number>(0);
-	let sseConnected = $state<boolean>(false);
 
 	let rpcTabRef: { runRpcTest: () => Promise<void> } | undefined = $state();
 	let dbTabRef: { fetchProjects: () => Promise<void> } | undefined = $state();
@@ -34,6 +34,7 @@
 <div
 	class="min-h-screen bg-background text-foreground selection:bg-primary selection:text-primary-foreground"
 >
+	<!-- Top Navigation Header -->
 	<header class="sticky top-0 z-40 border-b border-border bg-card/60 backdrop-blur-md">
 		<div class="container mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
 			<div class="flex items-center gap-3">
@@ -48,8 +49,9 @@
 						<span class="text-lg font-black">SuperSvelte</span>
 						<span
 							class="rounded-full border border-primary/20 bg-primary/10 px-2 py-0.5 text-[10px] font-bold text-primary"
-							>Sandbox v1.0</span
 						>
+							Sandbox v1.0
+						</span>
 					</div>
 					<p class="text-xs text-muted-foreground">Live Infrastructure & Edge Diagnostics</p>
 				</div>
@@ -64,6 +66,7 @@
 	</header>
 
 	<main class="container mx-auto max-w-6xl px-4 py-10">
+		<!-- Diagnostic Banner -->
 		<div
 			class="mb-8 rounded-2xl border border-primary/20 bg-linear-to-r from-primary/10 via-emerald-500/5 to-cyan-500/10 p-6 shadow-xs"
 		>
@@ -92,112 +95,136 @@
 			</div>
 		</div>
 
-		<!-- Diagnostic Tab Navigation -->
-		<div class="mb-8 flex flex-wrap gap-2 rounded-xl border border-border bg-card p-1.5 shadow-xs">
+		<!-- Diagnostic Tab Navigation (Fixed Height + Tabular Layout) -->
+		<div
+			class="grid grid-cols-2 gap-1 rounded-2xl border border-border bg-card p-1.5 shadow-xs sm:grid-cols-3 lg:grid-cols-6"
+		>
+			<!-- Tab 1: RPC & Rate Limiter -->
 			<button
 				onclick={() => (activeTab = 'rpc')}
-				class="flex items-center gap-2 rounded-lg px-3.5 py-2 text-xs font-semibold transition-all {activeTab ===
+				class="flex h-9 items-center justify-between gap-1.5 rounded-xl px-2.5 text-xs font-semibold transition-all {activeTab ===
 				'rpc'
 					? 'bg-primary text-primary-foreground shadow-xs'
-					: 'text-muted-foreground hover:text-foreground'}"
+					: 'text-muted-foreground hover:bg-accent hover:text-foreground'}"
 			>
-				<Zap class="size-4" />
-				<span>1. RPC & Rate Limiter</span>
+				<div class="flex items-center gap-1.5 truncate">
+					<Zap class="size-3.5 shrink-0" />
+					<span class="truncate">1. RPC</span>
+				</div>
 				{#if rpcLatency !== null}
-					<span class="ml-1 rounded-full bg-background/20 px-1.5 py-0.5 font-mono text-[10px]"
-						>{rpcLatency}ms</span
+					<span
+						class="inline-flex min-w-11 items-center justify-center rounded-md px-1.5 py-0.5 font-mono text-[10px] font-bold tabular-nums {activeTab ===
+						'rpc'
+							? 'bg-primary-foreground/20 text-primary-foreground'
+							: 'bg-muted text-foreground'}"
 					>
+						{rpcLatency}ms
+					</span>
 				{/if}
 			</button>
 
+			<!-- Tab 2: Drizzle DB & Cache -->
 			<button
 				onclick={() => (activeTab = 'db')}
-				class="flex items-center gap-2 rounded-lg px-3.5 py-2 text-xs font-semibold transition-all {activeTab ===
+				class="flex h-9 items-center justify-between gap-1.5 rounded-xl px-2.5 text-xs font-semibold transition-all {activeTab ===
 				'db'
 					? 'bg-primary text-primary-foreground shadow-xs'
-					: 'text-muted-foreground hover:text-foreground'}"
+					: 'text-muted-foreground hover:bg-accent hover:text-foreground'}"
 			>
-				<Database class="size-4" />
-				<span>2. Drizzle DB & Cache</span>
+				<div class="flex items-center gap-1.5 truncate">
+					<Database class="size-3.5 shrink-0" />
+					<span class="truncate">2. DB & Cache</span>
+				</div>
 				{#if cacheSource}
 					<span
-						class="ml-1 rounded-full bg-background/20 px-1.5 py-0.5 font-mono text-[10px] uppercase"
-						>{cacheSource}</span
+						class="inline-flex items-center justify-center rounded-md px-1.5 py-0.5 font-mono text-[9px] font-bold uppercase {cacheSource ===
+						'redis'
+							? 'bg-emerald-500/20 text-emerald-500'
+							: 'bg-muted text-muted-foreground'}"
 					>
+						{cacheSource}
+					</span>
 				{/if}
 			</button>
 
+			<!-- Tab 3: Cloud Uploads -->
 			<button
 				onclick={() => (activeTab = 'upload')}
-				class="flex items-center gap-2 rounded-lg px-3.5 py-2 text-xs font-semibold transition-all {activeTab ===
+				class="flex h-9 items-center gap-1.5 truncate rounded-xl px-2.5 text-xs font-semibold transition-all {activeTab ===
 				'upload'
 					? 'bg-primary text-primary-foreground shadow-xs'
-					: 'text-muted-foreground hover:text-foreground'}"
+					: 'text-muted-foreground hover:bg-accent hover:text-foreground'}"
 			>
-				<CloudUpload class="size-4" />
-				<span>3. Cloud Uploads</span>
-				{#if fileCount > 0}
-					<span class="ml-1 rounded-full bg-background/20 px-1.5 py-0.5 font-mono text-[10px]"
-						>{fileCount}</span
-					>
-				{/if}
+				<Cloud class="size-3.5 shrink-0" />
+				<span class="truncate">3. Uploads</span>
 			</button>
 
+			<!-- Tab 4: SSE Realtime -->
 			<button
 				onclick={() => (activeTab = 'sse')}
-				class="flex items-center gap-2 rounded-lg px-3.5 py-2 text-xs font-semibold transition-all {activeTab ===
+				class="flex h-9 items-center gap-1.5 truncate rounded-xl px-2.5 text-xs font-semibold transition-all {activeTab ===
 				'sse'
 					? 'bg-primary text-primary-foreground shadow-xs'
-					: 'text-muted-foreground hover:text-foreground'}"
+					: 'text-muted-foreground hover:bg-accent hover:text-foreground'}"
 			>
-				<Radio class="size-4" />
-				<span>4. SSE Realtime</span>
-				{#if sseConnected}
-					<span class="flex h-2 w-2 animate-pulse rounded-full bg-emerald-400"></span>
-				{/if}
+				<Radio class="size-3.5 shrink-0" />
+				<span class="truncate">4. Realtime</span>
 			</button>
 
+			<!-- Tab 5: Better Auth -->
 			<button
 				onclick={() => (activeTab = 'auth')}
-				class="flex items-center gap-2 rounded-lg px-3.5 py-2 text-xs font-semibold transition-all {activeTab ===
+				class="flex h-9 items-center gap-1.5 truncate rounded-xl px-2.5 text-xs font-semibold transition-all {activeTab ===
 				'auth'
 					? 'bg-primary text-primary-foreground shadow-xs'
-					: 'text-muted-foreground hover:text-foreground'}"
+					: 'text-muted-foreground hover:bg-accent hover:text-foreground'}"
 			>
-				<ShieldCheck class="size-4" />
-				<span>5. Better Auth</span>
+				<ShieldCheck class="size-3.5 shrink-0" />
+				<span class="truncate">5. Auth</span>
 			</button>
 
+			<!-- Tab 6: Polar Billing -->
 			<button
 				onclick={() => (activeTab = 'polar')}
-				class="flex items-center gap-2 rounded-lg px-3.5 py-2 text-xs font-semibold transition-all {activeTab ===
+				class="flex h-9 items-center justify-between gap-1.5 rounded-xl px-2.5 text-xs font-semibold transition-all {activeTab ===
 				'polar'
 					? 'bg-primary text-primary-foreground shadow-xs'
-					: 'text-muted-foreground hover:text-foreground'}"
+					: 'text-muted-foreground hover:bg-accent hover:text-foreground'}"
 			>
-				<CreditCard class="size-4" />
-				<span>6. Polar Billing</span>
+				<div class="flex items-center gap-1.5 truncate">
+					<CreditCard class="size-3.5 shrink-0" />
+					<span class="truncate">6. Polar</span>
+				</div>
 				<span
-					class="ml-1 rounded-full bg-background/20 px-1.5 py-0.5 font-mono text-[10px] uppercase"
+					class="rounded-md px-1.5 py-0.5 text-[9px] font-bold uppercase {activeTab === 'polar'
+						? 'bg-primary-foreground/20 text-primary-foreground'
+						: 'bg-muted text-muted-foreground'}"
 				>
-					{data.systemStatus?.polarToken ? 'Active' : 'Unset'}
+					Active
 				</span>
 			</button>
 		</div>
 
-		<!-- Render Selected Tab -->
+		<!-- Render Selected Tab Panel -->
 		{#if activeTab === 'rpc'}
-			<RpcTab bind:this={rpcTabRef} onLatencyUpdate={(ms) => (rpcLatency = ms)} />
+			<RpcTab
+				bind:this={rpcTabRef}
+				onLatencyUpdate={(ms) => {
+					rpcLatency = ms;
+				}}
+			/>
 		{:else if activeTab === 'db'}
 			<DbTab
 				bind:this={dbTabRef}
 				initialProjects={data.existingProjects}
-				onSourceUpdate={(src) => (cacheSource = src)}
+				onSourceUpdate={(src) => {
+					cacheSource = src;
+				}}
 			/>
 		{:else if activeTab === 'upload'}
-			<UploadTab onFileCountUpdate={(cnt) => (fileCount = cnt)} />
+			<UploadTab />
 		{:else if activeTab === 'sse'}
-			<SseTab onStateChange={(connected) => (sseConnected = connected)} />
+			<SseTab />
 		{:else if activeTab === 'auth'}
 			<AuthTab initialUser={data.user} />
 		{:else if activeTab === 'polar'}

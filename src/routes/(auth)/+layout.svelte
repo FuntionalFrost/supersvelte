@@ -1,8 +1,9 @@
 <!-- src/routes/(auth)/+layout.svelte -->
 <script lang="ts">
 	import { resolve } from '$app/paths';
+	import type { Snippet } from 'svelte';
 
-	let { children } = $props();
+	let { children }: { children: Snippet } = $props();
 </script>
 
 <div class="flex min-h-screen w-full flex-col items-center justify-center bg-background p-4 sm:p-6">

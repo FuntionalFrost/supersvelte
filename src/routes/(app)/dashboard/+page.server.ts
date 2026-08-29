@@ -1,14 +1,16 @@
 // src/routes/(app)/dashboard/+page.server.ts
+import { resolve } from '$app/paths';
 import { auth } from '$lib/server/auth';
 import { db } from '$lib/server/db';
-import * as schema from '$lib/server/db/schema';
+import { projects } from '$lib/server/db/schema';
 import { setCookiesFromResponse } from '$lib/server/utils';
 import { redirect } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
+import type { Actions, PageServerLoad } from './$types';
 
-export const load = async ({ locals, request }) => {
+export const load: PageServerLoad = async ({ locals, request }) => {
 	if (!locals.user || !locals.session) {
-		throw redirect(303, '/login');
+		redirect(303, resolve('/login'));
 	}
 
 	const activeOrgId = locals.session.activeOrganizationId;
@@ -21,15 +23,22 @@ export const load = async ({ locals, request }) => {
 		};
 	}
 
-	const organization = await auth.api.getFullOrganization({
-		headers: request.headers,
-		query: { organizationId: activeOrgId }
-	});
+	let organization = null;
+	try {
+		organization = await auth.api.getFullOrganization({
+			headers: request.headers,
+			query: { organizationId: activeOrgId }
+		});
+	} catch (err) {
+		console.error('Failed to fetch full organization details:', err);
+	}
 
-	const orgProjects = await db
-		.select()
-		.from(schema.projects)
-		.where(eq(schema.projects.organizationId, activeOrgId));
+	let orgProjects: Array<typeof projects.$inferSelect> = [];
+	try {
+		orgProjects = await db.select().from(projects).where(eq(projects.userId, locals.user.id));
+	} catch (err) {
+		console.error('Failed to load projects:', err);
+	}
 
 	return {
 		user: locals.user,
@@ -38,16 +47,14 @@ export const load = async ({ locals, request }) => {
 	};
 };
 
-export const actions = {
+export const actions: Actions = {
 	signOut: async (event) => {
 		const response = await auth.api.signOut({
 			headers: event.request.headers,
 			asResponse: true
 		});
 
-		// Clear session cookie via event.cookies API
 		setCookiesFromResponse(event, response);
-
-		throw redirect(303, '/login');
+		redirect(303, resolve('/login'));
 	}
 };

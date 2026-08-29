@@ -4,8 +4,9 @@
 	import { resolve } from '$app/paths';
 	import { Button } from '$lib/components/ui/button';
 	import { Activity, ArrowRight, CreditCard, ShieldCheck, Users } from '@lucide/svelte';
+	import type { PageData } from './$types';
 
-	let { data } = $props();
+	let { data }: { data: PageData } = $props();
 </script>
 
 <div class="mx-auto max-w-5xl space-y-8 p-4 md:p-6">
@@ -14,9 +15,9 @@
 		<div>
 			<h1 class="text-2xl font-bold tracking-tight text-foreground">Dashboard</h1>
 			<p class="text-xs text-muted-foreground">
-				Welcome back, <span class="font-semibold text-foreground"
-					>{data.user.name ?? data.user.email}</span
-				>!
+				Welcome back, <span class="font-semibold text-foreground">
+					{data.user?.name || data.user?.email}
+				</span>!
 			</p>
 		</div>
 
@@ -36,7 +37,7 @@
 				<ShieldCheck class="size-4 text-emerald-500" />
 				<span class="text-xs font-bold text-foreground">Session Status: Active</span>
 			</div>
-			<p class="font-mono text-[11px] text-muted-foreground">User ID: {data.user.id}</p>
+			<p class="font-mono text-[11px] text-muted-foreground">User ID: {data.user?.id}</p>
 		</div>
 	</div>
 

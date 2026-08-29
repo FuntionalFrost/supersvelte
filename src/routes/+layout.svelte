@@ -3,11 +3,12 @@
 	import { onNavigate } from '$app/navigation';
 	import { defaultMetaTags } from '$lib/config/seo';
 	import { mode, ModeWatcher } from 'mode-watcher';
+	import type { Snippet } from 'svelte';
 	import { MetaTags } from 'svelte-meta-tags';
 	import { Toaster } from 'svelte-sonner';
 	import './layout.css';
 
-	let { children } = $props();
+	let { children }: { children: Snippet } = $props();
 
 	// Smooth page navigation with native View Transitions API
 	onNavigate((navigation) => {
@@ -23,8 +24,8 @@
 	// Dynamically update favicon based on the active mode-watcher theme
 	$effect(() => {
 		const isDark = mode.current === 'dark';
-		const bg = isDark ? '%23e2e8f0' : '%23090d16'; // Light badge in dark mode, dark badge in light mode
-		const fg = isDark ? '%23090d16' : '%23ffffff'; // Dark text in dark mode, white text in light mode
+		const bg = isDark ? '%23e2e8f0' : '%23090d16';
+		const fg = isDark ? '%23090d16' : '%23ffffff';
 
 		const svg = `data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='9' fill='${bg}'/><text x='16' y='22.5' font-family='system-ui,-apple-system,sans-serif' font-weight='900' font-size='16' letter-spacing='-0.5px' fill='${fg}' text-anchor='middle'>S5</text></svg>`;
 

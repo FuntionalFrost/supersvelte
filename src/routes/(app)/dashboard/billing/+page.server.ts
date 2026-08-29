@@ -1,4 +1,5 @@
 // src/routes/(app)/dashboard/billing/+page.server.ts
+import { resolve } from '$app/paths';
 import { db } from '$lib/server/db';
 import { purchases } from '$lib/server/db/schema';
 import { redirect } from '@sveltejs/kit';
@@ -7,7 +8,7 @@ import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ locals }) => {
 	if (!locals.user) {
-		throw redirect(303, '/login');
+		redirect(303, resolve('/login'));
 	}
 
 	const userPurchases = await db

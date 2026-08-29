@@ -7,8 +7,10 @@
 	import { Button } from '$lib/components/ui/button';
 	import { Separator } from '$lib/components/ui/separator';
 	import { Activity, CreditCard, LayoutDashboard, LogOut, Users } from '@lucide/svelte';
+	import type { Snippet } from 'svelte';
+	import type { LayoutData } from './$types';
 
-	let { data, children } = $props();
+	let { data, children }: { data: LayoutData; children: Snippet } = $props();
 
 	const navItems = [
 		{ href: resolve('/dashboard'), label: 'Dashboard', icon: LayoutDashboard },
@@ -62,7 +64,7 @@
 				<p class="truncate font-semibold text-foreground">{data.user?.name ?? 'Developer'}</p>
 				<p class="truncate text-muted-foreground">{data.user?.email ?? ''}</p>
 			</div>
-			<form method="POST" action="/dashboard?/signOut" use:enhance>
+			<form method="POST" action="{resolve('/dashboard')}?/signOut" use:enhance>
 				<Button
 					variant="ghost"
 					size="sm"
