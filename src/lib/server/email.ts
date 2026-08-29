@@ -1,33 +1,50 @@
-// src/lib/server/email.ts
 import { env } from '$env/dynamic/private';
 import { Resend } from 'resend';
+import { render } from 'svelte/server';
 
-export const resend = new Resend(env.RESEND_API_KEY);
+const resend = new Resend(env.RESEND_API_KEY);
 
-interface SendEmailOptions {
+// Base raw email dispatcher
+export async function sendEmail({
+	to,
+	subject,
+	html,
+	text
+}: {
 	to: string;
 	subject: string;
 	html: string;
+	text?: string;
+}) {
+	return await resend.emails.send({
+		from: env.EMAIL_FROM || 'App <notifications@yourdomain.com>',
+		to,
+		subject,
+		html,
+		text
+	});
 }
 
-export async function sendEmail({ to, subject, html }: SendEmailOptions) {
-	try {
-		const from = 'Acme <onboarding@resend.dev>';
-		const res = await resend.emails.send({
-			from,
-			to,
-			subject,
-			html
-		});
+// Svelte-component-driven template helper
+export async function sendWelcomeEmail({
+	to,
+	name,
+	actionUrl
+}: {
+	to: string;
+	name: string;
+	actionUrl: string;
+}) {
+	// Dynamic import avoids crashing CLI tools (like better-auth generate & seed scripts)
+	const { default: WelcomeEmail } = await import('$lib/emails/WelcomeEmail.svelte');
 
-		if (res.error) {
-			console.error('[Resend Email Error]:', res.error);
-			return { success: false, error: res.error };
-		}
+	const { body: html } = render(WelcomeEmail, {
+		props: { name, actionUrl }
+	});
 
-		return { success: true, data: res.data };
-	} catch (error) {
-		console.error('[Resend Email Exception]:', error);
-		return { success: false, error };
-	}
+	return await sendEmail({
+		to,
+		subject: `Welcome to the app, ${name}!`,
+		html
+	});
 }

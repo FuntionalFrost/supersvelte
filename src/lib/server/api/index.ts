@@ -1,4 +1,3 @@
-// src/lib/server/api/index.ts
 import { auth } from '$lib/server/auth';
 import { db } from '$lib/server/db';
 import { getProjects, invalidateProjectsCache } from '$lib/server/db/queries';
@@ -8,6 +7,14 @@ import { swaggerUI } from '@hono/swagger-ui';
 import { createRoute, OpenAPIHono, z } from '@hono/zod-openapi';
 import { eq } from 'drizzle-orm';
 import { streamSSE } from 'hono/streaming';
+import crypto from 'node:crypto';
+
+// Bindings for SvelteKit locals passed via app.fetch(request, { locals })
+export type HonoEnv = {
+	Bindings: {
+		locals?: App.Locals;
+	};
+};
 
 // 1. ZOD SCHEMAS
 const ProjectSchema = z
@@ -29,7 +36,7 @@ const CreateProjectInputSchema = z
 	.openapi('CreateProjectInput');
 
 // 2. PROJECTS SUB-ROUTER
-const projectsApp = new OpenAPIHono()
+const projectsApp = new OpenAPIHono<HonoEnv>()
 	.openapi(
 		createRoute({
 			method: 'get',
@@ -84,6 +91,9 @@ const projectsApp = new OpenAPIHono()
 		}),
 		async (c) => {
 			const body = c.req.valid('json');
+			const user = c.env?.locals?.user;
+			const session = c.env?.locals?.session;
+
 			const name = body.name || 'New Project';
 			const slug =
 				body.slug ||
@@ -93,7 +103,16 @@ const projectsApp = new OpenAPIHono()
 					.replace(/[\s\W-]+/g, '-')
 					.concat('-', crypto.randomUUID().slice(0, 8));
 
-			const [newProject] = await db.insert(projects).values({ name, slug }).returning();
+			const [newProject] = await db
+				.insert(projects)
+				.values({
+					name,
+					slug,
+					userId: user?.id ?? null,
+					organizationId: session?.activeOrganizationId ?? null
+				})
+				.returning();
+
 			await invalidateProjectsCache();
 			return c.json({ success: true, project: newProject }, 200);
 		}
@@ -131,7 +150,7 @@ const projectsApp = new OpenAPIHono()
 	);
 
 // 3. BASE API ROUTER CHAIN
-const api = new OpenAPIHono().basePath('/api');
+const api = new OpenAPIHono<HonoEnv>().basePath('/api');
 
 // OpenAPI 3.1 JSON Document
 api.doc('/doc', {
@@ -206,8 +225,10 @@ const routes = api
 			}
 		}),
 		async (c) => {
-			const ip = c.req.header('x-forwarded-for') ?? '127.0.0.1';
+			const forwarded = c.req.header('x-forwarded-for');
+			const ip = forwarded ? forwarded.split(',')[0].trim() : '127.0.0.1';
 			const result = await checkRateLimit(ip);
+
 			return c.json(
 				{
 					message: `Allowed (${result.mode})`,
@@ -221,15 +242,20 @@ const routes = api
 		}
 	)
 	.get('/realtime', async (c) => {
-		const session = await auth.api.getSession({ headers: c.req.raw.headers });
-		if (!session) return c.json({ error: 'Unauthorized' }, 401);
+		const session = c.env?.locals?.session
+			? { user: c.env.locals.user, session: c.env.locals.session }
+			: await auth.api.getSession({ headers: c.req.raw.headers });
+
+		if (!session?.user) return c.json({ error: 'Unauthorized' }, 401);
+
+		const user = session.user; // <-- Narrowed const preserves type safety inside callback
 
 		return streamSSE(c, async (stream) => {
 			let count = 0;
 			while (!stream.aborted) {
 				count++;
 				await stream.writeSSE({
-					data: JSON.stringify({ userId: session.user.id, count }),
+					data: JSON.stringify({ userId: user.id, count }),
 					event: 'heartbeat',
 					id: String(count)
 				});

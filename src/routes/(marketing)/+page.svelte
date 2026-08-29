@@ -412,7 +412,7 @@
 				<div class="space-y-2 rounded-xl border border-border bg-card p-5">
 					<h3 class="text-sm font-bold text-foreground">Are updates included?</h3>
 					<p class="leading-relaxed text-muted-foreground">
-						Yes. Both licenses grant lifetime access to repository updates, bug fixes, and
+						Yes. Both licences grant lifetime access to repository updates, bug fixes, and
 						compatibility patches as Svelte 5 evolves.
 					</p>
 				</div>

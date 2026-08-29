@@ -5,7 +5,7 @@
 
 <MetaTags
 	title="Refund Policy"
-	description="Review the 14-day refund policy and satisfaction guarantee for SuperSvelte licenses."
+	description="Review the 14-day refund policy and satisfaction guarantee for SuperSvelte licences."
 	canonical="https://supersvelte.netlify.app/refunds"
 />
 

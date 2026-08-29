@@ -1,6 +1,7 @@
-// src/routes/api/[...path]/+server.ts
+// src/routes/api/[...paths]/+server.ts
 import { app } from '$lib/server/api';
 import type { RequestHandler } from './$types';
 
-// Catch all HTTP methods (GET, POST, PUT, PATCH, DELETE, OPTIONS, HEAD)
-export const fallback: RequestHandler = ({ request }) => app.fetch(request);
+export const fallback: RequestHandler = ({ request, locals, platform }) => {
+	return app.fetch(request, { locals, platform });
+};

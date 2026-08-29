@@ -13,10 +13,16 @@
 		let timeoutId: ReturnType<typeof setTimeout>;
 
 		async function accept() {
-			const invitationId = page.params.id;
+			// Fallback cascade: route param -> ?id -> ?token -> ?invitationId
+			const invitationId =
+				page.params.id ??
+				page.url.searchParams.get('id') ??
+				page.url.searchParams.get('token') ??
+				page.url.searchParams.get('invitationId');
+
 			if (!invitationId) {
 				status = 'error';
-				errorMessage = 'Invalid invitation link';
+				errorMessage = 'Invalid invitation link: No invitation ID or token provided.';
 				return;
 			}
 
@@ -30,7 +36,6 @@
 			} else {
 				status = 'success';
 				timeoutId = setTimeout(() => {
-					// Use SvelteKit's router and path resolver
 					goto(resolve('/dashboard'));
 				}, 1500);
 			}
@@ -38,7 +43,6 @@
 
 		accept();
 
-		// Cleanup timeout if component unmounts prematurely
 		return () => {
 			if (timeoutId) clearTimeout(timeoutId);
 		};

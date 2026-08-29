@@ -1,9 +1,10 @@
 # netlify.toml
 [build]
-  command = "pnpm build"
+  command = "pnpm run build"
 
 [build.environment]
-  NODE_VERSION = "24.19.0"
+  NODE_VERSION = "26"
+  PNPM_VERSION = "11.22.0"
   SECRETS_SCAN_OMIT_KEYS = "ORIGIN, POLAR_ENVIRONMENT, PUBLIC_POLAR_STANDARD_PRODUCT_ID, PUBLIC_POLAR_PRO_PRODUCT_ID"
 
 # Security Headers (Adapter does not add these automatically)

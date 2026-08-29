@@ -1,12 +1,15 @@
 // src/routes/test/+page.ts
-import { client } from '$lib/api-client';
+import { createApiClient } from '$lib/api-client';
+import type { PageLoad } from './$types';
 
-export const load = async ({ fetch, data }) => {
+export const load: PageLoad = async ({ fetch, url, data }) => {
+	const rpc = createApiClient(fetch, url.origin);
+
 	let initialRpcStatus: string;
 	let initialRpcCount = 0;
 
 	try {
-		const res = await client.api.projects.$get({}, { fetch });
+		const res = await rpc.api.projects.$get();
 
 		if (res.ok) {
 			const json = await res.json();

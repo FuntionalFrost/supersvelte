@@ -7,13 +7,16 @@
 
 	interface Props {
 		required?: 'standard' | 'pro';
-		allowed: Snippet;
+		allowed?: Snippet;
+		children?: Snippet;
 		fallback?: Snippet;
+		denied?: Snippet;
 	}
 
-	let { required = 'standard', allowed, fallback }: Props = $props();
+	let { required = 'standard', allowed, children, fallback, denied }: Props = $props();
 
-	// Read purchases from layout data
+	// Read session and purchases from layout data
+	const user = $derived(page.data.user);
 	const purchases = $derived(page.data.purchases ?? []);
 
 	const hasPro = $derived(
@@ -21,14 +24,24 @@
 			(p.productId || p.priceId)?.includes('pro')
 		)
 	);
-	const hasStandard = $derived(purchases.length > 0);
-	const isUnlocked = $derived(required === 'pro' ? hasPro : hasStandard);
+	const hasStandard = $derived(purchases.length > 0 || hasPro);
+
+	const isUnlocked = $derived.by(() => {
+		if (user?.role === 'admin') return true;
+		return required === 'pro' ? hasPro : hasStandard;
+	});
+
+	// Support both snippet naming conventions
+	const renderAllowed = $derived(allowed ?? children);
+	const renderDenied = $derived(denied ?? fallback);
 </script>
 
 {#if isUnlocked}
-	{@render allowed()}
-{:else if fallback}
-	{@render fallback()}
+	{#if renderAllowed}
+		{@render renderAllowed()}
+	{/if}
+{:else if renderDenied}
+	{@render renderDenied()}
 {:else}
 	<div
 		class="relative overflow-hidden rounded-2xl border border-primary/30 bg-linear-to-b from-primary/5 via-background to-background p-8 text-center"

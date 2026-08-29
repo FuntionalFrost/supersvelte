@@ -25,7 +25,7 @@
 
 <div class="space-y-8">
 	<div>
-		<h1 class="text-2xl font-bold tracking-tight">Billing & Licenses</h1>
+		<h1 class="text-2xl font-bold tracking-tight">Billing & Licences</h1>
 		<p class="text-sm text-muted-foreground">
 			Manage your SuperSvelte license, view invoices, and update billing details.
 		</p>

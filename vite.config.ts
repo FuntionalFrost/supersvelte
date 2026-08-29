@@ -1,3 +1,4 @@
+/// <reference types="vitest/config" />
 import adapter from '@sveltejs/adapter-netlify';
 import { sveltekit } from '@sveltejs/kit/vite';
 import tailwindcss from '@tailwindcss/vite';
@@ -20,5 +21,11 @@ export default defineConfig({
 				}
 			}
 		})
-	]
+	],
+	test: {
+		include: ['src/**/*.{test,spec}.{js,ts}'],
+		environment: 'jsdom',
+		globals: true,
+		setupFiles: ['tests/setup.ts']
+	}
 });

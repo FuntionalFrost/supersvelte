@@ -1,20 +1,20 @@
-// src/lib/server/auth/guards.ts
 import { db } from '$lib/server/db';
 import { purchases } from '$lib/server/db/schema';
+import type { HonoEnv } from '$lib/server/api';
 import { eq } from 'drizzle-orm';
 import type { MiddlewareHandler } from 'hono';
 
 export type PlanTier = 'standard' | 'pro';
 
-export function requirePlan(requiredPlan: PlanTier): MiddlewareHandler {
+export function requirePlan(requiredPlan: PlanTier): MiddlewareHandler<HonoEnv> {
 	return async (c, next) => {
-		const user = c.get('user');
+		const user = c.env?.locals?.user ?? (c.get('user' as never) as App.Locals['user']);
 
-		if (!user) {
+		if (!user?.id) {
 			return c.json({ error: 'Unauthorized', code: 'UNAUTHORIZED' }, 401);
 		}
 
-		// Query user's purchases from the database
+		// Query active purchases for the user
 		const userPurchases = await db.select().from(purchases).where(eq(purchases.userId, user.id));
 
 		const hasPro = userPurchases.some(

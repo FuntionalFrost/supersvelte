@@ -1,6 +1,6 @@
 # 🚀 Getting Started with SuperSvelte
 
-Welcome to SuperSvelte! Follow this guide to take your project from zero to a fully deployed SaaS application in under 5 minutes.
+Welcome to SuperSvelte. Follow this guide to take your project from zero to a fully deployed full-stack SaaS application in under 5 minutes.
 
 ---
 
@@ -8,8 +8,8 @@ Welcome to SuperSvelte! Follow this guide to take your project from zero to a fu
 
 Ensure you have the following installed locally:
 
-- **Node.js**: `v20.0.0` or higher (tested with `v24+`)
-- **Package Manager**: `pnpm` (recommended), `npm`, or `bun`
+- **Node.js:** `v20.0.0` or higher (tested on `v22+` & `v24+`)
+- **Package Manager:** `pnpm` (recommended), `npm`, or `bun`
 - **Git**
 
 ---
@@ -19,78 +19,93 @@ Ensure you have the following installed locally:
 ### 1. Clone the Repository & Install Dependencies
 
 ```bash
-git clone https://github.com/FuntionalFrost/supersvelte.git
+git clone https://github.com/FunctionalFrost/supersvelte.git
 cd supersvelte
 pnpm install
 
 ```
 
-### 2. Environment Variables Configuration
+---
 
-Copy the template environment file:
+### 2. Configure Environment Variables
+
+Create your local `.env` configuration:
 
 ```bash
 cp .env.example .env
 
 ```
 
-Open `.env` and configure your API keys:
+Configure the following variables in `.env`:
 
-| Variable                           | Description                                                                                                                     | Where to Find                                  |
-| ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------- |
-| `ORIGIN`                           | App Base URL (`http://localhost:5173` locally, or `[https://supersvelte.netlify.app](https://supersvelte.netlify.app)` in prod) | Deployment domain                              |
-| `DATABASE_URL`                     | Neon PostgreSQL connection string (pooled)                                                                                      | [Neon Console](https://neon.tech)              |
-| `BETTER_AUTH_SECRET`               | 32-byte secret for session tokens                                                                                               | Run `openssl rand -hex 32`                     |
-| `POLAR_ENVIRONMENT`                | `"sandbox"` or `"production"`                                                                                                   | Polar Dashboard                                |
-| `POLAR_ACCESS_TOKEN`               | Polar Organization Access Token (`polar_at_...`)                                                                                | Polar Settings → Developers                    |
-| `POLAR_WEBHOOK_SECRET`             | Signing secret for webhook validation (`polar_whsec_...`)                                                                       | Polar Webhooks → Endpoint Secret               |
-| `PUBLIC_POLAR_STANDARD_PRODUCT_ID` | Standard tier product ID (`prod_...`)                                                                                           | Polar Products Catalog                         |
-| `PUBLIC_POLAR_PRO_PRODUCT_ID`      | Pro tier product ID (`prod_...`)                                                                                                | Polar Products Catalog                         |
-| `UPSTASH_REDIS_REST_URL`           | Redis URL for sliding-window rate limiting                                                                                      | [Upstash Console](https://upstash.com)         |
-| `UPSTASH_REDIS_REST_TOKEN`         | Upstash Redis REST token                                                                                                        | Upstash Console                                |
-| `QSTASH_TOKEN`                     | _(Optional)_ Upstash QStash token for async background jobs                                                                     | Upstash Console                                |
-| `RESEND_API_KEY`                   | Transactional email delivery key                                                                                                | [Resend Console](https://resend.com)           |
-| `UPLOADTHING_TOKEN`                | Direct S3 file storage secret token                                                                                             | [UploadThing Console](https://uploadthing.com) |
-| `GITHUB_ADMIN_TOKEN`               | Personal Access Token with repo invite scope                                                                                    | GitHub Developer Settings                      |
-| `GITHUB_REPO_OWNER`                | GitHub account or org name holding the template repo                                                                            | GitHub                                         |
-| `GITHUB_REPO_NAME`                 | Private repository name to invite buyers to                                                                                     | GitHub                                         |
+| Variable                           | Description                                                            | Source / How to Obtain                         |
+| ---------------------------------- | ---------------------------------------------------------------------- | ---------------------------------------------- |
+| `ORIGIN`                           | Base URL (`http://localhost:5173` locally, production domain deployed) | Localhost or deployment domain                 |
+| `DATABASE_URL`                     | Neon Postgres pooled connection string                                 | [Neon Console](https://neon.tech)              |
+| `BETTER_AUTH_SECRET`               | 32-byte secret key for cookie session encryption                       | Run `openssl rand -hex 32`                     |
+| `POLAR_ENVIRONMENT`                | `"sandbox"` (for testing) or `"production"`                            | Polar Dashboard                                |
+| `POLAR_ACCESS_TOKEN`               | Polar Organization Access Token (`polar_at_...`)                       | Polar Settings → Developers                    |
+| `POLAR_WEBHOOK_SECRET`             | Webhook signing secret (`polar_whsec_...`)                             | Polar Webhooks → Endpoint Secret               |
+| `PUBLIC_POLAR_STANDARD_PRODUCT_ID` | Standard tier product ID (`prod_...`)                                  | Polar Products Catalog                         |
+| `PUBLIC_POLAR_PRO_PRODUCT_ID`      | Pro tier product ID (`prod_...`)                                       | Polar Products Catalog                         |
+| `UPSTASH_REDIS_REST_URL`           | Upstash Redis REST endpoint for rate limiting & cache                  | [Upstash Console](https://upstash.com)         |
+| `UPSTASH_REDIS_REST_TOKEN`         | Upstash Redis REST authentication token                                | Upstash Console                                |
+| `QSTASH_TOKEN`                     | _(Optional)_ Upstash QStash token for async background jobs            | Upstash Console                                |
+| `RESEND_API_KEY`                   | Resend API key for transactional email delivery                        | [Resend Console](https://resend.com)           |
+| `EMAIL_FROM`                       | Verified sender address (e.g. `App <support@yourdomain.com>`)          | Resend Domains                                 |
+| `UPLOADTHING_TOKEN`                | Direct S3 file storage token                                           | [UploadThing Console](https://uploadthing.com) |
+| `GITHUB_ADMIN_TOKEN`               | GitHub Personal Access Token with repository invite scope              | GitHub Developer Settings                      |
+| `GITHUB_REPO_OWNER`                | GitHub username or organization holding your private template          | GitHub                                         |
+| `GITHUB_REPO_NAME`                 | Private repository name to grant buyer access to                       | GitHub                                         |
 
 ---
 
-### 3. Database Schema Push
+### 3. Generate Auth Schemas & Sync Database
 
-Apply the Drizzle ORM schema to your Neon PostgreSQL database:
+Generate Better-Auth table definitions and push all Drizzle schemas to your Neon Postgres database:
 
 ```bash
-# Push schema directly to your Neon database
+# 1. Generate Better-Auth Drizzle schemas (src/lib/server/db/auth.schema.ts)
+pnpm auth:schema
+
+# 2. Push application and auth schemas to Neon Postgres
 pnpm db:push
 
-# (Optional) Launch Drizzle Studio GUI
+# 3. (Optional) Seed the database with a test user and demo records
+pnpm db:seed
+
+# 4. (Optional) Open the visual Drizzle Studio schema browser
 pnpm db:studio
 
 ```
 
 ---
 
-### 4. Run Development Server
+### 4. Start the Development Server
 
 ```bash
 pnpm dev
 
 ```
 
-Open [http://localhost:5173](http://localhost:5173) in your browser.
+- **Application:** [http://localhost:5173](http://localhost:5173)
+- **Diagnostic Workbench:** [http://localhost:5173/test](http://localhost:5173/test)
+- **Interactive OpenAPI Swagger Docs:** [http://localhost:5173/api/docs](http://localhost:5173/api/docs)
+- **OpenAPI 3.1 Spec JSON:** [http://localhost:5173/api/doc](http://localhost:5173/api/doc)
 
 ---
 
 ## 🛠️ Developer Productivity Commands
 
 ```bash
-# Generate a full CRUD entity (Drizzle Schema + Hono RPC Route)
+# Generate full-stack CRUD slice (Drizzle Schema + OpenAPI Hono Route)
 pnpm make:resource invoice
 
-# Run end-to-end typechecks across Svelte 5 runes and TypeScript
+# Run end-to-end type safety checks (Svelte 5 Runes + TypeScript)
 pnpm check
+
+# Run automated tests with Vitest
+pnpm test
 
 # Format and lint codebase
 pnpm format
@@ -105,27 +120,27 @@ pnpm lint
 1. **Push your code to GitHub.**
 2. **Connect Repository to Netlify:**
 
-- Import your repository on Netlify.
+- Import your repository on the Netlify dashboard.
 - **Build Command:** `pnpm build`
-- **Publish Directory:** `.svelte-kit/netlify` (handled automatically by `@sveltejs/adapter-netlify`).
+- **Publish Directory:** `.svelte-kit/netlify` (handled automatically via `@sveltejs/adapter-netlify`).
 
-3. **Set Environment Variables:**
+3. **Configure Environment Variables:**
 
-- Copy all key-value pairs from your `.env` into **Netlify Site Configuration → Environment Variables**.
-- Ensure `SECRETS_SCAN_OMIT_KEYS = "ORIGIN, PUBLIC_POLAR_STANDARD_PRODUCT_ID, PUBLIC_POLAR_PRO_PRODUCT_ID"` is set in `netlify.toml` to prevent false-positive build blocks.
+- Copy all key-value pairs from your production `.env` into **Netlify Site Configuration → Environment Variables**.
+- Set `SECRETS_SCAN_OMIT_KEYS = "ORIGIN, PUBLIC_POLAR_STANDARD_PRODUCT_ID, PUBLIC_POLAR_PRO_PRODUCT_ID"` in `netlify.toml` to prevent false-positive build flags.
 
 4. **Configure Polar Webhooks:**
 
-- In your Polar Dashboard, add an endpoint pointing to:
+- Add a webhook endpoint in your Polar Dashboard pointing to:
 
 ```text
-https://supersvelte.netlify.app/api/webhooks/polar
+https://your-domain.netlify.app/api/webhooks/polar
 
 ```
 
-- Subscribe to `order.created`, `subscription.created`, `subscription.updated`, and `subscription.revoked`.
+- Subscribe to events: `order.created`, `subscription.created`, `subscription.updated`, and `subscription.revoked`.
 
-5. **Deploy!**
+5. **Deploy Site.**
 
 ---
 
@@ -133,9 +148,9 @@ https://supersvelte.netlify.app/api/webhooks/polar
 
 Navigate to `/test` in your local development environment to run real-time infrastructure tests:
 
-- **Hono RPC Client:** Verify zero-codegen API queries & Upstash sliding-window rate limiting.
-- **Drizzle DB & Redis:** Check Neon PostgreSQL query latency and Redis cache hits.
-- **UploadThing:** Test cloud file uploads to S3 storage.
-- **Realtime SSE:** Verify server-sent event heartbeats over HTTP/2.
-- **Better Auth:** Inspect live cookie session states and organization membership.
-- **Polar Billing:** Test hosted sandbox checkout flows and customer portal routing.
+- **1. Hono RPC Client:** Verify 0-codegen client queries and Upstash sliding-window rate limiting.
+- **2. Drizzle DB & Redis:** Measure query round-trip latency to Neon and verify Redis cache hits/invalidation.
+- **3. UploadThing Storage:** Test direct-to-cloud file uploads to S3 storage.
+- **4. Realtime SSE:** Verify server-sent event heartbeats streamed over HTTP/2.
+- **5. Better Auth:** Inspect live cookie session states, organization context, and role-based permissions.
+- **6. Polar Billing:** Test hosted sandbox checkout triggers, custom metadata passing, and customer portal redirection.

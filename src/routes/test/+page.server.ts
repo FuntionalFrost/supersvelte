@@ -6,19 +6,27 @@ import { db } from '$lib/server/db';
 import { insertProjectSchema, projects, user } from '$lib/server/db/schema';
 import { sendEmail } from '$lib/server/email';
 import { setCookiesFromResponse } from '$lib/server/utils';
-import { fail, redirect } from '@sveltejs/kit';
+import { error, fail, redirect } from '@sveltejs/kit';
 import { and, eq } from 'drizzle-orm';
 import { superValidate } from 'sveltekit-superforms';
 import { zod4 as zod } from 'sveltekit-superforms/adapters';
+import type { Actions, PageServerLoad } from './$types';
 
 const MOCK_DEMO_PROJECTS = [
 	{ id: 'demo-1', name: 'Acme Analytics Platform', slug: 'acme-analytics' },
 	{ id: 'demo-2', name: 'Edge AI Gateway', slug: 'edge-ai-gateway' }
 ];
 
-export const load = async ({ locals }) => {
-	const form = await superValidate(zod(insertProjectSchema));
+export const load: PageServerLoad = async ({ locals }) => {
+	const isDev = dev;
+	const isAdmin = locals.user?.role === 'admin';
 
+	// Block route in production unless authenticated as an admin
+	if (!isDev && !isAdmin) {
+		throw error(404, 'Not found');
+	}
+
+	const form = await superValidate(zod(insertProjectSchema));
 	let userProjects = MOCK_DEMO_PROJECTS;
 
 	if (locals.user) {
@@ -38,7 +46,6 @@ export const load = async ({ locals }) => {
 		existingProjects: userProjects,
 		user: locals.user ?? null,
 		session: locals.session ?? null,
-		// Safely expose configuration booleans to client
 		systemStatus: {
 			database: !!env.DATABASE_URL,
 			polarSecret: !!env.POLAR_WEBHOOK_SECRET,
@@ -50,8 +57,12 @@ export const load = async ({ locals }) => {
 	};
 };
 
-export const actions = {
+export const actions: Actions = {
 	createProject: async (event) => {
+		if (!dev && event.locals.user?.role !== 'admin') {
+			throw error(404, 'Not found');
+		}
+
 		const form = await superValidate(event.request, zod(insertProjectSchema));
 		if (!form.valid) return fail(400, { form });
 
@@ -72,6 +83,10 @@ export const actions = {
 	},
 
 	deleteProject: async ({ request, locals }) => {
+		if (!dev && locals.user?.role !== 'admin') {
+			throw error(404, 'Not found');
+		}
+
 		if (!locals.user) {
 			return fail(401, { message: 'Must be logged in to delete.' });
 		}
@@ -88,11 +103,11 @@ export const actions = {
 		return { success: true };
 	},
 
-	seed: async () => {
-		if (!dev) {
+	seed: async ({ locals }) => {
+		if (!dev && locals.user?.role !== 'admin') {
 			return fail(403, {
 				seeded: false,
-				message: 'Database seeding is disabled in public production mode.'
+				message: 'Database seeding is disabled in production mode.'
 			});
 		}
 
@@ -118,10 +133,14 @@ export const actions = {
 		});
 
 		setCookiesFromResponse(event, response);
-		throw redirect(303, '/login');
+		redirect(303, '/login');
 	},
 
 	sendTestEmail: async ({ locals }) => {
+		if (!dev && locals.user?.role !== 'admin') {
+			throw error(404, 'Not found');
+		}
+
 		if (!locals.user?.email) {
 			return fail(400, { message: 'Must be logged in to send a test email.' });
 		}
@@ -132,9 +151,10 @@ export const actions = {
 			html: `<h1>Test Successful!</h1><p>Sent to ${locals.user.email} via Resend.</p>`
 		});
 
-		if (res.success) {
+		if (!res.error) {
 			return { emailSent: true, message: `Test email sent to ${locals.user.email}!` };
 		}
-		return fail(500, { message: 'Failed to send email.' });
+
+		return fail(500, { message: res.error.message ?? 'Failed to send email.' });
 	}
 };
