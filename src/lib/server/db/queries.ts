@@ -4,16 +4,22 @@ import { files, projects } from '$lib/server/db/schema';
 import { redis } from '$lib/server/ratelimit';
 import { desc, eq } from 'drizzle-orm';
 
-const CACHE_KEY_ALL_PROJECTS = 'cache:projects:all';
-
 /**
- * Fetch all projects with Upstash Redis cache-aside strategy.
+ * Fetch projects scoped to an authenticated user or active organization with tenant-isolated Redis caching.
  */
-export async function getProjects() {
+export async function getProjects(userId?: string, organizationId?: string | null) {
+	if (!userId && !organizationId) {
+		return { data: [], source: 'Empty (Unauthenticated)' as const };
+	}
+
+	const cacheKey = organizationId
+		? `cache:projects:org:${organizationId}`
+		: `cache:projects:user:${userId}`;
+
 	// 1. Attempt cache read from Upstash Redis
 	if (redis) {
 		try {
-			const cached = await redis.get<(typeof projects.$inferSelect)[]>(CACHE_KEY_ALL_PROJECTS);
+			const cached = await redis.get<(typeof projects.$inferSelect)[]>(cacheKey);
 			if (cached) {
 				return { data: cached, source: 'Upstash Redis Cache (Fast)' as const };
 			}
@@ -22,13 +28,15 @@ export async function getProjects() {
 		}
 	}
 
-	// 2. Cache Miss: Fetch fresh data from Neon Postgres
-	const data = await db.select().from(projects);
+	// 2. Cache Miss: Fetch fresh scoped data from Neon Postgres
+	const data = organizationId
+		? await db.select().from(projects).where(eq(projects.organizationId, organizationId))
+		: await db.select().from(projects).where(eq(projects.userId, userId!));
 
 	// 3. Populate Redis cache (expires in 60 seconds)
 	if (redis) {
 		try {
-			await redis.set(CACHE_KEY_ALL_PROJECTS, data, { ex: 60 });
+			await redis.set(cacheKey, data, { ex: 60 });
 		} catch (err) {
 			console.error('[Redis Cache Write Error]:', err);
 		}
@@ -38,15 +46,19 @@ export async function getProjects() {
 }
 
 /**
- * Purge the projects cache key whenever a write operation occurs.
+ * Purge the tenant's projects cache key whenever a write operation occurs.
  */
-export async function invalidateProjectsCache() {
-	if (redis) {
-		try {
-			await redis.del(CACHE_KEY_ALL_PROJECTS);
-		} catch (err) {
-			console.error('[Redis Cache Invalidation Error]:', err);
-		}
+export async function invalidateProjectsCache(userId?: string, organizationId?: string | null) {
+	if (!redis || (!userId && !organizationId)) return;
+
+	const cacheKey = organizationId
+		? `cache:projects:org:${organizationId}`
+		: `cache:projects:user:${userId}`;
+
+	try {
+		await redis.del(cacheKey);
+	} catch (err) {
+		console.error('[Redis Cache Invalidation Error]:', err);
 	}
 }
 

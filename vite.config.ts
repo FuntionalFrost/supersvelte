@@ -4,7 +4,7 @@ import { sveltekit } from '@sveltejs/kit/vite';
 import tailwindcss from '@tailwindcss/vite';
 import { defineConfig } from 'vite';
 
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
 	plugins: [
 		tailwindcss(),
 		sveltekit({
@@ -22,10 +22,17 @@ export default defineConfig({
 			}
 		})
 	],
+	...(mode === 'test'
+		? {
+				resolve: {
+					conditions: ['browser']
+				}
+			}
+		: {}),
 	test: {
 		include: ['src/**/*.{test,spec}.{js,ts}'],
 		environment: 'jsdom',
 		globals: true,
 		setupFiles: ['tests/setup.ts']
 	}
-});
+}));

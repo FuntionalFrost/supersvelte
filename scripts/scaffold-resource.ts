@@ -16,11 +16,11 @@ const PluralName = resource.endsWith('s') ? resource : `${resource}s`;
 // 1. Generate Drizzle Schema
 const schemaPath = path.resolve(`src/lib/server/db/schema/${PluralName}.ts`);
 const schemaCode = `import { pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
-import { users } from './users';
+import { user } from '../schema';
 
 export const ${PluralName} = pgTable('${PluralName}', {
 	id: uuid('id').defaultRandom().primaryKey(),
-	userId: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+	userId: text('user_id').notNull().references(() => user.id, { onDelete: 'cascade' }),
 	name: text('name').notNull(),
 	description: text('description'),
 	createdAt: timestamp('created_at').defaultNow().notNull(),
@@ -64,6 +64,9 @@ export const ${PluralName}Route = new Hono()
 		return c.json({ success: true });
 	});
 `;
+
+fs.mkdirSync(path.dirname(schemaPath), { recursive: true });
+fs.mkdirSync(path.dirname(routePath), { recursive: true });
 
 fs.writeFileSync(schemaPath, schemaCode);
 fs.writeFileSync(routePath, routeCode);

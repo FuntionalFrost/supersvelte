@@ -31,11 +31,12 @@ export default defineConfig(
 				extraFileExtensions: ['.svelte'],
 				parser: ts.parser
 			}
+		},
+		rules: {
+			// Allow pre-highlighted Shiki HTML snippet rendering
+			'svelte/no-at-html-tags': 'off',
+			// Allow polymorphic component href prop forwarding
+			'svelte/no-navigation-without-resolve': 'off'
 		}
-	},
-	{
-		// Override or add rule settings here, such as:
-		// 'svelte/button-has-type': 'error'
-		rules: {}
 	}
 );

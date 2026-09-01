@@ -2,6 +2,7 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
+	import { PUBLIC_POLAR_PRO_PRODUCT_ID } from '$env/static/public';
 	import { Lock, Sparkles } from '@lucide/svelte';
 	import type { Snippet } from 'svelte';
 
@@ -20,11 +21,17 @@
 	const purchases = $derived(page.data.purchases ?? []);
 
 	const hasPro = $derived(
-		purchases.some((p: { productId?: string; priceId?: string }) =>
-			(p.productId || p.priceId)?.includes('pro')
+		purchases.some(
+			(p: { productId?: string; priceId?: string; status?: string }) =>
+				(p.status === 'active' || !p.status) &&
+				(p.productId === PUBLIC_POLAR_PRO_PRODUCT_ID ||
+					p.productId?.toLowerCase().includes('pro') ||
+					p.priceId?.toLowerCase().includes('pro'))
 		)
 	);
-	const hasStandard = $derived(purchases.length > 0 || hasPro);
+	const hasStandard = $derived(
+		purchases.some((p: { status?: string }) => p.status === 'active' || !p.status) || hasPro
+	);
 
 	const isUnlocked = $derived.by(() => {
 		if (user?.role === 'admin') return true;

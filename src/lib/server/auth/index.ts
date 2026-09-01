@@ -13,6 +13,14 @@ export const auth = betterAuth({
 	secret: env.BETTER_AUTH_SECRET,
 	database: drizzleAdapter(db, { provider: 'pg', schema }),
 
+	socialProviders: {
+		github: {
+			clientId: env.GITHUB_CLIENT_ID || '',
+			clientSecret: env.GITHUB_CLIENT_SECRET || '',
+			enabled: Boolean(env.GITHUB_CLIENT_ID && env.GITHUB_CLIENT_SECRET)
+		}
+	},
+
 	emailAndPassword: {
 		enabled: true,
 		sendResetPassword: async ({ user, url }) => {

@@ -1,4 +1,5 @@
 // src/routes/api/download/+server.ts
+import { env } from '$env/dynamic/private';
 import { db } from '$lib/server/db';
 import { purchases } from '$lib/server/db/schema';
 import { error, type RequestHandler } from '@sveltejs/kit';
@@ -29,7 +30,7 @@ export const GET: RequestHandler = async ({ locals }) => {
 
 	if (!fs.existsSync(zipPath)) {
 		// Fallback: If local file storage isn't populated, redirect to secure S3/UploadThing URL
-		const signedCloudUrl = process.env.SOURCE_CODE_ZIP_URL;
+		const signedCloudUrl = env.SOURCE_CODE_ZIP_URL;
 		if (signedCloudUrl) {
 			return Response.redirect(signedCloudUrl, 302);
 		}

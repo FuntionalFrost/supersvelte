@@ -1,6 +1,5 @@
 <!-- src/routes/(marketing)/+page.svelte -->
 <script lang="ts">
-	import { resolve } from '$app/paths';
 	import {
 		PUBLIC_POLAR_PRO_PRODUCT_ID,
 		PUBLIC_POLAR_STANDARD_PRODUCT_ID
@@ -80,11 +79,11 @@
 					<span>Get SuperSvelte!</span>
 				</a>
 				<a
-					href={resolve('/test')}
+					href="#features"
 					class="inline-flex items-center justify-center gap-2 rounded-xl border border-border bg-card px-6 py-3.5 text-sm font-semibold transition hover:bg-accent"
 				>
 					<Terminal class="size-4" />
-					<span>Live Interactive Sandbox</span>
+					<span>Explore Architecture</span>
 				</a>
 			</div>
 		</div>
@@ -357,7 +356,7 @@
 					</div>
 
 					<div class="mt-8">
-						<PolarCheckout productId={PUBLIC_POLAR_PRO_PRODUCT_ID} buttonText="Test Pro Checkout" />
+						<PolarCheckout productId={PUBLIC_POLAR_PRO_PRODUCT_ID} buttonText="Get Pro License" />
 					</div>
 				</div>
 			</div>

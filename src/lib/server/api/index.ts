@@ -5,7 +5,7 @@ import { projects } from '$lib/server/db/schema';
 import { checkRateLimit } from '$lib/server/ratelimit';
 import { swaggerUI } from '@hono/swagger-ui';
 import { createRoute, OpenAPIHono, z } from '@hono/zod-openapi';
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 import { streamSSE } from 'hono/streaming';
 import crypto from 'node:crypto';
 
@@ -41,7 +41,7 @@ const projectsApp = new OpenAPIHono<HonoEnv>()
 		createRoute({
 			method: 'get',
 			path: '/',
-			summary: 'Get all projects',
+			summary: 'Get all projects for authenticated user or active organization',
 			responses: {
 				200: {
 					content: {
@@ -57,7 +57,14 @@ const projectsApp = new OpenAPIHono<HonoEnv>()
 			}
 		}),
 		async (c) => {
-			const { data, source } = await getProjects();
+			const sessionData = c.env?.locals?.session
+				? { user: c.env.locals.user, session: c.env.locals.session }
+				: await auth.api.getSession({ headers: c.req.raw.headers });
+
+			const user = sessionData?.user;
+			const session = sessionData?.session;
+
+			const { data, source } = await getProjects(user?.id, session?.activeOrganizationId);
 			return c.json({ projects: data, source }, 200);
 		}
 	)
@@ -86,14 +93,32 @@ const projectsApp = new OpenAPIHono<HonoEnv>()
 						}
 					},
 					description: 'Project created'
+				},
+				401: {
+					content: {
+						'application/json': {
+							schema: z.object({
+								error: z.string()
+							})
+						}
+					},
+					description: 'Unauthorized'
 				}
 			}
 		}),
 		async (c) => {
-			const body = c.req.valid('json');
-			const user = c.env?.locals?.user;
-			const session = c.env?.locals?.session;
+			const sessionData = c.env?.locals?.session
+				? { user: c.env.locals.user, session: c.env.locals.session }
+				: await auth.api.getSession({ headers: c.req.raw.headers });
 
+			const user = sessionData?.user;
+			const session = sessionData?.session;
+
+			if (!user) {
+				return c.json({ error: 'Unauthorized' }, 401);
+			}
+
+			const body = c.req.valid('json');
 			const name = body.name || 'New Project';
 			const slug =
 				body.slug ||
@@ -108,12 +133,12 @@ const projectsApp = new OpenAPIHono<HonoEnv>()
 				.values({
 					name,
 					slug,
-					userId: user?.id ?? null,
+					userId: user.id,
 					organizationId: session?.activeOrganizationId ?? null
 				})
 				.returning();
 
-			await invalidateProjectsCache();
+			await invalidateProjectsCache(user.id, session?.activeOrganizationId);
 			return c.json({ success: true, project: newProject }, 200);
 		}
 	)
@@ -138,13 +163,40 @@ const projectsApp = new OpenAPIHono<HonoEnv>()
 						}
 					},
 					description: 'Project deleted'
+				},
+				401: {
+					content: {
+						'application/json': {
+							schema: z.object({
+								error: z.string()
+							})
+						}
+					},
+					description: 'Unauthorized'
 				}
 			}
 		}),
 		async (c) => {
+			const sessionData = c.env?.locals?.session
+				? { user: c.env.locals.user, session: c.env.locals.session }
+				: await auth.api.getSession({ headers: c.req.raw.headers });
+
+			const user = sessionData?.user;
+			const session = sessionData?.session;
+
+			if (!user) {
+				return c.json({ error: 'Unauthorized' }, 401);
+			}
+
 			const { id } = c.req.valid('param');
-			await db.delete(projects).where(eq(projects.id, id));
-			await invalidateProjectsCache();
+
+			// Ensure user only deletes their own project or active organization's project
+			const whereClause = session?.activeOrganizationId
+				? and(eq(projects.id, id), eq(projects.organizationId, session.activeOrganizationId))
+				: and(eq(projects.id, id), eq(projects.userId, user.id));
+
+			await db.delete(projects).where(whereClause);
+			await invalidateProjectsCache(user.id, session?.activeOrganizationId);
 			return c.json({ success: true, deletedId: id }, 200);
 		}
 	);

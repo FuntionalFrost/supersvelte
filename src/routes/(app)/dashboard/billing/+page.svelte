@@ -6,10 +6,12 @@
 		PUBLIC_POLAR_STANDARD_PRODUCT_ID
 	} from '$env/static/public';
 	import PolarCheckout from '$lib/components/PolarCheckout.svelte';
-	import { Check, CreditCard, ExternalLink, ShieldCheck } from '@lucide/svelte';
+	import { Check, Copy, CreditCard, ExternalLink, ShieldCheck } from '@lucide/svelte';
+	import { toast } from 'svelte-sonner';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
+	let copied = $state(false);
 
 	const hasActivePlan = $derived(!!data.purchase);
 	const planName = $derived(
@@ -21,6 +23,13 @@
 				? 'Standard Plan (Single License)'
 				: 'No Active License'
 	);
+
+	function copyLicenseKey(key: string) {
+		navigator.clipboard.writeText(key);
+		copied = true;
+		toast.success('License key copied to clipboard');
+		setTimeout(() => (copied = false), 2000);
+	}
 </script>
 
 <div class="space-y-8">
@@ -67,7 +76,29 @@
 				</a>
 			</div>
 
-			<div class="mt-6 grid grid-cols-1 gap-4 border-t border-border/60 pt-4 sm:grid-cols-2">
+			<div class="mt-6 grid grid-cols-1 gap-4 border-t border-border/60 pt-4 sm:grid-cols-3">
+				<div>
+					<span class="text-xs text-muted-foreground">License Key</span>
+					<div class="flex items-center gap-1.5 font-mono text-xs font-semibold text-foreground">
+						{#if data.purchase?.licenseKey}
+							<span>{data.purchase.licenseKey}</span>
+							<button
+								type="button"
+								onclick={() => copyLicenseKey(data.purchase!.licenseKey!)}
+								class="rounded p-1 text-muted-foreground hover:text-foreground"
+								title="Copy License Key"
+							>
+								{#if copied}
+									<Check class="size-3.5 text-emerald-500" />
+								{:else}
+									<Copy class="size-3.5" />
+								{/if}
+							</button>
+						{:else}
+							<span>N/A</span>
+						{/if}
+					</div>
+				</div>
 				<div>
 					<span class="text-xs text-muted-foreground">Customer ID</span>
 					<div class="font-mono text-xs font-semibold text-foreground">
