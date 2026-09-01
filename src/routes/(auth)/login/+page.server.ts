@@ -48,6 +48,12 @@ export const actions: Actions = {
 			return setMessage(form, message, { status: 400 });
 		}
 
-		redirect(303, resolve('/dashboard'));
+		const target =
+			event.url.searchParams.get('redirectTo') ||
+			event.url.searchParams.get('callbackUrl') ||
+			'/dashboard';
+		const safeTarget = target.startsWith('/') && !target.startsWith('//') ? target : '/dashboard';
+
+		redirect(303, resolve(safeTarget as '/dashboard'));
 	}
 };

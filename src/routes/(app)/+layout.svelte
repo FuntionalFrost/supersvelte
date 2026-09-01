@@ -6,18 +6,28 @@
 	import TeamSwitcher from '$lib/components/TeamSwitcher.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import { Separator } from '$lib/components/ui/separator';
-	import { Activity, CreditCard, LayoutDashboard, LogOut, Users } from '@lucide/svelte';
+	import {
+		Activity,
+		CreditCard,
+		LayoutDashboard,
+		LogOut,
+		ShieldAlert,
+		Users
+	} from '@lucide/svelte';
 	import type { Snippet } from 'svelte';
 	import type { LayoutData } from './$types';
 
 	let { data, children }: { data: LayoutData; children: Snippet } = $props();
 
-	const navItems = [
+	const navItems = $derived([
 		{ href: resolve('/dashboard'), label: 'Dashboard', icon: LayoutDashboard },
 		{ href: resolve('/dashboard/billing'), label: 'Billing & Plan', icon: CreditCard },
 		{ href: resolve('/settings/team'), label: 'Team & Workspaces', icon: Users },
+		...(data.user?.role === 'admin'
+			? [{ href: resolve('/admin'), label: 'Admin Console', icon: ShieldAlert, admin: true }]
+			: []),
 		{ href: resolve('/test'), label: 'Diagnostics (/test)', icon: Activity, accent: true }
-	];
+	]);
 </script>
 
 <div class="flex min-h-screen flex-col bg-background md:flex-row">

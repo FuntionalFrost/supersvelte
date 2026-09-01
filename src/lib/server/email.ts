@@ -2,8 +2,6 @@ import { env } from '$env/dynamic/private';
 import { Resend } from 'resend';
 import { render } from 'svelte/server';
 
-const resend = new Resend(env.RESEND_API_KEY);
-
 // Base raw email dispatcher
 export async function sendEmail({
 	to,
@@ -16,13 +14,24 @@ export async function sendEmail({
 	html: string;
 	text?: string;
 }) {
-	return await resend.emails.send({
-		from: env.EMAIL_FROM || 'App <notifications@yourdomain.com>',
-		to,
-		subject,
-		html,
-		text
-	});
+	if (!env.RESEND_API_KEY) {
+		console.warn(`[Resend Local / Dry Run] Email to ${to}: ${subject}`);
+		return { data: { id: 'mock-email-id' }, error: null };
+	}
+
+	try {
+		const resend = new Resend(env.RESEND_API_KEY);
+		return await resend.emails.send({
+			from: env.EMAIL_FROM || 'SuperSvelte <notifications@yourdomain.com>',
+			to,
+			subject,
+			html,
+			text
+		});
+	} catch (err: unknown) {
+		console.error('[Resend Error] Failed to dispatch email:', err);
+		return { data: null, error: err as Error };
+	}
 }
 
 // Svelte-component-driven template helper
