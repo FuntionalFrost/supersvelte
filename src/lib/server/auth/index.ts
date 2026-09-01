@@ -1,3 +1,4 @@
+import { dev } from '$app/environment';
 import { getRequestEvent } from '$app/server';
 import { env } from '$env/dynamic/private';
 import { db } from '$lib/server/db';
@@ -9,9 +10,22 @@ import { admin, organization } from 'better-auth/plugins';
 import { sveltekitCookies } from 'better-auth/svelte-kit';
 
 export const auth = betterAuth({
-	baseURL: env.ORIGIN || env.BETTER_AUTH_URL || 'http://localhost:5173',
+	baseURL: dev
+		? 'http://localhost:5173'
+		: env.ORIGIN || env.BETTER_AUTH_URL || 'https://supersvelte.netlify.app',
+	trustedOrigins: [
+		'http://localhost:5173',
+		'http://localhost:4173',
+		'http://127.0.0.1:5173',
+		'http://127.0.0.1:4173',
+		env.ORIGIN,
+		env.BETTER_AUTH_URL
+	].filter(Boolean) as string[],
 	secret: env.BETTER_AUTH_SECRET,
 	database: drizzleAdapter(db, { provider: 'pg', schema }),
+	advanced: {
+		useSecureCookies: false
+	},
 
 	socialProviders: {
 		github: {

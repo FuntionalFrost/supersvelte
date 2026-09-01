@@ -1,5 +1,4 @@
 // src/lib/server/utils.ts
-import { dev } from '$app/environment';
 import type { RequestEvent } from '@sveltejs/kit';
 
 /**
@@ -9,6 +8,15 @@ import type { RequestEvent } from '@sveltejs/kit';
  */
 export function setCookiesFromResponse(event: RequestEvent, response: Response) {
 	const setCookies = response.headers.getSetCookie();
+
+	// Never enforce Secure flag on plain HTTP localhost/127.0.0.1 (e.g. dev:5173 or preview:4173)
+	const isLocalhost =
+		event.url.hostname === 'localhost' ||
+		event.url.hostname === '127.0.0.1' ||
+		event.url.hostname === '::1';
+	const isSecure =
+		!isLocalhost &&
+		(event.url.protocol === 'https:' || event.request.headers.get('x-forwarded-proto') === 'https');
 
 	for (const cookieStr of setCookies) {
 		const parts = cookieStr.split(';').map((p) => p.trim());
@@ -29,7 +37,7 @@ export function setCookiesFromResponse(event: RequestEvent, response: Response) 
 				path: '/',
 				httpOnly: true,
 				sameSite: 'lax',
-				secure: !dev
+				secure: isSecure
 			};
 
 			for (const attr of attributes) {
@@ -44,7 +52,9 @@ export function setCookiesFromResponse(event: RequestEvent, response: Response) 
 				} else if (lowerName === 'path') {
 					options.path = attrVal || '/';
 				} else if (lowerName === 'domain') {
-					options.domain = attrVal;
+					if (!isLocalhost && attrVal) {
+						options.domain = attrVal;
+					}
 				} else if (lowerName === 'samesite') {
 					const s = attrVal.toLowerCase();
 					if (s === 'strict' || s === 'none' || s === 'lax') {

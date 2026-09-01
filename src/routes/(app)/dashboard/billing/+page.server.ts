@@ -3,7 +3,7 @@ import { resolve } from '$app/paths';
 import { db } from '$lib/server/db';
 import { purchases } from '$lib/server/db/schema';
 import { redirect } from '@sveltejs/kit';
-import { desc, eq } from 'drizzle-orm';
+import { and, desc, eq } from 'drizzle-orm';
 import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ locals }) => {
@@ -14,7 +14,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 	const userPurchases = await db
 		.select()
 		.from(purchases)
-		.where(eq(purchases.userId, locals.user.id))
+		.where(and(eq(purchases.userId, locals.user.id), eq(purchases.status, 'active')))
 		.orderBy(desc(purchases.createdAt));
 
 	return {

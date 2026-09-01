@@ -7,15 +7,46 @@
 	import * as Form from '$lib/components/ui/form';
 	import { Input } from '$lib/components/ui/input';
 	import { Separator } from '$lib/components/ui/separator';
+	import { toast } from 'svelte-sonner';
 	import { superForm } from 'sveltekit-superforms';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
 	let githubLoading = $state(false);
+	let emailLoading = $state(false);
+	let errorText = $state('');
 
 	// svelte-ignore state_referenced_locally
-	const form = superForm(data.form);
-	const { form: formData, enhance, submitting, message } = form;
+	const form = superForm(data.form, {
+		SPA: true,
+		validators: false,
+		onSubmit: async ({ cancel }) => {
+			cancel();
+			emailLoading = true;
+			errorText = '';
+
+			const target =
+				page.url.searchParams.get('redirectTo') ||
+				page.url.searchParams.get('callbackUrl') ||
+				'/dashboard';
+			const safeTarget = target.startsWith('/') && !target.startsWith('//') ? target : '/dashboard';
+
+			const res = await authClient.signIn.email({
+				email: $formData.email,
+				password: $formData.password
+			});
+
+			if (res.error) {
+				emailLoading = false;
+				errorText = res.error.message || 'Invalid email or password';
+				toast.error(errorText);
+			} else {
+				toast.success('Logged in successfully!');
+				window.location.href = safeTarget;
+			}
+		}
+	});
+	const { form: formData, enhance, message } = form;
 
 	async function loginWithGithub() {
 		githubLoading = true;
@@ -36,12 +67,12 @@
 		<p class="text-xs text-muted-foreground">Enter your credentials to access your account</p>
 	</div>
 
-	<!-- Render error message from setMessage -->
-	{#if $message}
+	<!-- Render error message -->
+	{#if errorText || $message}
 		<div
 			class="rounded-md border border-destructive/20 bg-destructive/10 p-3 text-center text-xs font-medium text-destructive"
 		>
-			{$message}
+			{errorText || $message}
 		</div>
 	{/if}
 
@@ -50,7 +81,7 @@
 		type="button"
 		variant="outline"
 		onclick={loginWithGithub}
-		disabled={githubLoading}
+		disabled={githubLoading || emailLoading}
 		class="w-full text-xs font-semibold"
 	>
 		<svg class="mr-2 size-4" viewBox="0 0 24 24" fill="currentColor">
@@ -105,8 +136,8 @@
 			<Form.FieldErrors class="text-[11px]" />
 		</Form.Field>
 
-		<Button type="submit" disabled={$submitting} class="w-full text-xs font-bold">
-			{$submitting ? 'Signing in...' : 'Sign In with Email'}
+		<Button type="submit" disabled={emailLoading} class="w-full text-xs font-bold">
+			{emailLoading ? 'Signing in...' : 'Sign In with Email'}
 		</Button>
 	</form>
 

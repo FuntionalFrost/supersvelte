@@ -18,14 +18,6 @@ const MOCK_DEMO_PROJECTS = [
 ];
 
 export const load: PageServerLoad = async ({ locals }) => {
-	const isDev = dev;
-	const isAdmin = locals.user?.role === 'admin';
-
-	// Block route in production unless authenticated as an admin
-	if (!isDev && !isAdmin) {
-		throw error(404, 'Not found');
-	}
-
 	const form = await superValidate(zod(insertProjectSchema));
 	let userProjects = MOCK_DEMO_PROJECTS;
 

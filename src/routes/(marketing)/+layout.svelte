@@ -1,11 +1,14 @@
 <!-- src/routes/(marketing)/+layout.svelte -->
 <script lang="ts">
 	import { resolve } from '$app/paths';
+	import { page } from '$app/state';
 	import ThemeToggle from '$lib/components/ThemeToggle.svelte';
-	import { Rocket, ShieldCheck } from '@lucide/svelte';
+	import { LayoutDashboard, Rocket, ShieldCheck } from '@lucide/svelte';
 	import type { Snippet } from 'svelte';
 
 	let { children }: { children: Snippet } = $props();
+
+	const user = $derived(page.data.user);
 </script>
 
 <div class="flex min-h-screen flex-col bg-background text-foreground">
@@ -37,19 +40,29 @@
 			<!-- Actions -->
 			<div class="flex items-center gap-3">
 				<ThemeToggle />
-				<a
-					href={resolve('/login')}
-					class="text-sm font-semibold text-muted-foreground transition hover:text-foreground"
-				>
-					Sign In
-				</a>
-				<a
-					href="#pricing"
-					class="inline-flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2 text-sm font-bold text-primary-foreground shadow-xs transition hover:bg-primary/90"
-				>
-					<Rocket class="size-3.5" />
-					<span>Get SuperSvelte</span>
-				</a>
+				{#if user}
+					<a
+						href={resolve('/dashboard')}
+						class="inline-flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2 text-sm font-bold text-primary-foreground shadow-xs transition hover:bg-primary/90"
+					>
+						<LayoutDashboard class="size-3.5" />
+						<span>Dashboard</span>
+					</a>
+				{:else}
+					<a
+						href={resolve('/login')}
+						class="text-sm font-semibold text-muted-foreground transition hover:text-foreground"
+					>
+						Sign In
+					</a>
+					<a
+						href="#pricing"
+						class="inline-flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2 text-sm font-bold text-primary-foreground shadow-xs transition hover:bg-primary/90"
+					>
+						<Rocket class="size-3.5" />
+						<span>Get SuperSvelte</span>
+					</a>
+				{/if}
 			</div>
 		</div>
 	</header>
