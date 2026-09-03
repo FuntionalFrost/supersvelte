@@ -1,9 +1,11 @@
 <!-- src/lib/emails/WelcomeEmail.svelte -->
 <script lang="ts">
-	let { name = 'there', actionUrl = 'http://localhost:5173' } = $props<{
+	interface Props {
 		name?: string;
 		actionUrl?: string;
-	}>();
+	}
+
+	let { name = 'there', actionUrl = 'https://supersvelte.netlify.app' }: Props = $props();
 </script>
 
 <div

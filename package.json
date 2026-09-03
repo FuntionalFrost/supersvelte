@@ -22,6 +22,8 @@
 		"db:drop": "drizzle-kit drop",
 		"auth:schema": "better-auth generate --config src/lib/server/auth.ts --output src/lib/server/db/auth.schema.ts --yes",
 		"make:resource": "tsx scripts/scaffold-resource.ts",
+		"manage": "tsx scripts/manage.ts",
+		"package:zip": "tsx scripts/manage.ts package",
 		"test": "vitest run",
 		"test:ui": "vitest --ui",
 		"test:watch": "vitest",

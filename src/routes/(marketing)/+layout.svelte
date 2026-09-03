@@ -34,6 +34,7 @@
 				<a href="#features" class="transition hover:text-foreground">Stack & Specs</a>
 				<a href="#comparison" class="transition hover:text-foreground">Matrix</a>
 				<a href="#pricing" class="transition hover:text-foreground">Pricing</a>
+				<a href="/docs" class="transition hover:text-foreground">Docs</a>
 				<a href="#faq" class="transition hover:text-foreground">FAQ</a>
 			</nav>
 

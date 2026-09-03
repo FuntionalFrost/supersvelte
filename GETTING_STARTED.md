@@ -89,6 +89,8 @@ pnpm dev
 ```
 
 - **Application:** [http://localhost:5173](http://localhost:5173)
+- **In-App Documentation:** [http://localhost:5173/docs](http://localhost:5173/docs)
+- **Dynamic Social Card Preview:** [http://localhost:5173/api/og?title=SuperSvelte](http://localhost:5173/api/og?title=SuperSvelte)
 - **Diagnostic Workbench:** [http://localhost:5173/test](http://localhost:5173/test)
 - **Interactive OpenAPI Swagger Docs:** [http://localhost:5173/api/docs](http://localhost:5173/api/docs)
 - **OpenAPI 3.1 Spec JSON:** [http://localhost:5173/api/doc](http://localhost:5173/api/doc)
@@ -98,19 +100,27 @@ pnpm dev
 ## 🛠️ Developer Productivity Commands
 
 ```bash
+# Unified Management CLI (Django/Laravel-style)
+pnpm manage make:admin user@example.com      # Promote user to superadmin
+pnpm manage make:license user@example.com pro # Issue a manual license key
+pnpm manage stats                           # View active users, orgs & purchases
+
+# Package release archive for buyer distribution (/api/download)
+pnpm package:zip
+
 # Generate full-stack CRUD slice (Drizzle Schema + OpenAPI Hono Route)
 pnpm make:resource invoice
 
 # Run end-to-end type safety checks (Svelte 5 Runes + TypeScript)
 pnpm check
 
-# Run automated tests with Vitest
-pnpm test
+# Run automated tests
+pnpm test          # Vitest unit & component tests
+pnpm test:e2e      # Playwright end-to-end browser test
 
 # Format and lint codebase
 pnpm format
 pnpm lint
-
 ```
 
 ---

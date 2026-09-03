@@ -7,7 +7,10 @@ import type { RequestEvent } from '@sveltejs/kit';
  * expiration dates, max-age, same-site attributes, and deletion flags.
  */
 export function setCookiesFromResponse(event: RequestEvent, response: Response) {
-	const setCookies = response.headers.getSetCookie();
+	const setCookies =
+		typeof response.headers.getSetCookie === 'function'
+			? response.headers.getSetCookie()
+			: ([response.headers.get('set-cookie')].filter(Boolean) as string[]);
 
 	// Never enforce Secure flag on plain HTTP localhost/127.0.0.1 (e.g. dev:5173 or preview:4173)
 	const isLocalhost =

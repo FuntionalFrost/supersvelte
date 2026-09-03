@@ -5,7 +5,10 @@ export default defineConfig({
 	webServer: {
 		command: 'pnpm build && pnpm preview',
 		port: 4173,
-		reuseExistingServer: !process.env.CI
+		reuseExistingServer: !process.env.CI,
+		env: {
+			ORIGIN: 'http://localhost:4173'
+		}
 	},
 	testDir: 'e2e',
 	testMatch: /(.+\.)?(test|spec)\.[jt]s/,

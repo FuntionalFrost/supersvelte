@@ -81,16 +81,20 @@ export const auth = betterAuth({
 		user: {
 			create: {
 				after: async (user) => {
-					const orgName = `${user.name || 'Personal'}'s Workspace`;
-					const slug = `workspace-${user.id.slice(0, 8)}`;
+					try {
+						const orgName = `${user.name || 'Personal'}'s Workspace`;
+						const slug = `workspace-${user.id.slice(0, 8)}`;
 
-					await auth.api.createOrganization({
-						body: {
-							name: orgName,
-							slug: slug,
-							userId: user.id
-						}
-					});
+						await auth.api.createOrganization({
+							body: {
+								name: orgName,
+								slug: slug,
+								userId: user.id
+							}
+						});
+					} catch (err) {
+						console.error('[Better Auth] Could not create default workspace for user:', err);
+					}
 				}
 			}
 		}

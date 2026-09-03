@@ -202,12 +202,21 @@
 			<span>Lifetime License Verified</span>
 		</div>
 
-		<a
-			href={resolve('/dashboard')}
-			class="inline-flex items-center gap-2 rounded-xl bg-primary px-6 py-4 font-bold text-primary-foreground shadow-lg transition hover:bg-primary/90"
-		>
-			<span>Go to Dashboard</span>
-			<ArrowRight class="size-4" />
-		</a>
+		<div class="flex items-center gap-3">
+			<a
+				href="/docs"
+				class="inline-flex items-center gap-2 rounded-xl border border-border bg-card px-5 py-3.5 text-xs font-bold text-foreground shadow-xs transition hover:bg-muted"
+			>
+				<span>Browse Documentation</span>
+			</a>
+
+			<a
+				href={resolve('/dashboard')}
+				class="inline-flex items-center gap-2 rounded-xl bg-primary px-6 py-3.5 text-xs font-bold text-primary-foreground shadow-lg transition hover:bg-primary/90"
+			>
+				<span>Go to Dashboard</span>
+				<ArrowRight class="size-4" />
+			</a>
+		</div>
 	</div>
 </div>
