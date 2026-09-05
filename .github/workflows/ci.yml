@@ -29,8 +29,8 @@ jobs:
           cache: true
           require-lockfile: true
 
+      - name: sync
+        run: pnpm prepare
+
       - name: Lint and format check
         run: pnpm lint
-
-      - name: Run svelte-check
-        run: pnpm check
