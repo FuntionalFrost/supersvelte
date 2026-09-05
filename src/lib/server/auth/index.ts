@@ -24,7 +24,7 @@ export const auth = betterAuth({
 	secret: env.BETTER_AUTH_SECRET,
 	database: drizzleAdapter(db, { provider: 'pg', schema }),
 	advanced: {
-		useSecureCookies: false
+		useSecureCookies: !dev
 	},
 
 	socialProviders: {
