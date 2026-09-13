@@ -246,6 +246,51 @@ const data = await res.json();`
 				}
 			}
 		]
+	},
+	{
+		slug: 'features/admin-crud',
+		title: 'Auto-Introspecting Admin CRUD',
+		description:
+			'Instant relational database CRUD dashboard with search, sorting, pagination, and record inspector.',
+		category: 'Features',
+		badge: 'Admin Panel',
+		sections: [
+			{
+				heading: 'Instant Drizzle Model Management',
+				id: 'admin-overview',
+				body: 'The /admin console auto-introspects your Drizzle tables (users, organizations, purchases, projects, files), generating searchable data tables and inline record editing modals.'
+			},
+			{
+				heading: 'Scaffolding New Resources',
+				id: 'scaffold-resources',
+				body: 'Generate full CRUD slices (Drizzle schema + Hono RPC API routes) with a single command:',
+				code: {
+					lang: 'bash',
+					filename: 'terminal',
+					code: `pnpm make:resource invoice`
+				}
+			}
+		]
+	},
+	{
+		slug: 'features/storage-and-email',
+		title: 'Dual Storage & Dev Email',
+		description:
+			'Cloudflare R2 / S3 Presigned Uploads, UploadThing, and Zero-Config Dev Email Dispatcher.',
+		category: 'Features',
+		badge: 'Cloud & DX',
+		sections: [
+			{
+				heading: 'Zero-Egress S3 & Cloudflare R2',
+				id: 's3-storage',
+				body: 'Direct browser-to-bucket presigned PUT uploads using `@aws-sdk/client-s3` and `@aws-sdk/s3-request-presigner` with real-time percentage progress tracking.'
+			},
+			{
+				heading: 'Zero-Config Local Email Fallback',
+				id: 'dev-email',
+				body: 'If no RESEND_API_KEY is provided on localhost, emails are automatically logged to the terminal as formatted ASCII boxes and rendered live in the /test?tab=email sandbox.'
+			}
+		]
 	}
 ];
 

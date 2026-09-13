@@ -7,7 +7,8 @@ export default defineConfig({
 		port: 4173,
 		reuseExistingServer: !process.env.CI,
 		env: {
-			ORIGIN: 'http://localhost:4173'
+			ORIGIN: 'http://localhost:4173',
+			PLAYWRIGHT: 'true'
 		}
 	},
 	testDir: 'e2e',

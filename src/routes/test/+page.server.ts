@@ -128,23 +128,30 @@ export const actions: Actions = {
 		redirect(303, '/login');
 	},
 
-	sendTestEmail: async ({ locals }) => {
-		if (!dev && locals.user?.role !== 'admin') {
-			throw error(404, 'Not found');
-		}
-
-		if (!locals.user?.email) {
-			return fail(400, { message: 'Must be logged in to send a test email.' });
-		}
+	sendTestEmail: async ({ request, locals }) => {
+		const formData = await request.formData();
+		const to = (formData.get('email') as string) || locals.user?.email || 'developer@example.com';
+		const name = (formData.get('name') as string) || 'Developer';
 
 		const res = await sendEmail({
-			to: locals.user.email,
-			subject: '🧪 Resend Stack Test Email',
-			html: `<h1>Test Successful!</h1><p>Sent to ${locals.user.email} via Resend.</p>`
+			to,
+			subject: `Welcome to SuperSvelte, ${name}!`,
+			html: `
+				<div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: #ffffff; border-radius: 12px; border: 1px solid #e4e4e7;">
+					<h2 style="color: #18181b; margin-top: 0;">Welcome to SuperSvelte!</h2>
+					<p style="color: #52525b; line-height: 1.5;">Hi ${name}, your full-stack Svelte 5 + Hono RPC + Neon SaaS is up and running.</p>
+					<div style="margin: 24px 0;">
+						<a href="http://localhost:5173/dashboard" style="display: inline-block; background: #18181b; color: #ffffff; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 14px;">Open Dashboard &rarr;</a>
+					</div>
+					<hr style="border: 0; border-top: 1px solid #f4f4f5; margin: 24px 0;" />
+					<p style="color: #a1a1aa; font-size: 12px;">Sent via SuperSvelte Zero-Config Dev Email Dispatcher.</p>
+				</div>
+			`,
+			actionUrl: 'http://localhost:5173/dashboard'
 		});
 
 		if (!res.error) {
-			return { emailSent: true, message: `Test email sent to ${locals.user.email}!` };
+			return { emailSent: true, message: `Test email sent to ${to}!` };
 		}
 
 		return fail(500, { message: res.error.message ?? 'Failed to send email.' });

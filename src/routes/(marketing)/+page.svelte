@@ -285,16 +285,20 @@
 								<Check class="size-4 text-emerald-500" /> Full Svelte 5 + Hono Source Code
 							</li>
 							<li class="flex items-center gap-2">
+								<Check class="size-4 text-emerald-500" /> Auto-Introspecting /admin CRUD Dashboard
+							</li>
+							<li class="flex items-center gap-2">
 								<Check class="size-4 text-emerald-500" /> Better Auth (Session + Social Logins)
 							</li>
 							<li class="flex items-center gap-2">
 								<Check class="size-4 text-emerald-500" /> Drizzle ORM + Neon Serverless Postgres
 							</li>
 							<li class="flex items-center gap-2">
-								<Check class="size-4 text-emerald-500" /> Upstash Redis Caching & Rate Limiting
+								<Check class="size-4 text-emerald-500" /> Dual Storage (UploadThing & Cloudflare R2 /
+								S3)
 							</li>
 							<li class="flex items-center gap-2">
-								<Check class="size-4 text-emerald-500" /> UploadThing File Uploads & Resend Mail
+								<Check class="size-4 text-emerald-500" /> Resend Mail + Zero-Config Dev Logger
 							</li>
 							<li class="flex items-center gap-2">
 								<Check class="size-4 text-emerald-500" /> Private GitHub Repository Access
@@ -345,6 +349,9 @@
 							</li>
 							<li class="flex items-center gap-2">
 								<Check class="size-4 text-emerald-500" /> Multi-Tenant Team Workspace Module
+							</li>
+							<li class="flex items-center gap-2">
+								<Check class="size-4 text-emerald-500" /> Yaxa Svelte UI Design System & Themes
 							</li>
 							<li class="flex items-center gap-2">
 								<Check class="size-4 text-emerald-500" /> Priority GitHub Issue Support

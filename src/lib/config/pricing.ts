@@ -10,10 +10,11 @@ export const pricingPlans = [
 		description: 'Perfect for solopreneurs launching a single product.',
 		features: [
 			'Full Svelte 5 + Hono Source Code',
+			'Auto-Introspecting /admin CRUD Dashboard',
 			'Better Auth (Session + Social Logins)',
 			'Drizzle ORM + Neon Serverless Postgres',
-			'Upstash Redis Caching & Rate Limiting',
-			'UploadThing File Uploads & Resend Mail',
+			'Dual Storage (UploadThing & Cloudflare R2 / S3)',
+			'Resend Mail + Zero-Config Dev Logger',
 			'Private GitHub Repository Access'
 		]
 	},
@@ -28,6 +29,7 @@ export const pricingPlans = [
 			'Everything in Standard License',
 			'Unlimited Commercial Projects & Clients',
 			'Multi-Tenant Team Workspace Module',
+			'Yaxa Svelte UI Design System & Themes',
 			'Priority GitHub Issue Support',
 			'Future SuperSvelte Feature Addons'
 		]

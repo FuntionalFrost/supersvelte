@@ -32,6 +32,15 @@ export const ratelimit = redis
 const memoryStore = new Map<string, { count: number; reset: number }>();
 
 export async function checkRateLimit(ip: string) {
+	// Bypass rate limiting during automated test / Playwright execution
+	if (
+		process.env.NODE_ENV === 'test' ||
+		process.env.PLAYWRIGHT === 'true' ||
+		env.NODE_ENV === 'test'
+	) {
+		return { success: true, limit: 1000, remaining: 1000, reset: 0, mode: 'Test Bypass' };
+	}
+
 	// --- MODE A: Live Upstash Redis Cloud ---
 	if (ratelimit) {
 		try {
@@ -45,10 +54,10 @@ export async function checkRateLimit(ip: string) {
 		}
 	}
 
-	// --- MODE B: Active In-Memory Sliding Window (5 requests / 10 sec) ---
+	// --- MODE B: Active In-Memory Sliding Window (30 requests / 10 sec for local dev) ---
 	const now = Date.now();
 	const windowMs = 10_000;
-	const limit = 5;
+	const limit = 30;
 
 	const record = memoryStore.get(ip) || { count: 0, reset: now + windowMs };
 

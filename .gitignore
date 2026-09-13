@@ -28,3 +28,7 @@ dev.txt
 /.gemini
 AGENTS.md
 GEMINI.md
+
+# Tests
+test-results/
+playwright-report/
