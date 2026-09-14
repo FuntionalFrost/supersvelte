@@ -30,6 +30,8 @@ export const POST: RequestHandler = async ({ request }) => {
 
 		return json({
 			...presigned,
+			publicUrl: presigned.fileUrl,
+			url: presigned.fileUrl,
 			filename
 		});
 	} catch (err: unknown) {

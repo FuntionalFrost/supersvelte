@@ -3,6 +3,7 @@
 	import { enhance } from '$app/forms';
 	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
+	import { authClient } from '$lib/auth-client';
 	import TeamSwitcher from '$lib/components/TeamSwitcher.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import { Separator } from '$lib/components/ui/separator';
@@ -15,6 +16,7 @@
 		Users
 	} from '@lucide/svelte';
 	import type { Snippet } from 'svelte';
+	import { ImpersonationBanner } from 'yaxa-svelte/admin';
 	import type { LayoutData } from './$types';
 
 	let { data, children }: { data: LayoutData; children: Snippet } = $props();
@@ -29,6 +31,16 @@
 		{ href: resolve('/test'), label: 'Diagnostics (/test)', icon: Activity, accent: true }
 	]);
 </script>
+
+{#if data.session?.impersonatedBy}
+	<ImpersonationBanner
+		impersonatedUser={data.user}
+		onstop={async () => {
+			await authClient.admin.stopImpersonating();
+			window.location.href = resolve('/admin');
+		}}
+	/>
+{/if}
 
 <div class="flex min-h-screen flex-col bg-background md:flex-row">
 	<!-- Sidebar -->
