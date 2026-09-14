@@ -8,6 +8,7 @@
 	} from '$lib/config/code-comparisons';
 	import { Check, CodeXml, Copy, FileCode, Layers, ShieldCheck, Zap } from '@lucide/svelte';
 	import { createHighlighter } from 'shiki';
+	import { createJavaScriptRegexEngine } from 'shiki/engine/javascript';
 
 	let activeCompetitor = $state<CompetitorKey>('nextjs');
 	let copiedSnippet = $state<string | null>(null);
@@ -34,6 +35,7 @@
 		let isMounted = true;
 
 		createHighlighter({
+			engine: createJavaScriptRegexEngine(),
 			themes: ['github-dark'],
 			langs: ['svelte', 'typescript', 'javascript', 'html', 'css']
 		}).then((highlighter) => {

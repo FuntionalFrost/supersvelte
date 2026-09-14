@@ -2,6 +2,7 @@
 import { docsRegistry, getDocBySlug } from '$lib/docs';
 import { error } from '@sveltejs/kit';
 import { createHighlighter } from 'shiki';
+import { createJavaScriptRegexEngine } from 'shiki/engine/javascript';
 import type { PageServerLoad } from './$types';
 
 let highlighterPromise: ReturnType<typeof createHighlighter> | null = null;
@@ -9,6 +10,7 @@ let highlighterPromise: ReturnType<typeof createHighlighter> | null = null;
 async function getHighlighter() {
 	if (!highlighterPromise) {
 		highlighterPromise = createHighlighter({
+			engine: createJavaScriptRegexEngine(),
 			themes: ['github-dark'],
 			langs: ['typescript', 'javascript', 'bash', 'svelte', 'html', 'css', 'json']
 		});
