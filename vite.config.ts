@@ -1,8 +1,11 @@
 /// <reference types="vitest/config" />
-import adapter from '@sveltejs/adapter-netlify';
+import adapterNetlify from '@sveltejs/adapter-netlify';
 import { sveltekit } from '@sveltejs/kit/vite';
 import tailwindcss from '@tailwindcss/vite';
+import adapterNode from '@sveltejs/adapter-node';
 import { defineConfig } from 'vite';
+
+const isNode = process.env.DEPLOY_TARGET === 'node';
 
 export default defineConfig(({ mode }) => ({
 	plugins: [
@@ -13,7 +16,7 @@ export default defineConfig(({ mode }) => ({
 				runes: ({ filename }) =>
 					filename.split(/[/\\]/).includes('node_modules') ? undefined : true
 			},
-			adapter: adapter(),
+			adapter: isNode ? adapterNode() : adapterNetlify(),
 
 			typescript: {
 				config: (config) => {

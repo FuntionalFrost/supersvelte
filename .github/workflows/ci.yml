@@ -8,7 +8,7 @@ on:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
 permissions:
   contents: read
@@ -21,16 +21,25 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v7
 
-      - name: Setup pnpm and Node.js
-        uses: pnpm/setup@v2
+      - name: Install pnpm
+        uses: pnpm/action-setup@v6
         with:
-          version: 11
-          runtime: node@26
-          cache: true
-          require-lockfile: true
+          version: 12
 
-      - name: sync
-        run: pnpm prepare
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 26
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
 
       - name: Lint and format check
         run: pnpm lint
+
+      - name: Run svelte-check
+        run: pnpm check
+
+      - name: Build production bundle
+        run: pnpm build
