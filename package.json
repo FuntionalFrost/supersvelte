@@ -37,6 +37,7 @@
 		"@lucide/svelte": "^1.30.0",
 		"@playwright/test": "^1.62.1",
 		"@sveltejs/adapter-netlify": "^6.0.4",
+		"@sveltejs/adapter-node": "^5.5.7",
 		"@sveltejs/kit": "^2.70.2",
 		"@sveltejs/vite-plugin-svelte": "^7.3.0",
 		"@tailwindcss/typography": "^0.5.20",
