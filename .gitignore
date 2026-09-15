@@ -24,11 +24,6 @@ vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 dev.txt
 
-# AI
-/.gemini
-AGENTS.md
-GEMINI.md
-
 # Tests
 test-results/
 playwright-report/
