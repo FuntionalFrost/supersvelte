@@ -27,3 +27,7 @@ dev.txt
 # Tests
 test-results/
 playwright-report/
+
+# AI
+/.gemini
+GEMINI.md
