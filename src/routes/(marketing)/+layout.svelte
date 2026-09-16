@@ -3,7 +3,7 @@
 	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
 	import ThemeToggle from '$lib/components/ThemeToggle.svelte';
-	import { LayoutDashboard, Rocket, ShieldCheck } from '@lucide/svelte';
+	import { LayoutDashboard, Rocket, ShieldCheck, Sparkles } from '@lucide/svelte';
 	import type { Snippet } from 'svelte';
 
 	let { children }: { children: Snippet } = $props();
@@ -78,9 +78,19 @@
 		<div
 			class="container mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-4 sm:flex-row"
 		>
-			<div class="flex items-center gap-2 font-mono">
+			<div class="flex flex-wrap items-center gap-2 font-mono text-xs">
 				<ShieldCheck class="size-4 text-emerald-500" />
 				<span>Official Svelte 5 + Hono Edge Boilerplate</span>
+				<span class="text-border">•</span>
+				<a
+					href="https://yaxa.vercel.app"
+					target="_blank"
+					rel="noopener noreferrer"
+					class="inline-flex items-center gap-1 font-semibold text-primary transition hover:underline"
+				>
+					<Sparkles class="size-3" />
+					<span>Built with Yaxa</span>
+				</a>
 			</div>
 			<div class="flex items-center gap-6 font-medium">
 				<a href={resolve('/terms')} class="transition hover:text-foreground">Terms of Service</a>

@@ -1,14 +1,11 @@
 // src/lib/config/seo.ts
+import { siteConfig as mainSiteConfig } from '../../site.config';
 import type { MetaTagsProps } from 'svelte-meta-tags';
 
 export const siteConfig = {
-	name: 'SuperSvelte',
-	title: 'SuperSvelte — The Batteries-Included Edge TS Framework',
-	description:
-		'Full-stack Svelte 5 boilerplate with OpenAPI Hono RPC, Better Auth, Neon Postgres, Drizzle ORM, Polar, and Upstash Redis.',
-	url: 'https://supersvelte.netlify.app',
-	ogImage: 'https://supersvelte.netlify.app/og.png',
-	twitterHandle: '@funtionalfrost'
+	...mainSiteConfig,
+	twitterHandle: mainSiteConfig.socials?.twitter || '@funtionalfrost',
+	ogImage: `${mainSiteConfig.url}/api/og`
 };
 
 export const defaultMetaTags: MetaTagsProps = {

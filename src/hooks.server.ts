@@ -1,9 +1,16 @@
+// src/hooks.server.ts
 import { building } from '$app/environment';
 import { auth } from '$lib/server/auth';
 import { checkRateLimit } from '$lib/server/ratelimit';
 import type { Handle } from '@sveltejs/kit';
 import { error, redirect } from '@sveltejs/kit';
+import { sequence } from '@sveltejs/kit/hooks';
 import { svelteKitHandler } from 'better-auth/svelte-kit';
+import { createYaxaHook } from 'yaxa-svelte/server';
+import { siteConfig } from './site.config';
+
+// 1. All-in-one Yaxa Hook for /robots.txt, /sitemap.xml, /sitemap.xsl, /site.webmanifest, and /api/og
+const yaxaHook = createYaxaHook(siteConfig);
 
 const PROTECTED_ROUTES = ['/dashboard', '/settings', '/projects'];
 const AUTH_ROUTES = ['/login', '/signup', '/forgot-password'];
@@ -14,7 +21,7 @@ const EXCLUDED_RATE_LIMIT_PREFIXES = [
 	'/api/uploadthing'
 ];
 
-export const handle: Handle = async ({ event, resolve }) => {
+const appHandle: Handle = async ({ event, resolve }) => {
 	// 1. Guard against DB/Auth execution during build time
 	if (building) {
 		return resolve(event);
@@ -23,7 +30,6 @@ export const handle: Handle = async ({ event, resolve }) => {
 	const pathname = event.url.pathname;
 
 	// 2. Better Auth internal handler (/api/auth/*)
-	// src/hooks.server.ts (around line 26)
 	if (pathname.startsWith('/api/auth')) {
 		return svelteKitHandler({ event, resolve, auth, building });
 	}
@@ -81,3 +87,5 @@ export const handle: Handle = async ({ event, resolve }) => {
 
 	return resolve(event);
 };
+
+export const handle = sequence(yaxaHook, appHandle);

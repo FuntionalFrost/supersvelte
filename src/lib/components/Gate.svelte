@@ -7,14 +7,26 @@
 	import type { Snippet } from 'svelte';
 
 	interface Props {
-		required?: 'standard' | 'pro';
+		required?: 'standard' | 'pro' | string;
 		allowed?: Snippet;
 		children?: Snippet;
 		fallback?: Snippet;
 		denied?: Snippet;
+		preview?: boolean;
+		upgradeUrl?: string;
+		class?: string;
 	}
 
-	let { required = 'standard', allowed, children, fallback, denied }: Props = $props();
+	let {
+		required = 'standard',
+		allowed,
+		children,
+		fallback,
+		denied,
+		preview = false,
+		upgradeUrl = '/dashboard/billing',
+		class: className = ''
+	}: Props = $props();
 
 	// Read session and purchases from layout data
 	const user = $derived(page.data.user);
@@ -47,6 +59,48 @@
 	{#if renderAllowed}
 		{@render renderAllowed()}
 	{/if}
+{:else if preview && renderAllowed}
+	<div
+		class="relative overflow-hidden rounded-2xl border border-border bg-card {className}"
+	>
+		<!-- Blurred disabled preview of children -->
+		<div
+			class="pointer-events-none max-h-[380px] opacity-40 blur-[3px] transition-all select-none"
+			aria-hidden="true"
+			tabindex="-1"
+		>
+			{@render renderAllowed()}
+		</div>
+
+		<!-- Centered Upgrade Callout Overlay -->
+		<div
+			class="absolute inset-0 z-10 flex flex-col items-center justify-center bg-background/80 p-6 text-center backdrop-blur-xs transition-colors"
+		>
+			<div
+				class="flex size-12 items-center justify-center rounded-2xl bg-primary/10 text-primary shadow-xs"
+			>
+				<Lock class="size-6" />
+			</div>
+
+			<h4 class="mt-3 text-base font-bold text-foreground">
+				{required === 'pro' ? 'Pro Plan Required' : 'Active License Required'}
+			</h4>
+
+			<p class="mt-1 max-w-sm text-xs text-muted-foreground">
+				This feature is part of the {required === 'pro' ? 'Unlimited Pro' : 'Standard'} license tier.
+			</p>
+
+			<div class="mt-4 flex items-center gap-3">
+				<a
+					href={resolve(upgradeUrl as any)}
+					class="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2 text-xs font-bold text-primary-foreground shadow-xs transition hover:brightness-110"
+				>
+					<Sparkles class="size-3.5" />
+					<span>Upgrade License</span>
+				</a>
+			</div>
+		</div>
+	</div>
 {:else if renderDenied}
 	{@render renderDenied()}
 {:else}
@@ -69,7 +123,7 @@
 
 		<div class="mt-6 flex justify-center">
 			<a
-				href={resolve('/dashboard/billing')}
+				href={resolve(upgradeUrl as any)}
 				class="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-xs font-bold text-primary-foreground shadow-xs transition hover:brightness-110"
 			>
 				<Sparkles class="size-3.5" />
