@@ -8,10 +8,18 @@ export const siteConfig = defineSiteConfig({
 		'Enterprise-grade Svelte 5 boilerplate with OpenAPI Hono RPC, Better Auth, Neon Postgres, Drizzle ORM, Polar, and Upstash Redis. Built with Yaxa.',
 	url: 'https://supersvelte.netlify.app',
 	email: 'hello@supersvelte.dev',
+	author: {
+		name: 'FunctionalFrost',
+		twitter: '@funtionalfrost',
+		github: 'https://github.com/FunctionalFrost'
+	},
 	project: {
 		license: 'MIT',
 		type: 'open-source',
-		repositoryUrl: 'https://github.com/FunctionalFrost/supersvelte'
+		pricingModel: 'paid',
+		repositoryUrl: 'https://github.com/FunctionalFrost/supersvelte',
+		isAccessibleForFree: false,
+		badge: 'Svelte 5 Boilerplate'
 	},
 	theme: {
 		primaryColor: '#ff3e00',
@@ -21,6 +29,22 @@ export const siteConfig = defineSiteConfig({
 	socials: {
 		github: 'https://github.com/FunctionalFrost/supersvelte',
 		twitter: '@funtionalfrost'
+	},
+	seo: {
+		titleTemplate: '%s · SuperSvelte',
+		keywords: [
+			'svelte 5',
+			'sveltekit',
+			'hono rpc',
+			'better auth',
+			'drizzle orm',
+			'neon postgres',
+			'polar.sh',
+			'upstash redis',
+			'tailwind css v4',
+			'saas boilerplate'
+		],
+		defaultOgImage: '/api/og'
 	},
 	sitemap: {
 		exclude: [
@@ -40,7 +64,8 @@ export const siteConfig = defineSiteConfig({
 		rules: [
 			{
 				userAgent: '*',
-				disallow: ['/admin', '/dashboard', '/settings', '/api', '/test']
+				allow: ['/api/og'],
+				disallow: ['/admin', '/dashboard', '/settings', '/api', '/test', '/test-gate']
 			}
 		]
 	}

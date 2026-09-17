@@ -6,11 +6,23 @@ import type { Handle } from '@sveltejs/kit';
 import { error, redirect } from '@sveltejs/kit';
 import { sequence } from '@sveltejs/kit/hooks';
 import { svelteKitHandler } from 'better-auth/svelte-kit';
+import { docsRegistry } from '$lib/docs';
 import { createYaxaHook } from 'yaxa-svelte/server';
 import { siteConfig } from './site.config';
 
 // 1. All-in-one Yaxa Hook for /robots.txt, /sitemap.xml, /sitemap.xsl, /site.webmanifest, and /api/og
-const yaxaHook = createYaxaHook(siteConfig);
+const yaxaHook = createYaxaHook({
+	config: siteConfig,
+	sitemap: {
+		config: siteConfig,
+		dynamicRoutes: () =>
+			docsRegistry.map((doc) => ({
+				loc: `/docs/${doc.slug}`,
+				changefreq: 'weekly' as const,
+				priority: 0.8
+			}))
+	}
+});
 
 const PROTECTED_ROUTES = ['/dashboard', '/settings', '/projects'];
 const AUTH_ROUTES = ['/login', '/signup', '/forgot-password'];

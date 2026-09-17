@@ -1,6 +1,8 @@
 // tests/unit/hooks.test.ts
 import { describe, expect, it, vi } from 'vitest';
 import type { RequestEvent } from '@sveltejs/kit';
+import { createRobotsHandler } from 'yaxa-svelte/server';
+import { siteConfig } from '../../src/site.config';
 import { userFixture } from '../fixtures/auth';
 
 const mockGetSession = vi.fn();
@@ -22,12 +24,13 @@ import { appHandle, yaxaHook } from '../../src/hooks.server';
 function createMockEvent(
 	pathname: string,
 	user: App.Locals['user'] = null,
-	search = ''
+	search = '',
+	origin = 'http://localhost:5173'
 ): RequestEvent {
 	mockGetSession.mockResolvedValue(
 		user ? { user, session: { id: 'sess_1', userId: user.id } } : null
 	);
-	const url = new URL(`http://localhost:5173${pathname}${search}`);
+	const url = new URL(`${origin}${pathname}${search}`);
 	return {
 		url,
 		request: new Request(url.toString(), {
@@ -39,16 +42,29 @@ function createMockEvent(
 }
 
 describe('SvelteKit Server Hooks & Route Protection (hooks.server.ts)', () => {
-	it('serves dynamic robots.txt via yaxaHook without invoking downstream handlers', async () => {
-		const event = createMockEvent('/robots.txt');
-		const resolve = vi.fn();
+	it('serves environment-aware robots.txt via yaxaHook', async () => {
+		// Non-production / Localhost guard
+		const devEvent = createMockEvent('/robots.txt');
+		const resolveDev = vi.fn();
+		const devRes = await yaxaHook({ event: devEvent, resolve: resolveDev });
+		expect(devRes.status).toBe(200);
+		expect(devRes.headers.get('content-type')).toContain('text/plain');
+		const devText = await devRes.text();
+		expect(devText).toContain('User-agent: *');
+		expect(devText).toContain('Disallow: /');
+		expect(devText).toContain('Sitemap: https://supersvelte.netlify.app/sitemap.xml');
+		expect(resolveDev).not.toHaveBeenCalled();
 
-		const res = await yaxaHook({ event, resolve });
-		expect(res.status).toBe(200);
-		expect(res.headers.get('content-type')).toContain('text/plain');
-		const text = await res.text();
-		expect(text).toContain('User-agent:');
-		expect(resolve).not.toHaveBeenCalled();
+		// Production rules generator
+		const prodHandler = createRobotsHandler({ config: siteConfig, isProduction: true });
+		const prodRes = await prodHandler({
+			url: new URL('https://supersvelte.netlify.app/robots.txt')
+		} as unknown as RequestEvent);
+		expect(prodRes.status).toBe(200);
+		const prodText = await prodRes.text();
+		expect(prodText).toContain('Allow: /api/og');
+		expect(prodText).toContain('Disallow: /admin');
+		expect(prodText).toContain('Sitemap: https://supersvelte.netlify.app/sitemap.xml');
 	});
 
 	it('serves dynamic OpenGraph card at /api/og via yaxaHook', async () => {
@@ -61,13 +77,15 @@ describe('SvelteKit Server Hooks & Route Protection (hooks.server.ts)', () => {
 		expect(resolve).not.toHaveBeenCalled();
 	});
 
-	it('serves dynamic sitemap.xml via yaxaHook', async () => {
+	it('serves dynamic sitemap.xml via yaxaHook with documentation routes', async () => {
 		const event = createMockEvent('/sitemap.xml');
 		const resolve = vi.fn();
 
 		const res = await yaxaHook({ event, resolve });
 		expect(res.status).toBe(200);
 		expect(res.headers.get('content-type')).toContain('application/xml');
+		const xml = await res.text();
+		expect(xml).toContain('/docs/getting-started/introduction');
 		expect(resolve).not.toHaveBeenCalled();
 	});
 

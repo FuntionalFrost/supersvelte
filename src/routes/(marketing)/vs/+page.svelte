@@ -1,15 +1,18 @@
 <!-- src/routes/(marketing)/vs/+page.svelte -->
 <script lang="ts">
 	import SuperSvelteVsOthers from '$lib/components/SuperSvelteVsOthers.svelte';
+	import { Seo } from 'yaxa-svelte';
 </script>
 
-<svelte:head>
-	<title>SuperSvelte vs Supastarter & Epic Stack | Performance Benchmark</title>
-	<meta
-		name="description"
-		content="Compare SuperSvelte against Supastarter and Epic Stack. See why Svelte 5 Runes and Hono RPC deliver zero-codegen type safety and 90% smaller client JS bundles."
-	/>
-</svelte:head>
+<Seo
+	title="SuperSvelte vs Supastarter & Epic Stack — Performance Benchmark"
+	description="Compare SuperSvelte against Supastarter and Epic Stack. See why Svelte 5 Runes and Hono RPC deliver zero-codegen type safety and 90% smaller client JS bundles."
+	ogImage={{
+		title: 'SuperSvelte vs Others',
+		description: 'Architectural & Performance Matrix',
+		badge: 'Benchmark'
+	}}
+/>
 
 <div class="container mx-auto max-w-5xl space-y-12 px-4 py-16">
 	<div class="space-y-3 text-center">

@@ -21,7 +21,7 @@
 		Terminal,
 		Zap
 	} from '@lucide/svelte';
-	import { MetaTags } from 'svelte-meta-tags';
+	import { Seo } from 'yaxa-svelte';
 
 	let mode = $state<Mode>('saas-starters');
 	let currentMatrix = $derived(matrices[mode]);
@@ -31,10 +31,14 @@
 	}
 </script>
 
-<MetaTags
+<Seo
 	title="SuperSvelte — Ship Svelte 5 SaaS Apps at Light Speed"
 	description="The ultimate Svelte 5 production boilerplate. Features Better Auth, Drizzle ORM, Neon Postgres, Upstash Redis, UploadThing, and 0-codegen Hono Zod RPC."
-	canonical="https://supersvelte.netlify.app"
+	ogImage={{
+		title: 'SuperSvelte',
+		description: 'Ship Svelte 5 SaaS Apps at Light Speed',
+		badge: 'Svelte 5 + Hono RPC'
+	}}
 />
 
 <div

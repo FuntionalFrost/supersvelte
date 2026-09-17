@@ -1,8 +1,9 @@
 <!-- src/routes/docs/[...slug]/+page.svelte -->
 <script lang="ts">
 	import { ArrowLeft, ArrowRight, Check, ChevronRight, Copy, FileCode, Hash } from '@lucide/svelte';
-	import { MetaTags } from 'svelte-meta-tags';
+	import { Seo, generateBreadcrumbSchema } from 'yaxa-svelte';
 	import { toast } from 'svelte-sonner';
+	import { siteConfig } from '../../../site.config';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
@@ -18,19 +19,24 @@
 		}, 2000);
 	}
 
-	const ogUrl = $derived(
-		`/api/og?title=${encodeURIComponent(data.doc.title)}&desc=${encodeURIComponent(data.doc.description)}&badge=${encodeURIComponent(data.doc.category)}`
+	const breadcrumbSchema = $derived(
+		generateBreadcrumbSchema(siteConfig, [
+			{ name: 'Docs', url: `${siteConfig.url}/docs` },
+			{ name: data.doc.category, url: `${siteConfig.url}/docs/${data.doc.slug}` },
+			{ name: data.doc.title, url: `${siteConfig.url}/docs/${data.doc.slug}` }
+		])
 	);
 </script>
 
-<MetaTags
+<Seo
 	title="{data.doc.title} — SuperSvelte Docs"
 	description={data.doc.description}
-	openGraph={{
+	ogImage={{
 		title: data.doc.title,
 		description: data.doc.description,
-		images: [{ url: ogUrl, width: 1200, height: 630, alt: data.doc.title }]
+		badge: data.doc.category
 	}}
+	schema={breadcrumbSchema}
 />
 
 <div class="flex gap-10">

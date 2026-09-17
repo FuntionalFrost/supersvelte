@@ -1,12 +1,16 @@
 <!-- src/routes/(marketing)/terms/+page.svelte -->
 <script lang="ts">
-	import { MetaTags } from 'svelte-meta-tags';
+	import { Seo } from 'yaxa-svelte';
 </script>
 
-<MetaTags
+<Seo
 	title="Terms of Service"
 	description="Read the terms of service, commercial licensing terms, and usage conditions for SuperSvelte."
-	canonical="https://supersvelte.netlify.app/terms"
+	ogImage={{
+		title: 'Terms of Service',
+		description: 'Commercial licensing & usage conditions',
+		badge: 'Legal'
+	}}
 />
 
 <div class="container mx-auto max-w-4xl px-4 py-16 text-foreground">
