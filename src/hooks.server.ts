@@ -88,4 +88,5 @@ const appHandle: Handle = async ({ event, resolve }) => {
 	return resolve(event);
 };
 
+export { yaxaHook, appHandle };
 export const handle = sequence(yaxaHook, appHandle);

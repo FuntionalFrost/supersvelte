@@ -1,6 +1,5 @@
 import { relations } from 'drizzle-orm';
 import { index, integer, pgTable, text, timestamp } from 'drizzle-orm/pg-core';
-import crypto from 'node:crypto';
 import { z } from 'zod';
 
 // Re-export all Better-Auth tables
@@ -193,6 +192,10 @@ export type Project = typeof projects.$inferSelect;
 export type FileRecord = typeof files.$inferSelect;
 
 export function generateLicenseKey(prefix = 'SS-LIVE'): string {
-	const bytes = crypto.randomBytes(6).toString('hex').toUpperCase();
-	return `${prefix}-${bytes.slice(0, 4)}-${bytes.slice(4, 8)}-${bytes.slice(8, 12)}`;
+	const array = new Uint8Array(6);
+	crypto.getRandomValues(array);
+	const hex = Array.from(array, (byte) => byte.toString(16).padStart(2, '0'))
+		.join('')
+		.toUpperCase();
+	return `${prefix}-${hex.slice(0, 4)}-${hex.slice(4, 8)}-${hex.slice(8, 12)}`;
 }

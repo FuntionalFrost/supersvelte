@@ -7,7 +7,6 @@ import { swaggerUI } from '@hono/swagger-ui';
 import { createRoute, OpenAPIHono, z } from '@hono/zod-openapi';
 import { and, eq } from 'drizzle-orm';
 import { streamSSE } from 'hono/streaming';
-import crypto from 'node:crypto';
 
 // Bindings for SvelteKit locals passed via app.fetch(request, { locals })
 export type HonoEnv = {

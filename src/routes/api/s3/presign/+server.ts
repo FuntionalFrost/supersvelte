@@ -1,7 +1,6 @@
 // src/routes/api/s3/presign/+server.ts
 import { getPresignedUploadUrl, isS3Configured } from '$lib/server/s3';
 import { error, json, type RequestHandler } from '@sveltejs/kit';
-import crypto from 'node:crypto';
 
 export const POST: RequestHandler = async ({ request }) => {
 	// Guard: check if S3/R2 is configured

@@ -27,6 +27,7 @@ dev.txt
 # Tests
 test-results/
 playwright-report/
+coverage/
 
 # AI
 /.gemini

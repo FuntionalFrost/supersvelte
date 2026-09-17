@@ -24,7 +24,7 @@
 		fallback,
 		denied,
 		preview = false,
-		upgradeUrl = '/dashboard/billing',
+		upgradeUrl = resolve('/dashboard/billing'),
 		class: className = ''
 	}: Props = $props();
 
@@ -60,12 +60,10 @@
 		{@render renderAllowed()}
 	{/if}
 {:else if preview && renderAllowed}
-	<div
-		class="relative overflow-hidden rounded-2xl border border-border bg-card {className}"
-	>
+	<div class="relative overflow-hidden rounded-2xl border border-border bg-card {className}">
 		<!-- Blurred disabled preview of children -->
 		<div
-			class="pointer-events-none max-h-[380px] opacity-40 blur-[3px] transition-all select-none"
+			class="pointer-events-none max-h-95 opacity-40 blur-[3px] transition-all select-none"
 			aria-hidden="true"
 			tabindex="-1"
 		>
@@ -92,7 +90,7 @@
 
 			<div class="mt-4 flex items-center gap-3">
 				<a
-					href={resolve(upgradeUrl as any)}
+					href={upgradeUrl}
 					class="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2 text-xs font-bold text-primary-foreground shadow-xs transition hover:brightness-110"
 				>
 					<Sparkles class="size-3.5" />
@@ -123,7 +121,7 @@
 
 		<div class="mt-6 flex justify-center">
 			<a
-				href={resolve(upgradeUrl as any)}
+				href={upgradeUrl}
 				class="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-xs font-bold text-primary-foreground shadow-xs transition hover:brightness-110"
 			>
 				<Sparkles class="size-3.5" />
