@@ -28,17 +28,16 @@ test.describe('Marketing & Landing Pages', () => {
 	});
 
 	test('competitor comparison matrix allows switching categories', async ({ page }) => {
+		await page.waitForLoadState('networkidle');
 		const comparisonSection = page.locator('#comparison');
+		await comparisonSection.scrollIntoViewIfNeeded();
 		await expect(comparisonSection).toBeVisible();
 
-		// Switch to ts-frameworks
-		const tsTab = comparisonSection.getByRole('button', {
-			name: /vs\. TS Frameworks/i
-		});
-		if (await tsTab.isVisible()) {
-			await tsTab.click();
-			await expect(tsTab).toHaveClass(/bg-primary/);
-		}
+		const tsTab = comparisonSection.locator('button', { hasText: 'vs. TS Frameworks' });
+		await tsTab.scrollIntoViewIfNeeded();
+		await tsTab.click();
+		await expect(tsTab).toHaveClass(/bg-primary/);
+		await expect(comparisonSection.getByText(/AdonisJS/i).first()).toBeVisible();
 	});
 
 	test('pricing section renders standard and pro tiers with features', async ({ page }) => {

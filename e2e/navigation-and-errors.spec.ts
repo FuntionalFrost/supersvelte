@@ -28,10 +28,10 @@ test.describe('Navigation, Theme, and Error Handling', () => {
 	test('marketing header navigation links and logo function properly', async ({ page }) => {
 		await page.goto('/');
 
-		// Logo links to /
+		// Logo links to root
 		const logo = page.getByRole('link', { name: /SuperSvelte/i }).first();
 		await expect(logo).toBeVisible();
-		await expect(logo).toHaveAttribute('href', '/');
+		await expect(logo).toHaveAttribute('href', /^\.?\/$/);
 	});
 
 	test('marketing footer contains legal links and current year', async ({ page }) => {

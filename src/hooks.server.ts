@@ -102,3 +102,9 @@ const appHandle: Handle = async ({ event, resolve }) => {
 
 export { yaxaHook, appHandle };
 export const handle = sequence(yaxaHook, appHandle);
+
+export const handleError: import('@sveltejs/kit').HandleServerError = ({ error, event }) => {
+	console.error('[Server Error]', event.url.pathname, error);
+	// Never expose raw error internals to the client
+	return { message: 'An unexpected error occurred. Please try again.' };
+};

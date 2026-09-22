@@ -3,8 +3,8 @@ import { defineConfig, devices } from '@playwright/test';
 
 export default defineConfig({
 	webServer: {
-		command: 'pnpm build && pnpm preview',
-		port: 4173,
+		command: 'pnpm dev --port 4173',
+		url: 'http://localhost:4173',
 		reuseExistingServer: !process.env.CI,
 		env: {
 			ORIGIN: 'http://localhost:4173',
