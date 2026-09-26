@@ -4,9 +4,7 @@
 	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
 	import { authClient } from '$lib/auth-client';
-	import TeamSwitcher from '$lib/components/TeamSwitcher.svelte';
-	import { Button } from '$lib/components/ui/button';
-	import { Separator } from '$lib/components/ui/separator';
+	import { Button, Divider, OrgSwitcher } from 'yaxa-svelte';
 	import {
 		Activity,
 		CreditCard,
@@ -50,10 +48,10 @@
 		<div class="space-y-4">
 			<!-- Workspace / Team Selector -->
 			<div class="pb-1">
-				<TeamSwitcher />
+				<OrgSwitcher />
 			</div>
 
-			<Separator />
+			<Divider />
 
 			<!-- Navigation Links -->
 			<nav class="space-y-1">

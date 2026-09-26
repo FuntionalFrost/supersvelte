@@ -54,9 +54,9 @@
 					<div class="flex items-center gap-2">
 						<span class="text-lg font-black">SuperSvelte</span>
 						<span
-							class="rounded-full border border-primary/20 bg-primary/10 px-2 py-0.5 text-[10px] font-bold text-primary"
+							class="rounded-full border border-teal-500/20 bg-teal-500/10 px-2.5 py-0.5 text-[10px] font-bold text-teal-400"
 						>
-							Sandbox v1.0
+							Sandbox
 						</span>
 					</div>
 					<p class="text-xs text-muted-foreground">Live Infrastructure & Edge Diagnostics</p>

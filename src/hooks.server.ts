@@ -61,9 +61,14 @@ const appHandle: Handle = async ({ event, resolve }) => {
 	}
 
 	// 4. Populate Better Auth session into event.locals
-	const session = await auth.api.getSession({
-		headers: event.request.headers
-	});
+	const session = await auth.api
+		.getSession({
+			headers: event.request.headers
+		})
+		.catch((err) => {
+			console.error('[Auth getSession Error]', err);
+			return null;
+		});
 
 	if (session) {
 		event.locals.session = session.session;

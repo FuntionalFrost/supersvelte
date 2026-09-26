@@ -1,10 +1,10 @@
 <!-- src/routes/+layout.svelte -->
 <script lang="ts">
+	import { browser } from '$app/environment';
 	import { onNavigate } from '$app/navigation';
 	import { resolve } from '$app/paths';
-	import { toggleMode } from 'mode-watcher';
 	import type { Snippet } from 'svelte';
-	import { CommandPalette, YaxaApp } from 'yaxa-svelte';
+	import { CommandPalette, theme, YaxaApp } from 'yaxa-svelte';
 	import { siteConfig } from '../site.config';
 	import type { LayoutServerData } from './$types';
 	import './layout.css';
@@ -12,6 +12,16 @@
 	let { data, children }: { data: LayoutServerData; children: Snippet } = $props();
 
 	let isCommandPaletteOpen = $state(false);
+
+	// Dynamically update site favicon on theme changes
+	$effect(() => {
+		if (!browser) return;
+		const isDark = theme.resolvedTheme === 'dark';
+		const favicon = document.getElementById('favicon') as HTMLLinkElement | null;
+		if (favicon) {
+			favicon.href = isDark ? '/favicon-dark.svg' : '/favicon-light.svg';
+		}
+	});
 
 	const commandItems = [
 		{
@@ -67,10 +77,18 @@
 			icon: 'document' as const
 		},
 		{
+			id: 'contact',
+			label: 'Contact & Support',
+			description: 'Maintainer email & help inquiries',
+			href: resolve('/contact'),
+			group: 'Help',
+			icon: 'mail' as const
+		},
+		{
 			id: 'toggle-theme',
 			label: 'Toggle Dark / Light Mode',
 			description: 'Switch application color theme',
-			onSelect: () => toggleMode(),
+			onSelect: () => theme.toggle(),
 			group: 'Preferences',
 			icon: 'sun' as const
 		}

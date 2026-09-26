@@ -36,7 +36,7 @@ test.describe('Marketing & Landing Pages', () => {
 		const tsTab = comparisonSection.locator('button', { hasText: 'vs. TS Frameworks' });
 		await tsTab.scrollIntoViewIfNeeded();
 		await tsTab.click();
-		await expect(tsTab).toHaveClass(/bg-primary/);
+		await expect(tsTab).toHaveClass(/bg-(white|primary)/);
 		await expect(comparisonSection.getByText(/AdonisJS/i).first()).toBeVisible();
 	});
 

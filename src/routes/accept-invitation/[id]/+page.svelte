@@ -4,7 +4,7 @@
 	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
 	import { authClient } from '$lib/auth-client';
-	import { Button } from '$lib/components/ui/button';
+	import { Button } from 'yaxa-svelte';
 	import { CircleCheck, CircleX, LogIn } from '@lucide/svelte';
 	import { onMount } from 'svelte';
 
@@ -119,9 +119,7 @@
 			<h2 class="text-base font-bold">Invitation Failed</h2>
 			<p class="text-xs text-muted-foreground">{errorMessage}</p>
 			<a href={resolve('/dashboard')} class="mt-4 inline-block">
-				<Button variant="secondary" size="sm" class="text-xs font-semibold"
-					>Return to Dashboard</Button
-				>
+				<Button variant="soft" size="sm" class="text-xs font-semibold">Return to Dashboard</Button>
 			</a>
 		{/if}
 	</div>

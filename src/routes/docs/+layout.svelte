@@ -2,8 +2,8 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
+	import Logo from '$lib/components/Logo.svelte';
 	import ThemeToggle from '$lib/components/ThemeToggle.svelte';
-	import { Input } from '$lib/components/ui/input';
 	import { BookOpen, ExternalLink, Menu, Search, X } from '@lucide/svelte';
 	import type { Snippet } from 'svelte';
 	import type { LayoutData } from './$types';
@@ -60,16 +60,9 @@
 
 				<!-- Brand Logo -->
 				<a href={resolve('/')} class="flex items-center gap-2.5 transition hover:opacity-90">
-					<div
-						class="flex size-7 items-center justify-center rounded-lg bg-primary text-xs font-black text-primary-foreground"
-					>
-						S5
-					</div>
-					<span class="text-base font-extrabold tracking-tight">
-						Super<span class="text-primary">Svelte</span>
-					</span>
+					<Logo size="sm" showText />
 					<span
-						class="rounded-md border border-primary/20 bg-primary/10 px-1.5 py-0.5 font-mono text-[10px] font-bold text-primary"
+						class="rounded-md border border-teal-500/20 bg-teal-500/10 px-1.5 py-0.5 font-mono text-[10px] font-bold text-teal-400"
 					>
 						DOCS
 					</span>
@@ -80,11 +73,11 @@
 			<div class="hidden max-w-xs flex-1 px-4 sm:block">
 				<div class="relative">
 					<Search class="absolute top-2.5 left-2.5 size-3.5 text-muted-foreground" />
-					<Input
+					<input
 						type="text"
 						placeholder="Search documentation..."
 						bind:value={searchQuery}
-						class="h-8 pl-8 text-xs"
+						class="w-full rounded-lg border border-border bg-card/70 py-1.5 pr-3 pl-8 text-xs text-foreground transition-all placeholder:text-muted-foreground focus:border-primary/50 focus:ring-2 focus:ring-primary/20 focus:outline-hidden"
 					/>
 				</div>
 			</div>
@@ -99,7 +92,7 @@
 					Dashboard
 				</a>
 				<a
-					href="https://github.com/FunctionalFrost/supersvelte"
+					href="https://github.com/FunctionalFrost"
 					target="_blank"
 					rel="noreferrer"
 					class="inline-flex items-center gap-1.5 rounded-xl border border-border bg-card px-3 py-1.5 text-xs font-semibold text-foreground shadow-xs transition hover:bg-muted"
@@ -164,11 +157,11 @@
 				</div>
 
 				<div class="mb-4">
-					<Input
+					<input
 						type="text"
 						placeholder="Search documentation..."
 						bind:value={searchQuery}
-						class="text-xs"
+						class="w-full rounded-lg border border-border bg-card/70 px-3 py-2 text-xs text-foreground transition-all placeholder:text-muted-foreground focus:border-primary/50 focus:ring-2 focus:ring-primary/20 focus:outline-hidden"
 					/>
 				</div>
 

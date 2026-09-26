@@ -114,7 +114,7 @@
 					onclick={() => (activeCompetitor = 'nextjs')}
 					class="flex items-center gap-2 rounded-lg px-3.5 py-1.5 text-xs font-semibold transition-all {activeCompetitor ===
 					'nextjs'
-						? 'bg-primary text-primary-foreground shadow-xs'
+						? 'border border-border/80 bg-background text-foreground shadow-xs'
 						: 'text-muted-foreground hover:text-foreground'}"
 				>
 					<Layers class="size-3.5" />
@@ -124,7 +124,7 @@
 					onclick={() => (activeCompetitor = 'nestjs')}
 					class="flex items-center gap-2 rounded-lg px-3.5 py-1.5 text-xs font-semibold transition-all {activeCompetitor ===
 					'nestjs'
-						? 'bg-primary text-primary-foreground shadow-xs'
+						? 'border border-border/80 bg-background text-foreground shadow-xs'
 						: 'text-muted-foreground hover:text-foreground'}"
 				>
 					<FileCode class="size-3.5" />

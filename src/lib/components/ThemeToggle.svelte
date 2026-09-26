@@ -1,11 +1,19 @@
 <!-- src/lib/components/ThemeToggle.svelte -->
 <script lang="ts">
-	import { Button } from '$lib/components/ui/button';
+	import { Button, theme } from 'yaxa-svelte';
 	import { Moon, Sun } from '@lucide/svelte';
-	import { toggleMode } from 'mode-watcher';
 </script>
 
-<Button onclick={toggleMode} variant="outline" size="icon" aria-label="Toggle Theme">
-	<Sun class="size-4 scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90" />
-	<Moon class="absolute size-4 scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0" />
+<Button
+	onclick={() => theme.toggle()}
+	variant="ghost"
+	size="sm"
+	aria-label="Toggle Theme"
+	class="size-8 rounded-lg border border-border/70 bg-card/50 p-0 text-muted-foreground shadow-xs transition hover:bg-muted hover:text-foreground"
+>
+	{#if theme.resolvedTheme === 'dark'}
+		<Moon class="size-4" />
+	{:else}
+		<Sun class="size-4" />
+	{/if}
 </Button>

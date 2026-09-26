@@ -3,10 +3,7 @@
 	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
 	import { authClient } from '$lib/auth-client';
-	import { Button } from '$lib/components/ui/button';
-	import * as Form from '$lib/components/ui/form';
-	import { Input } from '$lib/components/ui/input';
-	import { Separator } from '$lib/components/ui/separator';
+	import { Button, Divider, FormField, Input } from 'yaxa-svelte';
 	import { toast } from 'svelte-sonner';
 	import { superForm } from 'sveltekit-superforms';
 	import type { PageData } from './$types';
@@ -47,7 +44,7 @@
 			}
 		}
 	});
-	const { form: formData, enhance, message } = form;
+	const { form: formData, enhance, errors, message } = form;
 
 	async function signupWithGithub() {
 		githubLoading = true;
@@ -94,65 +91,42 @@
 	</Button>
 
 	<div class="relative">
-		<div class="absolute inset-0 flex items-center">
-			<Separator />
-		</div>
-		<div class="relative flex justify-center text-[10px] uppercase">
-			<span class="bg-card px-2 text-muted-foreground">Or register with email</span>
-		</div>
+		<Divider />
 	</div>
 
 	<form method="POST" use:enhance class="space-y-4">
 		<!-- NAME FIELD -->
-		<Form.Field {form} name="name">
-			<Form.Control>
-				{#snippet children({ props })}
-					<Form.Label class="text-xs font-semibold">Full Name</Form.Label>
-					<Input
-						{...props}
-						type="text"
-						placeholder="Jane Doe"
-						bind:value={$formData.name}
-						class="text-xs"
-					/>
-				{/snippet}
-			</Form.Control>
-			<Form.FieldErrors class="text-[11px]" />
-		</Form.Field>
+		<FormField label="Full Name" error={$errors.name?.[0]}>
+			<Input
+				type="text"
+				placeholder="Jane Doe"
+				bind:value={$formData.name}
+				size="sm"
+				class="border-border bg-background text-foreground placeholder:text-muted-foreground"
+			/>
+		</FormField>
 
 		<!-- EMAIL FIELD -->
-		<Form.Field {form} name="email">
-			<Form.Control>
-				{#snippet children({ props })}
-					<Form.Label class="text-xs font-semibold">Email</Form.Label>
-					<Input
-						{...props}
-						type="email"
-						placeholder="name@example.com"
-						bind:value={$formData.email}
-						class="text-xs"
-					/>
-				{/snippet}
-			</Form.Control>
-			<Form.FieldErrors class="text-[11px]" />
-		</Form.Field>
+		<FormField label="Email" error={$errors.email?.[0]}>
+			<Input
+				type="email"
+				placeholder="name@example.com"
+				bind:value={$formData.email}
+				size="sm"
+				class="border-border bg-background text-foreground placeholder:text-muted-foreground"
+			/>
+		</FormField>
 
 		<!-- PASSWORD FIELD -->
-		<Form.Field {form} name="password">
-			<Form.Control>
-				{#snippet children({ props })}
-					<Form.Label class="text-xs font-semibold">Password</Form.Label>
-					<Input
-						{...props}
-						type="password"
-						placeholder="••••••••"
-						bind:value={$formData.password}
-						class="text-xs"
-					/>
-				{/snippet}
-			</Form.Control>
-			<Form.FieldErrors class="text-[11px]" />
-		</Form.Field>
+		<FormField label="Password" error={$errors.password?.[0]}>
+			<Input
+				type="password"
+				placeholder="••••••••"
+				bind:value={$formData.password}
+				size="sm"
+				class="border-border bg-background text-foreground placeholder:text-muted-foreground"
+			/>
+		</FormField>
 
 		<Button type="submit" disabled={emailLoading} class="w-full text-xs font-bold">
 			{emailLoading ? 'Creating account...' : 'Create Account with Email'}

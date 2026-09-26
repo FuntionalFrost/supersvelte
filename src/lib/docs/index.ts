@@ -42,7 +42,7 @@ export const docsRegistry: DocItem[] = [
 					lang: 'typescript',
 					filename: 'tech-stack.ts',
 					code: `export const stack = {
-  frontend: 'Svelte 5 (Runes) + Tailwind CSS v4 + shadcn-svelte',
+  frontend: 'Svelte 5 (Runes) + Tailwind CSS v4 + yaxa-svelte',
   api: 'Hono Zod OpenAPI 3.1 (Zero-Codegen RPC)',
   auth: 'Better-Auth (Credentials + GitHub OAuth + Orgs)',
   database: 'Neon Serverless Postgres + Drizzle ORM',

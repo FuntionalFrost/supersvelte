@@ -52,24 +52,24 @@
 
 		<div class="relative container mx-auto max-w-5xl px-4 text-center">
 			<div
-				class="mb-6 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-3.5 py-1 text-sm font-semibold text-primary shadow-xs"
+				class="mb-6 inline-flex items-center gap-2 rounded-full border border-border/70 bg-card/60 px-4 py-1.5 text-xs font-semibold text-muted-foreground shadow-xs"
 			>
-				<Sparkles class="size-3.5" />
+				<Sparkles class="size-3.5 text-muted-foreground" />
 				<span>SuperSvelte • Svelte 5 + Hono RPC + Neon</span>
 			</div>
 
-			<h1 class="text-5xl font-black tracking-tight sm:text-7xl md:text-8xl">
-				Super<span
-					class="bg-linear-to-r from-emerald-300 via-teal-300 to-cyan-400 bg-clip-text text-transparent"
+			<h1 class="text-6xl font-black tracking-tight sm:text-7xl md:text-8xl">
+				<span class="text-foreground">Super</span><span
+					class="bg-linear-to-r from-teal-400 via-cyan-400 to-cyan-300 bg-clip-text text-transparent"
 					>Svelte</span
 				>
 			</h1>
 
-			<p class="mx-auto mt-4 max-w-xl text-sm font-medium text-foreground sm:text-xl">
+			<p class="mx-auto mt-4 max-w-xl text-lg font-bold text-foreground sm:text-2xl">
 				The Batteries-Included Edge TS Framework
 			</p>
 
-			<p class="mx-auto mt-2 max-w-2xl text-sm text-muted-foreground sm:text-base">
+			<p class="mx-auto mt-3 max-w-2xl text-xs leading-relaxed text-muted-foreground sm:text-sm">
 				Stop assembling your stack from 15 npm packages. SuperSvelte ships Auth, Neon DB, Redis SSE,
 				OpenAPI 3.1 Hono RPC, Uploads, and Resend out-of-the-box with sub-10ms edge cold starts.
 			</p>
@@ -77,16 +77,16 @@
 			<div class="mt-8 flex flex-col justify-center gap-4 sm:flex-row">
 				<a
 					href="#pricing"
-					class="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-8 py-3.5 text-sm font-bold text-primary-foreground shadow-lg transition hover:scale-105 hover:bg-primary/90"
+					class="inline-flex items-center justify-center gap-2 rounded-xl bg-foreground px-6 py-3 text-sm font-bold text-background shadow-md transition hover:scale-105 hover:bg-foreground/90"
 				>
 					<Rocket class="size-4" />
 					<span>Get SuperSvelte!</span>
 				</a>
 				<a
 					href="#features"
-					class="inline-flex items-center justify-center gap-2 rounded-xl border border-border bg-card px-6 py-3.5 text-sm font-semibold transition hover:bg-accent"
+					class="inline-flex items-center justify-center gap-2 rounded-xl border border-border/80 bg-card/60 px-6 py-3 text-sm font-semibold text-foreground shadow-xs transition hover:border-border hover:bg-muted"
 				>
-					<Terminal class="size-4" />
+					<Terminal class="size-4 text-muted-foreground" />
 					<span>Explore Architecture</span>
 				</a>
 			</div>
@@ -97,48 +97,54 @@
 	<section id="features" class="border-b border-border/40 bg-muted/30 py-16">
 		<div class="container mx-auto max-w-6xl px-4">
 			<div class="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-6">
-				<div
+				<a
+					href="/docs/getting-started/introduction"
 					class="group flex flex-col items-center gap-2 rounded-xl border border-border/60 bg-card p-4 text-center transition-all duration-300 hover:-translate-y-1 hover:border-amber-400/50"
 				>
 					<Zap class="size-6 text-amber-400" />
 					<span class="text-sm font-bold">Svelte 5</span>
 					<span class="text-[11px] text-muted-foreground">Fine-grained Runes</span>
-				</div>
-				<div
+				</a>
+				<a
+					href="/docs/architecture/hono-rpc"
 					class="group flex flex-col items-center gap-2 rounded-xl border border-border/60 bg-card p-4 text-center transition-all duration-300 hover:-translate-y-1 hover:border-cyan-400/50"
 				>
 					<Cpu class="size-6 text-cyan-400" />
 					<span class="text-sm font-bold">Hono Zod RPC</span>
 					<span class="text-[11px] text-muted-foreground">Auto OpenAPI 3.1</span>
-				</div>
-				<div
+				</a>
+				<a
+					href="/docs/architecture/database"
 					class="group flex flex-col items-center gap-2 rounded-xl border border-border/60 bg-card p-4 text-center transition-all duration-300 hover:-translate-y-1 hover:border-emerald-400/50"
 				>
 					<Database class="size-6 text-emerald-400" />
 					<span class="text-sm font-bold">Drizzle + Neon</span>
 					<span class="text-[11px] text-muted-foreground">Serverless Postgres</span>
-				</div>
-				<div
+				</a>
+				<a
+					href="/docs/architecture/authentication"
 					class="group flex flex-col items-center gap-2 rounded-xl border border-border/60 bg-card p-4 text-center transition-all duration-300 hover:-translate-y-1 hover:border-indigo-400/50"
 				>
 					<ShieldCheck class="size-6 text-indigo-400" />
 					<span class="text-sm font-bold">Better Auth</span>
 					<span class="text-[11px] text-muted-foreground">Sessions & Social</span>
-				</div>
-				<div
+				</a>
+				<a
+					href="/docs/architecture/queue-realtime"
 					class="group flex flex-col items-center gap-2 rounded-xl border border-border/60 bg-card p-4 text-center transition-all duration-300 hover:-translate-y-1 hover:border-red-400/50"
 				>
 					<Cloud class="size-6 text-red-400" />
 					<span class="text-sm font-bold">Upstash Redis</span>
 					<span class="text-[11px] text-muted-foreground">Cache & SSE Queue</span>
-				</div>
-				<div
+				</a>
+				<a
+					href="/docs/architecture/storage"
 					class="group flex flex-col items-center gap-2 rounded-xl border border-border/60 bg-card p-4 text-center transition-all duration-300 hover:-translate-y-1 hover:border-pink-400/50"
 				>
 					<Mail class="size-6 text-pink-400" />
 					<span class="text-sm font-bold">Resend & UT</span>
 					<span class="text-[11px] text-muted-foreground">Mail & Storage</span>
-				</div>
+				</a>
 			</div>
 		</div>
 	</section>
@@ -166,7 +172,7 @@
 						onclick={() => (mode = 'saas-starters')}
 						class="rounded-lg px-4 py-2 text-sm font-semibold transition-all {mode ===
 						'saas-starters'
-							? 'bg-primary text-primary-foreground shadow-xs'
+							? 'border border-border/80 bg-background text-foreground shadow-xs'
 							: 'text-muted-foreground hover:text-foreground'}"
 					>
 						vs. SaaS Starters (Supastarter, Makerkit, Epic Stack)
@@ -176,7 +182,7 @@
 						onclick={() => (mode = 'ts-frameworks')}
 						class="rounded-lg px-4 py-2 text-sm font-semibold transition-all {mode ===
 						'ts-frameworks'
-							? 'bg-primary text-primary-foreground shadow-xs'
+							? 'border border-border/80 bg-background text-foreground shadow-xs'
 							: 'text-muted-foreground hover:text-foreground'}"
 					>
 						vs. TS Frameworks (AdonisJS, Redwood, Wasp)
@@ -185,7 +191,7 @@
 					<button
 						onclick={() => (mode = 'monoliths')}
 						class="rounded-lg px-4 py-2 text-sm font-semibold transition-all {mode === 'monoliths'
-							? 'bg-primary text-primary-foreground shadow-xs'
+							? 'border border-border/80 bg-background text-foreground shadow-xs'
 							: 'text-muted-foreground hover:text-foreground'}"
 					>
 						vs. Backend Monoliths (Laravel, Rails, Django, .NET)
@@ -200,10 +206,13 @@
 							{#each currentMatrix.columns as col (col.key)}
 								{#if col.isPrimary}
 									<th
-										class="border-x border-primary/20 bg-primary/10 p-4 font-bold text-primary {col.minWidth ??
+										class="border-x border-emerald-500/20 bg-emerald-500/10 p-4 font-bold text-emerald-600 dark:text-emerald-400 {col.minWidth ??
 											''}"
 									>
-										{col.label}
+										<div class="flex items-center gap-1.5">
+											<Sparkles class="size-4 text-emerald-600 dark:text-emerald-400" />
+											<span>{col.label}</span>
+										</div>
 									</th>
 								{:else if col.key === 'feature'}
 									<th class="p-4 font-semibold">{col.label}</th>
@@ -223,10 +232,10 @@
 										</td>
 									{:else if col.isPrimary}
 										<td
-											class="border-x border-primary/20 bg-primary/5 p-4 font-semibold text-primary"
+											class="border-x border-emerald-500/20 bg-emerald-500/5 p-4 font-semibold text-emerald-600 dark:text-emerald-400"
 										>
 											<div class="flex items-center gap-1.5">
-												<Check class="size-4 shrink-0 text-emerald-500" />
+												<Check class="size-4 shrink-0 text-emerald-600 dark:text-emerald-400" />
 												<span>{getCellValue(row, col.key)}</span>
 											</div>
 										</td>
@@ -245,7 +254,14 @@
 	<!-- 4. CODE COMPARISON SHOWCASE -->
 	<CodeComparison />
 
-	<!-- 5. PRICING SECTION -->
+	<!-- 5. BENCHMARKS -->
+	<section class="border-t border-border/60 bg-muted/20 py-20">
+		<div class="container mx-auto px-4">
+			<SuperSvelteVsOthers />
+		</div>
+	</section>
+
+	<!-- 6. PRICING SECTION -->
 	<section id="pricing" class="border-t border-border/40 bg-muted/20 py-24">
 		<div class="container mx-auto max-w-5xl px-4">
 			<div class="text-center">
@@ -320,18 +336,18 @@
 
 				<!-- Pro Tier -->
 				<div
-					class="relative flex flex-col justify-between rounded-2xl border-2 border-primary bg-card p-8 shadow-xl"
+					class="relative flex flex-col justify-between rounded-2xl border-2 border-primary/50 bg-card p-8 shadow-xl ring-1 ring-primary/20"
 				>
 					<div
-						class="absolute -top-3.5 right-6 rounded-full bg-primary px-3 py-1 text-[10px] font-bold tracking-wider text-primary-foreground uppercase"
+						class="absolute -top-3.5 right-6 rounded-full bg-primary px-3 py-1 text-[10px] font-bold tracking-wider text-primary-foreground uppercase shadow-xs"
 					>
 						Most Popular
 					</div>
 					<div>
 						<div class="flex items-center justify-between">
-							<h3 class="text-sm font-bold text-primary">Unlimited Pro License</h3>
+							<h3 class="text-sm font-bold text-foreground">Unlimited Pro License</h3>
 							<span
-								class="rounded-md border border-primary/30 bg-primary/10 px-2.5 py-0.5 font-mono text-[10px] font-bold text-primary"
+								class="rounded-md border border-border bg-muted px-2.5 py-0.5 font-mono text-[10px] font-bold text-foreground"
 							>
 								Unlimited Projects
 							</span>
@@ -371,12 +387,24 @@
 					</div>
 				</div>
 			</div>
-		</div>
-	</section>
 
-	<section class="border-t border-border/60 bg-muted/20 py-20">
-		<div class="container mx-auto px-4">
-			<SuperSvelteVsOthers />
+			<!-- Pricing Trust Guarantee Strip -->
+			<div
+				class="mx-auto mt-12 flex max-w-4xl flex-wrap items-center justify-center gap-6 rounded-2xl border border-border/60 bg-card/60 px-6 py-4 text-xs font-semibold text-muted-foreground shadow-xs backdrop-blur-sm sm:justify-between"
+			>
+				<div class="flex items-center gap-2">
+					<ShieldCheck class="size-4 text-emerald-500" />
+					<span>Secure Checkout via Polar</span>
+				</div>
+				<div class="flex items-center gap-2">
+					<Zap class="size-4 text-cyan-400" />
+					<span>Instant GitHub Collaborator Access</span>
+				</div>
+				<div class="flex items-center gap-2">
+					<Check class="size-4 text-emerald-500" />
+					<span>14-Day Money-Back Guarantee</span>
+				</div>
+			</div>
 		</div>
 	</section>
 

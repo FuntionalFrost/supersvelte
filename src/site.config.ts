@@ -7,7 +7,7 @@ export const siteConfig = defineSiteConfig({
 	description:
 		'Enterprise-grade Svelte 5 boilerplate with OpenAPI Hono RPC, Better Auth, Neon Postgres, Drizzle ORM, Polar, and Upstash Redis. Built with Yaxa.',
 	url: 'https://supersvelte.netlify.app',
-	email: 'hello@supersvelte.dev',
+	email: 'devfrost@protonmail.com',
 	author: {
 		name: 'FunctionalFrost',
 		twitter: '@funtionalfrost',
@@ -21,14 +21,34 @@ export const siteConfig = defineSiteConfig({
 		isAccessibleForFree: false,
 		badge: 'Svelte 5 Boilerplate'
 	},
+	nav: [
+		{ label: 'Stack & Specs', href: '/#features' },
+		{ label: 'Matrix', href: '/#comparison' },
+		{ label: 'Pricing', href: '/#pricing' },
+		{ label: 'Docs', href: '/docs' },
+		{ label: 'FAQ', href: '/#faq' }
+	],
 	theme: {
-		primaryColor: '#ff3e00',
+		primaryColor: '#2dd4bf',
 		neutralColor: '#71717a',
 		defaultMode: 'dark'
 	},
 	socials: {
 		github: 'https://github.com/FunctionalFrost/supersvelte',
 		twitter: '@funtionalfrost'
+	},
+	company: {
+		legalName: 'SuperSvelte',
+		contactEmail: 'devfrost@protonmail.com'
+	},
+	legal: {
+		paymentProcessor: 'polar',
+		refundDays: 14,
+		links: {
+			privacy: '/privacy',
+			terms: '/terms',
+			refunds: '/refunds'
+		}
 	},
 	seo: {
 		titleTemplate: '%s · SuperSvelte',

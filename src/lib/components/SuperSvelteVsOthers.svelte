@@ -59,7 +59,7 @@
 			<button
 				onclick={() => (selectedTab = 'performance')}
 				class="rounded-md px-3 py-1.5 font-semibold transition {selectedTab === 'performance'
-					? 'bg-background text-foreground shadow-xs'
+					? 'border border-border/80 bg-background text-foreground shadow-xs'
 					: 'text-muted-foreground hover:text-foreground'}"
 			>
 				Bundle & Latency
@@ -67,7 +67,7 @@
 			<button
 				onclick={() => (selectedTab = 'codegen')}
 				class="rounded-md px-3 py-1.5 font-semibold transition {selectedTab === 'codegen'
-					? 'bg-background text-foreground shadow-xs'
+					? 'border border-border/80 bg-background text-foreground shadow-xs'
 					: 'text-muted-foreground hover:text-foreground'}"
 			>
 				0-Codegen RPC
@@ -86,15 +86,17 @@
 					{#each metrics as m (m.framework)}
 						<div class="space-y-1">
 							<div class="flex justify-between text-xs font-semibold">
-								<span class={m.isWinner ? 'font-bold text-primary' : 'text-foreground'}
-									>{m.framework}</span
+								<span
+									class={m.isWinner
+										? 'font-bold text-cyan-500 dark:text-cyan-400'
+										: 'text-foreground'}>{m.framework}</span
 								>
 								<span class="font-mono">{m.bundleSize}</span>
 							</div>
 							<div class="h-3 w-full overflow-hidden rounded-full bg-muted/60">
 								<div
 									class="h-full transition-all duration-500 {m.isWinner
-										? 'bg-primary'
+										? 'bg-cyan-500 dark:bg-cyan-400'
 										: 'bg-muted-foreground/40'}"
 									style="width: {m.bundleWidth};"
 								></div>

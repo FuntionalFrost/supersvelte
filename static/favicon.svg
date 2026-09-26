@@ -1,13 +1,24 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
-  <rect width="32" height="32" rx="9" fill="#e2e8f0" />
-  <text
-    x="16"
-    y="22.5"
-    font-family="system-ui, -apple-system, sans-serif"
-    font-weight="900"
-    font-size="16"
-    letter-spacing="-0.5px"
-    fill="#090d16"
-    text-anchor="middle"
-  >S5</text>
+  <style>
+    :root {
+      --bg: #090d16;
+      --fg: #ffffff;
+      --accent: #34d399;
+      --border: rgba(255, 255, 255, 0.15);
+    }
+    @media (prefers-color-scheme: light) {
+      :root {
+        --bg: #ffffff;
+        --fg: #0f172a;
+        --accent: #059669;
+        --border: #cbd5e1;
+      }
+    }
+    .bg-rect { fill: var(--bg); stroke: var(--border); stroke-width: 1.5; }
+    .glyph { stroke: var(--fg); stroke-width: 3.2; stroke-linecap: round; stroke-linejoin: round; }
+    .accent-dot { fill: var(--accent); }
+  </style>
+  <rect x="0.75" y="0.75" width="30.5" height="30.5" rx="8" class="bg-rect" />
+  <path d="M21.5 9.5C21.5 7.2 19.3 5.5 16 5.5C12.2 5.5 9.5 7.8 9.5 11.5C9.5 16.2 22.5 14.8 22.5 20.8C22.5 24.8 19.2 26.5 16 26.5C12.2 26.5 9.5 24.2 9.5 22" class="glyph" />
+  <circle cx="21.5" cy="9.5" r="2" class="accent-dot" />
 </svg>

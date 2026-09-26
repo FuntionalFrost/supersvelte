@@ -2,7 +2,7 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { resolve } from '$app/paths';
-	import { Button } from '$lib/components/ui/button';
+	import { Button } from 'yaxa-svelte';
 	import { Activity, ArrowRight, CreditCard, ShieldCheck, Users } from '@lucide/svelte';
 	import type { PageData } from './$types';
 

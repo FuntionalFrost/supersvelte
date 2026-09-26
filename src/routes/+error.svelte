@@ -2,7 +2,7 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
-	import { Button } from '$lib/components/ui/button';
+	import { Button } from 'yaxa-svelte';
 	import { AlertTriangle, ArrowLeft, Home, LayoutDashboard, ShieldAlert } from '@lucide/svelte';
 	import { MetaTags } from 'svelte-meta-tags';
 
