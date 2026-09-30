@@ -33,7 +33,7 @@ export default defineConfig(
 			}
 		},
 		rules: {
-			// Allow pre-highlighted Shiki HTML snippet rendering
+			// Allow raw HTML rendering when needed
 			'svelte/no-at-html-tags': 'off',
 			// Allow polymorphic component href prop forwarding
 			'svelte/no-navigation-without-resolve': 'off'

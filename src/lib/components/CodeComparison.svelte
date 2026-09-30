@@ -1,87 +1,27 @@
 <!-- src/lib/components/CodeComparison.svelte -->
 <script lang="ts">
-	import { browser } from '$app/environment';
 	import {
 		competitorExamples,
 		superSvelteExample,
 		type CompetitorKey
 	} from '$lib/config/code-comparisons';
 	import { Check, CodeXml, Copy, FileCode, Layers, ShieldCheck, Zap } from '@lucide/svelte';
-	import { createHighlighter } from 'shiki';
-	import { createJavaScriptRegexEngine } from 'shiki/engine/javascript';
+
+	interface Props {
+		snippets?: {
+			superSvelte: { server: string; client: string };
+			nextjs: { server: string; client: string };
+			nestjs: { server: string; client: string };
+		};
+	}
+
+	let { snippets }: Props = $props();
 
 	let activeCompetitor = $state<CompetitorKey>('nextjs');
 	let copiedSnippet = $state<string | null>(null);
 
-	// Pre-highlighted HTML cache
-	let superSvelteServerHtml = $state('');
-	let superSvelteClientHtml = $state('');
-
-	let competitorHtmlMap = $state<Record<CompetitorKey, { server: string; client: string }>>({
-		nextjs: { server: '', client: '' },
-		nestjs: { server: '', client: '' }
-	});
-
-	let isReady = $state(false);
-
 	let currentCompetitor = $derived(competitorExamples[activeCompetitor]);
-	// ⚡ Instant 0ms lookup derived directly from state cache
-	let currentCompetitorHtml = $derived(competitorHtmlMap[activeCompetitor]);
-
-	// Initialize Shiki and pre-highlight ALL snippets in a single fast pass (~2ms)
-	$effect(() => {
-		if (!browser) return;
-
-		let isMounted = true;
-
-		createHighlighter({
-			engine: createJavaScriptRegexEngine(),
-			themes: ['github-dark'],
-			langs: ['svelte', 'typescript', 'javascript', 'html', 'css']
-		}).then((highlighter) => {
-			if (!isMounted) return;
-
-			// 1. Highlight SuperSvelte
-			superSvelteServerHtml = highlighter.codeToHtml(superSvelteExample.server.trim(), {
-				lang: 'typescript',
-				theme: 'github-dark'
-			});
-			superSvelteClientHtml = highlighter.codeToHtml(superSvelteExample.client.trim(), {
-				lang: 'svelte',
-				theme: 'github-dark'
-			});
-
-			// 2. Pre-highlight Next.js & NestJS upfront
-			const nextjsServer = highlighter.codeToHtml(competitorExamples.nextjs.server.trim(), {
-				lang: 'typescript',
-				theme: 'github-dark'
-			});
-			const nextjsClient = highlighter.codeToHtml(competitorExamples.nextjs.client.trim(), {
-				lang: 'typescript',
-				theme: 'github-dark'
-			});
-
-			const nestjsServer = highlighter.codeToHtml(competitorExamples.nestjs.server.trim(), {
-				lang: 'typescript',
-				theme: 'github-dark'
-			});
-			const nestjsClient = highlighter.codeToHtml(competitorExamples.nestjs.client.trim(), {
-				lang: 'typescript',
-				theme: 'github-dark'
-			});
-
-			competitorHtmlMap = {
-				nextjs: { server: nextjsServer, client: nextjsClient },
-				nestjs: { server: nestjsServer, client: nestjsClient }
-			};
-
-			isReady = true;
-		});
-
-		return () => {
-			isMounted = false;
-		};
-	});
+	let currentCompetitorSnippet = $derived(snippets?.[activeCompetitor]);
 
 	function copyCode(key: string, text: string) {
 		navigator.clipboard.writeText(text.trim());
@@ -157,7 +97,7 @@
 								'superSvelte',
 								superSvelteExample.server + '\n\n' + superSvelteExample.client
 							)}
-						class="rounded-md border border-emerald-500/30 bg-emerald-500/10 p-1.5 text-emerald-400 transition hover:bg-emerald-500/20"
+						class="rounded-md border border-emerald-500/30 bg-emerald-500/10 p-1.5 text-emerald-400 transition hover:bg-emerald-500/20 active:scale-95"
 						title="Copy Super Svelte Snippet"
 					>
 						{#if copiedSnippet === 'superSvelte'}
@@ -176,15 +116,13 @@
 							<span class="size-1.5 rounded-full bg-emerald-400"></span>
 							1. OpenAPI Route Definition
 						</div>
-						<div class="overflow-hidden rounded-lg border border-border/80 bg-[#0d1117]">
-							{#if isReady && superSvelteServerHtml}
-								{@html superSvelteServerHtml}
+						<div
+							class="overflow-hidden rounded-lg border border-border/80 bg-[#0d1117] p-3 font-mono text-xs [&>pre]:m-0! [&>pre]:bg-transparent! [&>pre]:p-0!"
+						>
+							{#if snippets?.superSvelte.server}
+								{@html snippets.superSvelte.server}
 							{:else}
-								<div class="animate-pulse space-y-2 bg-[#0d1117] p-3">
-									<div class="h-2.5 w-3/4 rounded bg-slate-800/60"></div>
-									<div class="h-2.5 w-1/2 rounded bg-slate-800/60"></div>
-									<div class="h-2.5 w-5/6 rounded bg-slate-800/60"></div>
-								</div>
+								<pre><code>{superSvelteExample.server}</code></pre>
 							{/if}
 						</div>
 					</div>
@@ -196,14 +134,13 @@
 							<span class="size-1.5 rounded-full bg-emerald-400"></span>
 							2. Client RPC Call
 						</div>
-						<div class="overflow-hidden rounded-lg border border-border/80 bg-[#0d1117]">
-							{#if isReady && superSvelteClientHtml}
-								{@html superSvelteClientHtml}
+						<div
+							class="overflow-hidden rounded-lg border border-border/80 bg-[#0d1117] p-3 font-mono text-xs [&>pre]:m-0! [&>pre]:bg-transparent! [&>pre]:p-0!"
+						>
+							{#if snippets?.superSvelte.client}
+								{@html snippets.superSvelte.client}
 							{:else}
-								<div class="animate-pulse space-y-2 bg-[#0d1117] p-3">
-									<div class="h-2.5 w-3/4 rounded bg-slate-800/60"></div>
-									<div class="h-2.5 w-1/2 rounded bg-slate-800/60"></div>
-								</div>
+								<pre><code>{superSvelteExample.client}</code></pre>
 							{/if}
 						</div>
 					</div>
@@ -240,7 +177,7 @@
 								activeCompetitor,
 								currentCompetitor.server + '\n\n' + currentCompetitor.client
 							)}
-						class="rounded-md border border-border bg-background p-1.5 text-muted-foreground transition hover:text-foreground"
+						class="rounded-md border border-border bg-background p-1.5 text-muted-foreground transition hover:text-foreground active:scale-95"
 						title="Copy Competitor Snippet"
 					>
 						{#if copiedSnippet === activeCompetitor}
@@ -259,15 +196,13 @@
 							<span class="size-1.5 rounded-full bg-muted-foreground"></span>
 							Server Implementation
 						</div>
-						<div class="overflow-hidden rounded-lg border border-border/60 bg-[#0d1117]">
-							{#if isReady && currentCompetitorHtml.server}
-								{@html currentCompetitorHtml.server}
+						<div
+							class="overflow-hidden rounded-lg border border-border/60 bg-[#0d1117] p-3 font-mono text-xs [&>pre]:m-0! [&>pre]:bg-transparent! [&>pre]:p-0!"
+						>
+							{#if currentCompetitorSnippet?.server}
+								{@html currentCompetitorSnippet.server}
 							{:else}
-								<div class="animate-pulse space-y-2 bg-[#0d1117] p-3">
-									<div class="h-2.5 w-3/4 rounded bg-slate-800/60"></div>
-									<div class="h-2.5 w-1/2 rounded bg-slate-800/60"></div>
-									<div class="h-2.5 w-5/6 rounded bg-slate-800/60"></div>
-								</div>
+								<pre><code>{currentCompetitor.server}</code></pre>
 							{/if}
 						</div>
 					</div>
@@ -279,14 +214,13 @@
 							<span class="size-1.5 rounded-full bg-muted-foreground"></span>
 							Client Consumption
 						</div>
-						<div class="overflow-hidden rounded-lg border border-border/60 bg-[#0d1117]">
-							{#if isReady && currentCompetitorHtml.client}
-								{@html currentCompetitorHtml.client}
+						<div
+							class="overflow-hidden rounded-lg border border-border/60 bg-[#0d1117] p-3 font-mono text-xs [&>pre]:m-0! [&>pre]:bg-transparent! [&>pre]:p-0!"
+						>
+							{#if currentCompetitorSnippet?.client}
+								{@html currentCompetitorSnippet.client}
 							{:else}
-								<div class="animate-pulse space-y-2 bg-[#0d1117] p-3">
-									<div class="h-2.5 w-3/4 rounded bg-slate-800/60"></div>
-									<div class="h-2.5 w-1/2 rounded bg-slate-800/60"></div>
-								</div>
+								<pre><code>{currentCompetitor.client}</code></pre>
 							{/if}
 						</div>
 					</div>
@@ -323,20 +257,3 @@
 		</div>
 	</div>
 </section>
-
-<style>
-	:global(pre.shiki) {
-		margin: 0 !important;
-		padding: 0.65rem 0.85rem !important;
-		box-sizing: border-box !important;
-		overflow-x: auto !important;
-		background-color: transparent !important;
-		font-size: 11px !important;
-		line-height: 1.45 !important;
-	}
-
-	:global(pre.shiki code) {
-		display: block !important;
-		min-height: 100% !important;
-	}
-</style>

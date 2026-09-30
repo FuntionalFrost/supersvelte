@@ -1,6 +1,5 @@
 // src/lib/config/seo.ts
 import { siteConfig as mainSiteConfig } from '../../site.config';
-import type { MetaTagsProps } from 'svelte-meta-tags';
 
 export const siteConfig = {
 	...mainSiteConfig,
@@ -8,7 +7,35 @@ export const siteConfig = {
 	ogImage: `${mainSiteConfig.url}/api/og`
 };
 
-export const defaultMetaTags: MetaTagsProps = {
+export interface DefaultMetaConfig {
+	title: string;
+	titleTemplate: string;
+	description: string;
+	canonical: string;
+	openGraph: {
+		type: string;
+		url: string;
+		title: string;
+		description: string;
+		siteName: string;
+		images: Array<{
+			url: string;
+			width: number;
+			height: number;
+			alt: string;
+		}>;
+	};
+	twitter: {
+		site: string;
+		creator: string;
+		cardType: string;
+		title: string;
+		description: string;
+		image: string;
+	};
+}
+
+export const defaultMetaTags: DefaultMetaConfig = {
 	title: siteConfig.title,
 	titleTemplate: '%s | SuperSvelte',
 	description: siteConfig.description,

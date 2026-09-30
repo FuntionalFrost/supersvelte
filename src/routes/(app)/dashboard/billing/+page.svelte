@@ -7,7 +7,7 @@
 	} from '$env/static/public';
 	import PolarCheckout from '$lib/components/PolarCheckout.svelte';
 	import { Check, Copy, CreditCard, ExternalLink, ShieldCheck } from '@lucide/svelte';
-	import { toast } from 'svelte-sonner';
+	import { toast } from 'yaxa-svelte';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();

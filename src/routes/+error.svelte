@@ -2,9 +2,8 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
-	import { Button } from 'yaxa-svelte';
+	import { Button, Seo } from 'yaxa-svelte';
 	import { AlertTriangle, ArrowLeft, Home, LayoutDashboard, ShieldAlert } from '@lucide/svelte';
-	import { MetaTags } from 'svelte-meta-tags';
 
 	const status = $derived(page.status);
 	const message = $derived(page.error?.message || 'An unexpected error occurred.');
@@ -34,7 +33,7 @@
 	);
 </script>
 
-<MetaTags title="{status} — {title}" {description} robots="noindex, nofollow" />
+<Seo title="{status} — {title}" {description} noindex nofollow />
 
 <div
 	class="flex min-h-screen flex-col items-center justify-center bg-background px-4 text-foreground"

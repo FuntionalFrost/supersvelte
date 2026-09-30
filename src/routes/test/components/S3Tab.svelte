@@ -9,8 +9,7 @@
 		Upload,
 		XCircle
 	} from '@lucide/svelte';
-	import { toast } from 'svelte-sonner';
-	import { useUpload } from 'yaxa-svelte';
+	import { toast, useUpload } from 'yaxa-svelte';
 
 	let fileInput = $state<HTMLInputElement | null>(null);
 	let uploadedResult = $state<{ key?: string; url: string; filename: string } | null>(null);

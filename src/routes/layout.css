@@ -127,3 +127,18 @@
 		@apply bg-background text-foreground;
 	}
 }
+
+/* Shiki Syntax Highlighting Resets */
+pre.shiki {
+	margin: 0 !important;
+	padding: 0 !important;
+	background-color: transparent !important;
+	font-size: 11px !important;
+	line-height: 1.5 !important;
+	overflow-x: auto !important;
+}
+
+pre.shiki code {
+	display: block !important;
+	font-family: inherit !important;
+}

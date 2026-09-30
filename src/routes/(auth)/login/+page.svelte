@@ -3,8 +3,7 @@
 	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
 	import { authClient } from '$lib/auth-client';
-	import { Button, Divider, FormField, Input } from 'yaxa-svelte';
-	import { toast } from 'svelte-sonner';
+	import { Button, Divider, FormField, Input, toast } from 'yaxa-svelte';
 	import { superForm } from 'sveltekit-superforms';
 	import type { PageData } from './$types';
 

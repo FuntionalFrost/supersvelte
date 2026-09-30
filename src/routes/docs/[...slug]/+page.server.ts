@@ -1,22 +1,8 @@
 // src/routes/docs/[...slug]/+page.server.ts
 import { docsRegistry, getDocBySlug } from '$lib/docs';
+import { highlightCode } from '$lib/server/shiki';
 import { error } from '@sveltejs/kit';
-import { createHighlighter } from 'shiki';
-import { createJavaScriptRegexEngine } from 'shiki/engine/javascript';
 import type { PageServerLoad } from './$types';
-
-let highlighterPromise: ReturnType<typeof createHighlighter> | null = null;
-
-async function getHighlighter() {
-	if (!highlighterPromise) {
-		highlighterPromise = createHighlighter({
-			engine: createJavaScriptRegexEngine(),
-			themes: ['github-dark'],
-			langs: ['typescript', 'javascript', 'bash', 'svelte', 'html', 'css', 'json']
-		});
-	}
-	return highlighterPromise;
-}
 
 export const load: PageServerLoad = async ({ params }) => {
 	const slug = params.slug;
@@ -26,21 +12,12 @@ export const load: PageServerLoad = async ({ params }) => {
 		throw error(404, `Documentation article "${slug}" not found`);
 	}
 
-	const highlighter = await getHighlighter();
-
-	// Pre-render syntax highlighted code server-side
+	// Pre-render syntax highlighted code server-side via Shiki
 	const highlightedSections = await Promise.all(
 		doc.sections.map(async (sec) => {
 			let highlightedCode = '';
 			if (sec.code) {
-				try {
-					highlightedCode = highlighter.codeToHtml(sec.code.code.trim(), {
-						lang: sec.code.lang,
-						theme: 'github-dark'
-					});
-				} catch {
-					highlightedCode = `<pre><code>${sec.code.code}</code></pre>`;
-				}
+				highlightedCode = await highlightCode(sec.code.code, sec.code.lang);
 			}
 			return {
 				...sec,

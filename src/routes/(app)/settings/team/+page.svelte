@@ -13,7 +13,7 @@
 		Users
 	} from '@lucide/svelte';
 	import { onMount } from 'svelte';
-	import { toast } from 'svelte-sonner';
+	import { toast } from 'yaxa-svelte';
 
 	const activeOrg = useActiveOrganization();
 

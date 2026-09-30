@@ -1,7 +1,7 @@
 <!-- src/routes/test/components/EmailTab.svelte -->
 <script lang="ts">
 	import { CheckCircle, Mail, RefreshCw, Send } from '@lucide/svelte';
-	import { toast } from 'svelte-sonner';
+	import { toast } from 'yaxa-svelte';
 
 	let recipient = $state('developer@example.com');
 	let name = $state('Alex Developer');

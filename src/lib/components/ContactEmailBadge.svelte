@@ -1,7 +1,7 @@
 <!-- src/lib/components/ContactEmailBadge.svelte -->
 <script lang="ts">
 	import { Check, Copy, Mail } from '@lucide/svelte';
-	import { toast } from 'svelte-sonner';
+	import { toast } from 'yaxa-svelte';
 	import { siteConfig } from '../../site.config';
 
 	interface Props {

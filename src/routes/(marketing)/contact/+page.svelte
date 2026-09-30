@@ -1,8 +1,7 @@
 <!-- src/routes/(marketing)/contact/+page.svelte -->
 <script lang="ts">
 	import { Check, Copy, HelpCircle, Mail, MessageSquare, Shield, Sparkles } from '@lucide/svelte';
-	import { Seo } from 'yaxa-svelte';
-	import { toast } from 'svelte-sonner';
+	import { Seo, toast } from 'yaxa-svelte';
 	import { siteConfig } from '../../../site.config';
 
 	let copied = $state(false);

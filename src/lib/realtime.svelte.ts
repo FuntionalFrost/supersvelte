@@ -1,5 +1,5 @@
 // src/lib/realtime.svelte.ts
-import { toast } from 'svelte-sonner';
+import { toast } from 'yaxa-svelte';
 
 export interface RealtimeEvent {
 	type: string;

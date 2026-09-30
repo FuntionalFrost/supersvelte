@@ -1,7 +1,7 @@
 <!-- src/lib/components/PolarCheckout.svelte -->
 <script lang="ts">
 	import { LoaderCircle, Rocket } from '@lucide/svelte';
-	import { toast } from 'svelte-sonner';
+	import { toast } from 'yaxa-svelte';
 
 	interface Props {
 		productId: string;

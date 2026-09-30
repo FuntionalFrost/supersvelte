@@ -1,7 +1,7 @@
 <!-- src/routes/(marketing)/welcome/+page.svelte -->
 <script lang="ts">
 	import { resolve } from '$app/paths';
-	import { MetaTags } from 'svelte-meta-tags';
+	import { Seo, toast } from 'yaxa-svelte';
 	import {
 		ArrowRight,
 		Check,
@@ -12,7 +12,6 @@
 		Mail,
 		ShieldCheck
 	} from '@lucide/svelte';
-	import { toast } from 'svelte-sonner';
 
 	let { data } = $props();
 
@@ -26,10 +25,11 @@
 	}
 </script>
 
-<MetaTags
+<Seo
 	title="Welcome to SuperSvelte!"
 	description="Getting started with your SuperSvelte license and GitHub repository access."
-	robots="noindex, nofollow"
+	noindex
+	nofollow
 />
 
 <div class="container mx-auto max-w-4xl space-y-8 px-4 py-12 md:py-16">
