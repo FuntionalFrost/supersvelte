@@ -7,11 +7,11 @@ import { userFixture } from '../fixtures/auth';
 
 const mockGetSession = vi.fn();
 
-vi.mock('$lib/server/ratelimit', () => ({
+vi.mock('#lib/server/ratelimit.js', () => ({
 	checkRateLimit: vi.fn().mockResolvedValue({ success: true, remaining: 99, reset: 0 })
 }));
 
-vi.mock('$lib/server/auth', () => ({
+vi.mock('#lib/server/auth/index.js', () => ({
 	auth: {
 		api: {
 			getSession: (...args: unknown[]) => mockGetSession(...args)

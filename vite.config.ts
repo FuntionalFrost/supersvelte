@@ -15,22 +15,10 @@ export default defineConfig(({ mode }) => ({
 				// Force runes mode for the project, except for libraries. Can be removed in svelte 6.
 				runes: true
 			},
-			adapter: isNode ? adapterNode() : adapterNetlify(),
-
-			typescript: {
-				config: (config) => {
-					config.include.push('../drizzle.config.ts');
-				}
-			}
+			adapter: isNode ? adapterNode() : adapterNetlify()
 		})
 	],
-	...(mode === 'test'
-		? {
-				resolve: {
-					conditions: ['browser']
-				}
-			}
-		: {}),
+	...(mode === 'test' ? { resolve: { conditions: ['browser'] } } : {}),
 	test: {
 		include: ['src/**/*.{test,spec}.{js,ts}', 'tests/**/*.{test,spec}.{js,ts}'],
 		environment: 'jsdom',

@@ -1,9 +1,17 @@
-import { dev } from '$app/environment';
+import { dev } from '$app/env';
 import { getRequestEvent } from '$app/server';
-import { env } from '$env/dynamic/private';
-import { db } from '$lib/server/db';
-import * as schema from '$lib/server/db/schema';
-import { sendEmail, sendWelcomeEmail } from '$lib/server/email';
+
+import {
+	ORIGIN,
+	BETTER_AUTH_URL,
+	BETTER_AUTH_SECRET,
+	GITHUB_CLIENT_ID,
+	GITHUB_CLIENT_SECRET
+} from '$app/env/private';
+
+import { db } from '#lib/server/db/index.js';
+import * as schema from '#lib/server/db/schema.js';
+import { sendEmail, sendWelcomeEmail } from '#lib/server/email.js';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { betterAuth } from 'better-auth';
 import { admin, organization } from 'better-auth/plugins';
@@ -12,16 +20,16 @@ import { sveltekitCookies } from 'better-auth/svelte-kit';
 export const auth = betterAuth({
 	baseURL: dev
 		? 'http://localhost:5173'
-		: env.ORIGIN || env.BETTER_AUTH_URL || 'https://supersvelte.netlify.app',
+		: ORIGIN || BETTER_AUTH_URL || 'https://supersvelte.netlify.app',
 	trustedOrigins: [
 		'http://localhost:5173',
 		'http://localhost:4173',
 		'http://127.0.0.1:5173',
 		'http://127.0.0.1:4173',
-		env.ORIGIN,
-		env.BETTER_AUTH_URL
+		ORIGIN,
+		BETTER_AUTH_URL
 	].filter(Boolean) as string[],
-	secret: env.BETTER_AUTH_SECRET,
+	secret: BETTER_AUTH_SECRET,
 	database: drizzleAdapter(db, { provider: 'pg', schema }),
 	advanced: {
 		useSecureCookies: !dev
@@ -29,9 +37,9 @@ export const auth = betterAuth({
 
 	socialProviders: {
 		github: {
-			clientId: env.GITHUB_CLIENT_ID || '',
-			clientSecret: env.GITHUB_CLIENT_SECRET || '',
-			enabled: Boolean(env.GITHUB_CLIENT_ID && env.GITHUB_CLIENT_SECRET)
+			clientId: GITHUB_CLIENT_ID || '',
+			clientSecret: GITHUB_CLIENT_SECRET || '',
+			enabled: Boolean(GITHUB_CLIENT_ID && GITHUB_CLIENT_SECRET)
 		}
 	},
 
@@ -85,13 +93,7 @@ export const auth = betterAuth({
 						const orgName = `${user.name || 'Personal'}'s Workspace`;
 						const slug = `workspace-${user.id.slice(0, 8)}`;
 
-						await auth.api.createOrganization({
-							body: {
-								name: orgName,
-								slug: slug,
-								userId: user.id
-							}
-						});
+						await auth.api.createOrganization({ body: { name: orgName, slug, userId: user.id } });
 					} catch (err) {
 						console.error('[Better Auth] Could not create default workspace for user:', err);
 					}

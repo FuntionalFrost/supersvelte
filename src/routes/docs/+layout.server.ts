@@ -1,5 +1,5 @@
 // src/routes/docs/+layout.server.ts
-import { getAllCategories } from '$lib/docs';
+import { getAllCategories } from '#lib/docs/index.js';
 import type { LayoutServerLoad } from './$types';
 
 export const load: LayoutServerLoad = () => {

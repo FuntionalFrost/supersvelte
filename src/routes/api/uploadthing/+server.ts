@@ -1,12 +1,12 @@
 // src/routes/api/uploadthing/+server.ts
-import { env } from '$env/dynamic/private';
-import { ourFileRouter } from '$lib/server/uploadthing';
+import { UPLOADTHING_TOKEN } from '$app/env/private';
+import { ourFileRouter } from '#lib/server/uploadthing.js';
 import { createRouteHandler } from 'uploadthing/server';
 
 const handlers = createRouteHandler({
 	router: ourFileRouter,
 	config: {
-		token: env.UPLOADTHING_TOKEN // Explicit manual token passing
+		token: UPLOADTHING_TOKEN // Explicit manual token passing
 	}
 });
 

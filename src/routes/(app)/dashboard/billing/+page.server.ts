@@ -1,14 +1,14 @@
 // src/routes/(app)/dashboard/billing/+page.server.ts
 import { resolve } from '$app/paths';
-import { db } from '$lib/server/db';
-import { purchases } from '$lib/server/db/schema';
+import { db } from '#lib/server/db/index.js';
+import { purchases } from '#lib/server/db/schema.js';
 import { redirect } from '@sveltejs/kit';
 import { and, desc, eq } from 'drizzle-orm';
 import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ locals }) => {
 	if (!locals.user) {
-		redirect(303, resolve('/login'));
+		redirect(303, resolve('login'));
 	}
 
 	const userPurchases = await db

@@ -1,4 +1,3 @@
-<!-- src/routes/+error.svelte -->
 <script lang="ts">
 	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
@@ -32,6 +31,8 @@
 					: message
 	);
 </script>
+
+<!-- src/routes/+error.svelte -->
 
 <Seo title="{status} — {title}" {description} noindex nofollow />
 
@@ -80,7 +81,7 @@
 			</Button>
 
 			<a
-				href={resolve('/dashboard')}
+				href={resolve('dashboard')}
 				class="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2 text-xs font-bold text-primary-foreground shadow-xs transition hover:bg-primary/90 sm:w-auto"
 			>
 				<LayoutDashboard class="size-3.5" />
@@ -88,7 +89,7 @@
 			</a>
 
 			<a
-				href={resolve('/')}
+				href="/"
 				class="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-border px-4 py-2 text-xs font-semibold text-muted-foreground transition hover:bg-muted hover:text-foreground sm:w-auto"
 			>
 				<Home class="size-3.5" />

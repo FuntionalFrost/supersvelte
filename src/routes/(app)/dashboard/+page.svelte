@@ -1,4 +1,3 @@
-<!-- src/routes/(app)/dashboard/+page.svelte -->
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { resolve } from '$app/paths';
@@ -8,6 +7,8 @@
 
 	let { data }: { data: PageData } = $props();
 </script>
+
+<!-- src/routes/(app)/dashboard/+page.svelte -->
 
 <div class="mx-auto max-w-5xl space-y-8 p-4 md:p-6">
 	<!-- Top Bar -->
@@ -44,7 +45,7 @@
 	<!-- Quick Action Navigation Grid -->
 	<div class="grid gap-4 sm:grid-cols-3">
 		<a
-			href={resolve('/dashboard/billing')}
+			href={resolve('dashboard/billing')}
 			class="group flex flex-col justify-between space-y-4 rounded-xl border border-border bg-card p-5 transition hover:border-primary/50 hover:bg-accent/30"
 		>
 			<div class="space-y-2">
@@ -63,7 +64,7 @@
 		</a>
 
 		<a
-			href={resolve('/settings/team')}
+			href={resolve('settings/team')}
 			class="group flex flex-col justify-between space-y-4 rounded-xl border border-border bg-card p-5 transition hover:border-primary/50 hover:bg-accent/30"
 		>
 			<div class="space-y-2">
@@ -82,7 +83,7 @@
 		</a>
 
 		<a
-			href={resolve('/test')}
+			href={resolve('test')}
 			class="group flex flex-col justify-between space-y-4 rounded-xl border border-border bg-card p-5 transition hover:border-primary/50 hover:bg-accent/30"
 		>
 			<div class="space-y-2">

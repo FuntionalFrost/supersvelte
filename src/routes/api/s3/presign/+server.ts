@@ -1,13 +1,11 @@
 // src/routes/api/s3/presign/+server.ts
-import { getPresignedUploadUrl, isS3Configured } from '$lib/server/s3';
-import { error, json, type RequestHandler } from '@sveltejs/kit';
+import { getPresignedUploadUrl, isS3Configured } from '#lib/server/s3.js';
+import { error, type RequestHandler } from '@sveltejs/kit';
 
 export const POST: RequestHandler = async ({ request }) => {
 	// Guard: check if S3/R2 is configured
 	if (!isS3Configured()) {
-		error(503, {
-			message: 'S3 / Cloudflare R2 is not configured in .env'
-		});
+		error(503, 'S3 / Cloudflare R2 is not configured in .env');
 	}
 
 	const body = await request.json().catch(() => ({}));
@@ -27,7 +25,7 @@ export const POST: RequestHandler = async ({ request }) => {
 			expiresIn: 300 // 5 minutes
 		});
 
-		return json({
+		return Response.json({
 			...presigned,
 			publicUrl: presigned.fileUrl,
 			url: presigned.fileUrl,
@@ -35,6 +33,6 @@ export const POST: RequestHandler = async ({ request }) => {
 		});
 	} catch (err: unknown) {
 		const message = err instanceof Error ? err.message : 'Failed to generate presigned upload URL';
-		error(500, { message });
+		error(500, message);
 	}
 };

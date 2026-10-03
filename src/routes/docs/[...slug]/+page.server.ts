@@ -1,6 +1,6 @@
 // src/routes/docs/[...slug]/+page.server.ts
-import { docsRegistry, getDocBySlug } from '$lib/docs';
-import { highlightCode } from '$lib/server/shiki';
+import { docsRegistry, getDocBySlug } from '#lib/docs/index.js';
+import { highlightCode } from '#lib/server/shiki.js';
 import { error } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 

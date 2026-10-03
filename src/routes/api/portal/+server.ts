@@ -1,7 +1,7 @@
 // src/routes/api/portal/+server.ts
-import { db } from '$lib/server/db';
-import { purchases } from '$lib/server/db/schema';
-import { polar } from '$lib/server/polar';
+import { db } from '#lib/server/db/index.js';
+import { purchases } from '#lib/server/db/schema.js';
+import { polar } from '#lib/server/polar.js';
 import { error, redirect, type RequestHandler } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
 

@@ -238,7 +238,7 @@ pnpm db:migrate  # Run migration bundle in production`
 				code: {
 					lang: 'typescript',
 					filename: 'src/routes/dashboard/+page.svelte',
-					code: `import { client } from '$lib/api-client';
+					code: `import { client } from '#lib/api-client.js';
 
 // Fully typed call with autocompletion and compile-time error checking:
 const res = await client.api.projects.$get();

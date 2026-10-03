@@ -1,11 +1,20 @@
 // src/routes/test/+page.server.ts
-import { dev } from '$app/environment';
-import { env } from '$env/dynamic/private';
-import { auth } from '$lib/server/auth';
-import { db } from '$lib/server/db';
-import { insertProjectSchema, projects, user } from '$lib/server/db/schema';
-import { sendEmail } from '$lib/server/email';
-import { setCookiesFromResponse } from '$lib/server/utils';
+import { dev } from '$app/env';
+
+import {
+	DATABASE_URL,
+	POLAR_WEBHOOK_SECRET,
+	POLAR_ACCESS_TOKEN,
+	QSTASH_TOKEN,
+	RESEND_API_KEY,
+	GITHUB_ADMIN_TOKEN
+} from '$app/env/private';
+
+import { auth } from '#lib/server/auth/index.js';
+import { db } from '#lib/server/db/index.js';
+import { insertProjectSchema, projects, user } from '#lib/server/db/schema.js';
+import { sendEmail } from '#lib/server/email.js';
+import { setCookiesFromResponse } from '#lib/server/utils.js';
 import { error, fail, redirect } from '@sveltejs/kit';
 import { and, eq } from 'drizzle-orm';
 import { superValidate } from 'sveltekit-superforms';
@@ -39,12 +48,12 @@ export const load: PageServerLoad = async ({ locals }) => {
 		user: locals.user ?? null,
 		session: locals.session ?? null,
 		systemStatus: {
-			database: !!env.DATABASE_URL,
-			polarSecret: !!env.POLAR_WEBHOOK_SECRET,
-			polarToken: !!env.POLAR_ACCESS_TOKEN,
-			qstashToken: !!env.QSTASH_TOKEN,
-			resendKey: !!env.RESEND_API_KEY,
-			githubToken: !!env.GITHUB_ADMIN_TOKEN
+			database: !!DATABASE_URL,
+			polarSecret: !!POLAR_WEBHOOK_SECRET,
+			polarToken: !!POLAR_ACCESS_TOKEN,
+			qstashToken: !!QSTASH_TOKEN,
+			resendKey: !!RESEND_API_KEY,
+			githubToken: !!GITHUB_ADMIN_TOKEN
 		}
 	};
 };

@@ -1,6 +1,6 @@
 <!-- src/routes/(marketing)/vs/+page.svelte -->
 <script lang="ts">
-	import SuperSvelteVsOthers from '$lib/components/SuperSvelteVsOthers.svelte';
+	import SuperSvelteVsOthers from '#lib/components/SuperSvelteVsOthers.svelte';
 	import { Seo } from 'yaxa-svelte';
 </script>
 

@@ -4,7 +4,7 @@
 		competitorExamples,
 		superSvelteExample,
 		type CompetitorKey
-	} from '$lib/config/code-comparisons';
+	} from '#lib/config/code-comparisons.js';
 	import { Check, CodeXml, Copy, FileCode, Layers, ShieldCheck, Zap } from '@lucide/svelte';
 
 	interface Props {

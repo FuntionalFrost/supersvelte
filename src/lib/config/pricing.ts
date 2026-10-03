@@ -1,5 +1,5 @@
 // src/lib/config/pricing.ts
-import { PUBLIC_POLAR_PRO_PRODUCT_ID, PUBLIC_POLAR_STANDARD_PRODUCT_ID } from '$env/static/public';
+import { PUBLIC_POLAR_PRO_PRODUCT_ID, PUBLIC_POLAR_STANDARD_PRODUCT_ID } from '$app/env/public';
 
 export const pricingPlans = [
 	{

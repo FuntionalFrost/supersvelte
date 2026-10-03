@@ -1,7 +1,7 @@
 // src/routes/api/v1/verify-license/+server.ts
-import { db } from '$lib/server/db';
-import { purchases } from '$lib/server/db/schema';
-import { json, type RequestHandler } from '@sveltejs/kit';
+import { db } from '#lib/server/db/index.js';
+import { purchases } from '#lib/server/db/schema.js';
+import type { RequestHandler } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
 
 export const POST: RequestHandler = async ({ request }) => {
@@ -10,7 +10,7 @@ export const POST: RequestHandler = async ({ request }) => {
 		const licenseKey = body.licenseKey || body.key || request.headers.get('x-license-key');
 
 		if (!licenseKey || typeof licenseKey !== 'string') {
-			return json(
+			return Response.json(
 				{ valid: false, error: 'Missing licenseKey in request body or X-License-Key header' },
 				{ status: 400 }
 			);
@@ -24,7 +24,7 @@ export const POST: RequestHandler = async ({ request }) => {
 			.limit(1);
 
 		if (!foundPurchase || foundPurchase.status !== 'active') {
-			return json(
+			return Response.json(
 				{
 					valid: false,
 					licenseKey: licenseKey.trim(),
@@ -34,7 +34,7 @@ export const POST: RequestHandler = async ({ request }) => {
 			);
 		}
 
-		return json(
+		return Response.json(
 			{
 				valid: true,
 				licenseKey: foundPurchase.licenseKey,
@@ -47,6 +47,6 @@ export const POST: RequestHandler = async ({ request }) => {
 		);
 	} catch (err) {
 		console.error('License verification failed:', err);
-		return json({ valid: false, error: 'Internal server error' }, { status: 500 });
+		return Response.json({ valid: false, error: 'Internal server error' }, { status: 500 });
 	}
 };

@@ -1,7 +1,7 @@
 // src/routes/api/download/+server.ts
-import { env } from '$env/dynamic/private';
-import { db } from '$lib/server/db';
-import { purchases } from '$lib/server/db/schema';
+import { SOURCE_CODE_ZIP_URL } from '$app/env/private';
+import { db } from '#lib/server/db/index.js';
+import { purchases } from '#lib/server/db/schema.js';
 import { error, type RequestHandler } from '@sveltejs/kit';
 import { and, eq } from 'drizzle-orm';
 import fs from 'node:fs';
@@ -30,7 +30,7 @@ export const GET: RequestHandler = async ({ locals }) => {
 
 	if (!fs.existsSync(zipPath)) {
 		// Fallback: If local file storage isn't populated, redirect to secure S3/UploadThing URL
-		const signedCloudUrl = env.SOURCE_CODE_ZIP_URL;
+		const signedCloudUrl = SOURCE_CODE_ZIP_URL;
 		if (signedCloudUrl) {
 			return Response.redirect(signedCloudUrl, 302);
 		}

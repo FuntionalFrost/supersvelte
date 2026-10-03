@@ -1,6 +1,6 @@
 // src/routes/(marketing)/welcome/+page.server.ts
-import { db } from '$lib/server/db';
-import { purchases } from '$lib/server/db/schema';
+import { db } from '#lib/server/db/index.js';
+import { purchases } from '#lib/server/db/schema.js';
 import { eq } from 'drizzle-orm';
 
 export const load = async ({ locals }) => {

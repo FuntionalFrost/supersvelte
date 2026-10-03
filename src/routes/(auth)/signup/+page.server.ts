@@ -1,7 +1,7 @@
 // src/routes/(auth)/signup/+page.server.ts
 import { resolve } from '$app/paths';
-import { auth } from '$lib/server/auth';
-import { setCookiesFromResponse } from '$lib/server/utils';
+import { auth } from '#lib/server/auth/index.js';
+import { setCookiesFromResponse } from '#lib/server/utils.js';
 import { fail, redirect } from '@sveltejs/kit';
 import { setMessage, superValidate } from 'sveltekit-superforms';
 import { zod4 } from 'sveltekit-superforms/adapters';
@@ -16,7 +16,7 @@ const signupSchema = z.object({
 
 export const load: PageServerLoad = async ({ locals }) => {
 	if (locals.user || locals.session) {
-		redirect(303, resolve('/dashboard'));
+		redirect(303, resolve('dashboard'));
 	}
 
 	const form = await superValidate(zod4(signupSchema));
@@ -56,6 +56,6 @@ export const actions: Actions = {
 			'/dashboard';
 		const safeTarget = target.startsWith('/') && !target.startsWith('//') ? target : '/dashboard';
 
-		redirect(303, resolve(safeTarget as '/dashboard'));
+		redirect(303, safeTarget);
 	}
 };

@@ -1,4 +1,3 @@
-<!-- src/routes/test/+page.svelte -->
 <script lang="ts">
 	import { resolve } from '$app/paths';
 	import {
@@ -37,6 +36,8 @@
 	let dbTabRef: { fetchProjects: () => Promise<void> } | undefined = $state();
 </script>
 
+<!-- src/routes/test/+page.svelte -->
+
 <div
 	class="min-h-screen bg-background text-foreground selection:bg-primary selection:text-primary-foreground"
 >
@@ -45,7 +46,7 @@
 		<div class="container mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
 			<div class="flex items-center gap-3">
 				<a
-					href={resolve('/')}
+					href="/"
 					class="inline-flex items-center justify-center rounded-lg border border-border bg-background p-2 text-muted-foreground transition hover:text-foreground"
 				>
 					<ArrowLeft class="size-4" />
@@ -64,13 +65,13 @@
 			</div>
 			<div class="flex items-center gap-2">
 				<a
-					href={resolve('/admin')}
+					href={resolve('admin')}
 					class="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-3.5 py-2 text-xs font-semibold hover:bg-accent"
 				>
 					<span>Admin CRUD</span>
 				</a>
 				<a
-					href={resolve('/dashboard')}
+					href={resolve('dashboard')}
 					class="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground shadow-xs transition hover:bg-primary/90"
 				>
 					<span>Dashboard</span>

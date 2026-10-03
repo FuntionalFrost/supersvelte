@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
-	import { authClient } from '$lib/auth-client';
+	import { authClient } from '#lib/auth-client.js';
 	import { CircleAlert, CircleCheck, Lock, ShieldCheck } from '@lucide/svelte';
 	import { onMount } from 'svelte';
 
@@ -81,7 +81,7 @@
 				</div>
 			</div>
 			<a
-				href={resolve('/dashboard')}
+				href={resolve('dashboard')}
 				class="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-primary py-2.5 text-xs font-semibold text-primary-foreground shadow-xs hover:bg-primary/90"
 			>
 				<span>Enter Protected App Area</span>
@@ -93,7 +93,7 @@
 				No active authentication session detected. Sign in to test protected queries.
 			</p>
 			<a
-				href={resolve('/login')}
+				href={resolve('login')}
 				class="inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-6 py-2.5 text-xs font-semibold text-primary-foreground shadow-xs hover:bg-primary/90"
 			>
 				<Lock class="size-3.5" />

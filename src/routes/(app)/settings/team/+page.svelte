@@ -1,6 +1,6 @@
 <!-- src/routes/(app)/settings/team/+page.svelte -->
 <script lang="ts">
-	import { authClient, useActiveOrganization } from '$lib/auth-client';
+	import { authClient, useActiveOrganization } from '#lib/auth-client.js';
 	import {
 		Building2,
 		Check,

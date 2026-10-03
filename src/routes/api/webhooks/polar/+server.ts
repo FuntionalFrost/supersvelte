@@ -1,11 +1,11 @@
 // src/routes/api/webhooks/polar/+server.ts
-import { env } from '$env/dynamic/private';
-import { db } from '$lib/server/db';
-import { customers, generateLicenseKey, purchases, user } from '$lib/server/db/schema';
-import { sendEmail } from '$lib/server/email';
-import { dispatchEvent } from '$lib/server/queue';
+import { POLAR_WEBHOOK_SECRET, ORIGIN } from '$app/env/private';
+import { db } from '#lib/server/db/index.js';
+import { customers, generateLicenseKey, purchases, user } from '#lib/server/db/schema.js';
+import { sendEmail } from '#lib/server/email.js';
+import { dispatchEvent } from '#lib/server/queue/index.js';
 import { validateEvent } from '@polar-sh/sdk/webhooks';
-import { json, type RequestHandler } from '@sveltejs/kit';
+import type { RequestHandler } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
 
 interface OrderData {
@@ -32,7 +32,7 @@ interface SubscriptionData {
 
 export const POST: RequestHandler = async ({ request }) => {
 	const rawBody = await request.text();
-	const webhookSecret = env.POLAR_WEBHOOK_SECRET;
+	const webhookSecret = POLAR_WEBHOOK_SECRET;
 
 	const headers: Record<string, string> = {
 		'webhook-id': request.headers.get('webhook-id') ?? '',
@@ -45,7 +45,7 @@ export const POST: RequestHandler = async ({ request }) => {
 		event = validateEvent(rawBody, headers, webhookSecret);
 	} catch (err) {
 		console.error('Polar Webhook Signature Verification Failed:', err);
-		return json({ error: 'Invalid signature' }, { status: 400 });
+		return Response.json({ error: 'Invalid signature' }, { status: 400 });
 	}
 
 	// Handle lifecycle events
@@ -141,7 +141,7 @@ export const POST: RequestHandler = async ({ request }) => {
 								<strong>Transaction ID:</strong> ${order.id}
 							</div>
 							<p>You can access your downloads, manage billing, and invite team members on your dashboard:</p>
-							<a href="${env.ORIGIN || 'https://supersvelte.netlify.app'}/dashboard/billing" style="display: inline-block; background: #000; color: #fff; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: 600;">Open Billing Dashboard</a>
+							<a href="${ORIGIN || 'https://supersvelte.netlify.app'}/dashboard/billing" style="display: inline-block; background: #000; color: #fff; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: 600;">Open Billing Dashboard</a>
 						</div>
 					`
 				});
@@ -181,5 +181,5 @@ export const POST: RequestHandler = async ({ request }) => {
 			break;
 	}
 
-	return json({ received: true });
+	return Response.json({ received: true });
 };

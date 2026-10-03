@@ -1,8 +1,8 @@
-import { auth } from '$lib/server/auth';
-import { db } from '$lib/server/db';
-import { getProjects, invalidateProjectsCache } from '$lib/server/db/queries';
-import { projects } from '$lib/server/db/schema';
-import { checkRateLimit } from '$lib/server/ratelimit';
+import { auth } from '#lib/server/auth/index.js';
+import { db } from '#lib/server/db/index.js';
+import { getProjects, invalidateProjectsCache } from '#lib/server/db/queries.js';
+import { projects } from '#lib/server/db/schema.js';
+import { checkRateLimit } from '#lib/server/ratelimit.js';
 import { swaggerUI } from '@hono/swagger-ui';
 import { createRoute, OpenAPIHono, z } from '@hono/zod-openapi';
 import { and, eq } from 'drizzle-orm';

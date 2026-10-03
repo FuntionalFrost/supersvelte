@@ -1,6 +1,6 @@
 // src/routes/(marketing)/+page.server.ts
-import { competitorExamples, superSvelteExample } from '$lib/config/code-comparisons';
-import { highlightCode } from '$lib/server/shiki';
+import { competitorExamples, superSvelteExample } from '#lib/config/code-comparisons.js';
+import { highlightCode } from '#lib/server/shiki.js';
 import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async () => {

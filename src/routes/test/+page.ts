@@ -1,5 +1,5 @@
 // src/routes/test/+page.ts
-import { createApiClient } from '$lib/api-client';
+import { createApiClient } from '#lib/api-client.js';
 import type { PageLoad } from './$types';
 
 export const load: PageLoad = async ({ fetch, url, data }) => {

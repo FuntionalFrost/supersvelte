@@ -1,5 +1,19 @@
 // src/lib/server/s3.ts
-import { env } from '$env/dynamic/private';
+import {
+	S3_BUCKET,
+	R2_BUCKET,
+	S3_REGION,
+	R2_REGION,
+	S3_ENDPOINT,
+	R2_ENDPOINT,
+	S3_ACCESS_KEY_ID,
+	R2_ACCESS_KEY_ID,
+	S3_SECRET_ACCESS_KEY,
+	R2_SECRET_ACCESS_KEY,
+	S3_PUBLIC_DOMAIN,
+	R2_PUBLIC_DOMAIN
+} from '$app/env/private';
+
 import {
 	DeleteObjectCommand,
 	GetObjectCommand,
@@ -8,12 +22,12 @@ import {
 } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 
-const bucket = env.S3_BUCKET || env.R2_BUCKET || '';
-const region = env.S3_REGION || env.R2_REGION || 'auto';
-const endpoint = env.S3_ENDPOINT || env.R2_ENDPOINT || undefined;
-const accessKeyId = env.S3_ACCESS_KEY_ID || env.R2_ACCESS_KEY_ID || '';
-const secretAccessKey = env.S3_SECRET_ACCESS_KEY || env.R2_SECRET_ACCESS_KEY || '';
-const publicDomain = env.S3_PUBLIC_DOMAIN || env.R2_PUBLIC_DOMAIN || '';
+const bucket = S3_BUCKET || R2_BUCKET || '';
+const region = S3_REGION || R2_REGION || 'auto';
+const endpoint = S3_ENDPOINT || R2_ENDPOINT || undefined;
+const accessKeyId = S3_ACCESS_KEY_ID || R2_ACCESS_KEY_ID || '';
+const secretAccessKey = S3_SECRET_ACCESS_KEY || R2_SECRET_ACCESS_KEY || '';
+const publicDomain = S3_PUBLIC_DOMAIN || R2_PUBLIC_DOMAIN || '';
 
 export function isS3Configured(): boolean {
 	return Boolean(bucket && accessKeyId && secretAccessKey);

@@ -1,13 +1,9 @@
-<!-- src/routes/(marketing)/+page.svelte -->
 <script lang="ts">
-	import {
-		PUBLIC_POLAR_PRO_PRODUCT_ID,
-		PUBLIC_POLAR_STANDARD_PRODUCT_ID
-	} from '$env/static/public';
-	import CodeComparison from '$lib/components/CodeComparison.svelte';
-	import PolarCheckout from '$lib/components/PolarCheckout.svelte';
-	import SuperSvelteVsOthers from '$lib/components/SuperSvelteVsOthers.svelte';
-	import { matrices, type Mode } from '$lib/config/comparison';
+	import { PUBLIC_POLAR_PRO_PRODUCT_ID, PUBLIC_POLAR_STANDARD_PRODUCT_ID } from '$app/env/public';
+	import CodeComparison from '#lib/components/CodeComparison.svelte';
+	import PolarCheckout from '#lib/components/PolarCheckout.svelte';
+	import SuperSvelteVsOthers from '#lib/components/SuperSvelteVsOthers.svelte';
+	import { matrices, type Mode } from '#lib/config/comparison.js';
 	import {
 		Check,
 		CircleQuestionMark,
@@ -33,6 +29,8 @@
 		return String(row[key] ?? '');
 	}
 </script>
+
+<!-- src/routes/(marketing)/+page.svelte -->
 
 <Seo
 	title="SuperSvelte — Ship Svelte 5 SaaS Apps at Light Speed"
@@ -299,6 +297,7 @@
 							<span class="text-4xl font-extrabold">€99</span>
 							<span class="text-sm text-muted-foreground">/ one-time</span>
 						</div>
+
 						<p class="mt-2 text-sm text-muted-foreground">
 							Perfect for solopreneurs launching a single product.
 						</p>
@@ -359,6 +358,7 @@
 							<span class="text-4xl font-extrabold">€199</span>
 							<span class="text-sm text-muted-foreground">/ one-time</span>
 						</div>
+
 						<p class="mt-2 text-sm text-muted-foreground">
 							For agencies, serial founders, and team workflows.
 						</p>

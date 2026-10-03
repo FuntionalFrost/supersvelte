@@ -1,4 +1,4 @@
-import { auth } from '$lib/server/auth';
+import { auth } from '#lib/server/auth/index.js';
 import { error, redirect } from '@sveltejs/kit';
 
 export const load = async ({ request }: { request: Request }) => {

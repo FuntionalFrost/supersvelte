@@ -1,9 +1,8 @@
-<!-- src/routes/(marketing)/+layout.svelte -->
 <script lang="ts">
 	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
-	import Logo from '$lib/components/Logo.svelte';
-	import ThemeToggle from '$lib/components/ThemeToggle.svelte';
+	import Logo from '#lib/components/Logo.svelte';
+	import ThemeToggle from '#lib/components/ThemeToggle.svelte';
 	import { ExternalLink, LayoutDashboard, Menu, Rocket, Sparkles, X } from '@lucide/svelte';
 	import type { Snippet } from 'svelte';
 	import { siteConfig } from '../../site.config';
@@ -12,6 +11,8 @@
 	const user = $derived(page.data.user);
 	let mobileOpen = $state(false);
 </script>
+
+<!-- src/routes/(marketing)/+layout.svelte -->
 
 <div
 	class="flex min-h-screen flex-col bg-background text-foreground selection:bg-primary selection:text-primary-foreground"
@@ -37,7 +38,7 @@
 				</button>
 
 				<!-- Brand Logo & Text -->
-				<a href={resolve('/')} class="flex items-center gap-3 transition hover:opacity-90">
+				<a href="/" class="flex items-center gap-3 transition hover:opacity-90">
 					<Logo size="md" showText />
 				</a>
 			</div>
@@ -56,7 +57,7 @@
 				<ThemeToggle />
 				{#if user}
 					<a
-						href={resolve('/dashboard')}
+						href={resolve('dashboard')}
 						class="inline-flex items-center gap-2 rounded-full bg-foreground px-5 py-2 text-xs font-bold text-background shadow-xs transition hover:bg-foreground/90 sm:text-sm"
 					>
 						<LayoutDashboard class="size-4" />
@@ -64,7 +65,7 @@
 					</a>
 				{:else}
 					<a
-						href={resolve('/login')}
+						href={resolve('login')}
 						class="hidden text-sm font-semibold text-muted-foreground transition hover:text-foreground sm:inline-block"
 					>
 						Sign In
@@ -103,7 +104,7 @@
 					{#if !user}
 						<div class="border-t border-border/40 pt-3">
 							<a
-								href={resolve('/login')}
+								href={resolve('login')}
 								onclick={() => (mobileOpen = false)}
 								class="block rounded-lg px-3 py-2 text-base font-semibold text-muted-foreground hover:bg-muted hover:text-foreground"
 							>
@@ -128,7 +129,7 @@
 				<!-- Brand & Mission Description -->
 				<div class="space-y-3 md:col-span-2 lg:col-span-2">
 					<div class="flex items-center gap-3">
-						<a href={resolve('/')} class="inline-flex items-center gap-2.5">
+						<a href="/" class="inline-flex items-center gap-2.5">
 							<Logo size="sm" showText />
 						</a>
 						<span
@@ -170,23 +171,23 @@
 					</h3>
 					<ul class="mt-4 space-y-2.5 text-xs">
 						<li>
-							<a href={resolve('/privacy')} class="transition hover:text-foreground">
-								Privacy Policy
-							</a>
+							<a href={resolve('privacy')} class="transition hover:text-foreground"
+								>Privacy Policy</a
+							>
 						</li>
 						<li>
-							<a href={resolve('/terms')} class="transition hover:text-foreground">
-								Terms of Service
-							</a>
+							<a href={resolve('terms')} class="transition hover:text-foreground"
+								>Terms of Service</a
+							>
 						</li>
 						<li>
-							<a href={resolve('/refunds')} class="transition hover:text-foreground">
-								Cancellation & Refunds
-							</a>
+							<a href={resolve('refunds')} class="transition hover:text-foreground"
+								>Cancellation & Refunds</a
+							>
 						</li>
 						<li>
 							<a
-								href={resolve('/contact')}
+								href={resolve('contact')}
 								class="font-medium text-foreground transition hover:text-foreground"
 							>
 								Contact & Support
@@ -211,9 +212,9 @@
 							</a>
 						</li>
 						<li>
-							<a href={resolve('/test')} class="transition hover:text-foreground">
-								Developer Sandbox (/test)
-							</a>
+							<a href={resolve('test')} class="transition hover:text-foreground"
+								>Developer Sandbox (/test)</a
+							>
 						</li>
 						<li>
 							<a

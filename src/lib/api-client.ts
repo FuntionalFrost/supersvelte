@@ -1,5 +1,5 @@
 // src/lib/api-client.ts
-import type { AppType } from '$lib/server/api';
+import type { AppType } from '#lib/server/api/index.js';
 import { hc } from 'hono/client';
 
 /**

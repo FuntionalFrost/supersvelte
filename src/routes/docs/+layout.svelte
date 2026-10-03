@@ -1,9 +1,8 @@
-<!-- src/routes/docs/+layout.svelte -->
 <script lang="ts">
 	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
-	import Logo from '$lib/components/Logo.svelte';
-	import ThemeToggle from '$lib/components/ThemeToggle.svelte';
+	import Logo from '#lib/components/Logo.svelte';
+	import ThemeToggle from '#lib/components/ThemeToggle.svelte';
 	import { BookOpen, ExternalLink, Menu, Search, X } from '@lucide/svelte';
 	import type { Snippet } from 'svelte';
 	import type { LayoutData } from './$types';
@@ -38,6 +37,8 @@
 	});
 </script>
 
+<!-- src/routes/docs/+layout.svelte -->
+
 <div class="flex min-h-screen flex-col bg-background text-foreground">
 	<!-- Top Documentation Header -->
 	<header
@@ -59,7 +60,7 @@
 				</button>
 
 				<!-- Brand Logo -->
-				<a href={resolve('/')} class="flex items-center gap-2.5 transition hover:opacity-90">
+				<a href="/" class="flex items-center gap-2.5 transition hover:opacity-90">
 					<Logo size="sm" showText />
 					<span
 						class="rounded-md border border-teal-500/20 bg-teal-500/10 px-1.5 py-0.5 font-mono text-[10px] font-bold text-teal-400"
@@ -86,7 +87,7 @@
 			<div class="flex items-center gap-3">
 				<ThemeToggle />
 				<a
-					href={resolve('/dashboard')}
+					href={resolve('dashboard')}
 					class="hidden text-xs font-semibold text-muted-foreground transition hover:text-foreground sm:inline-block"
 				>
 					Dashboard

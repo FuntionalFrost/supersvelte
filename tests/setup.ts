@@ -26,6 +26,7 @@ vi.mock('$app/navigation', () => ({
 	goto: vi.fn(),
 	invalidate: vi.fn(),
 	invalidateAll: vi.fn(),
+	refreshAll: vi.fn(),
 	preloadCode: vi.fn(),
 	preloadData: vi.fn(),
 	pushState: vi.fn(),
@@ -33,7 +34,24 @@ vi.mock('$app/navigation', () => ({
 }));
 
 vi.mock('$app/paths', () => ({
-	base: '',
-	assets: '',
+	asset: (path: string) => path,
 	resolve: (path: string) => path
+}));
+
+vi.mock('$app/server', () => ({
+	getRequestEvent: vi.fn()
+}));
+
+vi.mock('$app/env', () => ({
+	browser: true,
+	dev: true,
+	building: false,
+	version: '3.0.0'
+}));
+
+vi.mock('$app/environment', () => ({
+	browser: true,
+	dev: true,
+	building: false,
+	version: '3.0.0'
 }));

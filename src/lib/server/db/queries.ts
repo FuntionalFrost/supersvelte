@@ -1,7 +1,7 @@
 // src/lib/server/db/queries.ts
-import { db } from '$lib/server/db';
-import { files, projects } from '$lib/server/db/schema';
-import { redis } from '$lib/server/ratelimit';
+import { db } from '#lib/server/db/index.js';
+import { files, projects } from '#lib/server/db/schema.js';
+import { redis } from '#lib/server/ratelimit.js';
 import { desc, eq } from 'drizzle-orm';
 
 /**

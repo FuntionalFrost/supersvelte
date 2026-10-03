@@ -1,7 +1,7 @@
-import { env } from '$env/dynamic/private';
-import { db } from '$lib/server/db';
-import { purchases } from '$lib/server/db/schema';
-import type { HonoEnv } from '$lib/server/api';
+import { PUBLIC_POLAR_PRO_PRODUCT_ID } from '$app/env/public';
+import { db } from '#lib/server/db/index.js';
+import { purchases } from '#lib/server/db/schema.js';
+import type { HonoEnv } from '#lib/server/api/index.js';
 import { and, eq } from 'drizzle-orm';
 import type { MiddlewareHandler } from 'hono';
 
@@ -25,7 +25,7 @@ export function requirePlan(requiredPlan: PlanTier): MiddlewareHandler<HonoEnv> 
 			.from(purchases)
 			.where(and(eq(purchases.userId, user.id), eq(purchases.status, 'active')));
 
-		const proProductId = env.PUBLIC_POLAR_PRO_PRODUCT_ID;
+		const proProductId = PUBLIC_POLAR_PRO_PRODUCT_ID;
 		const hasPro = userPurchases.some(
 			(p) =>
 				(proProductId && p.productId === proProductId) ||

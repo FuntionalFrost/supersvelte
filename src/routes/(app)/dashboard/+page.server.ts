@@ -1,16 +1,16 @@
 // src/routes/(app)/dashboard/+page.server.ts
 import { resolve } from '$app/paths';
-import { auth } from '$lib/server/auth';
-import { db } from '$lib/server/db';
-import { projects } from '$lib/server/db/schema';
-import { setCookiesFromResponse } from '$lib/server/utils';
+import { auth } from '#lib/server/auth/index.js';
+import { db } from '#lib/server/db/index.js';
+import { projects } from '#lib/server/db/schema.js';
+import { setCookiesFromResponse } from '#lib/server/utils.js';
 import { redirect } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
 import type { Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ locals, request }) => {
 	if (!locals.user || !locals.session) {
-		redirect(303, resolve('/login'));
+		redirect(303, resolve('login'));
 	}
 
 	const activeOrgId = locals.session.activeOrganizationId;
@@ -55,6 +55,6 @@ export const actions: Actions = {
 		});
 
 		setCookiesFromResponse(event, response);
-		redirect(303, resolve('/login'));
+		redirect(303, resolve('login'));
 	}
 };

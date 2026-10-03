@@ -1,8 +1,8 @@
 // src/lib/server/uploadthing.ts
-import { auth } from '$lib/server/auth';
-import { db } from '$lib/server/db';
-import { files } from '$lib/server/db/schema';
-import { redis } from '$lib/server/ratelimit';
+import { auth } from '#lib/server/auth/index.js';
+import { db } from '#lib/server/db/index.js';
+import { files } from '#lib/server/db/schema.js';
+import { redis } from '#lib/server/ratelimit.js';
 import { createUploadthing, type FileRouter } from 'uploadthing/server';
 
 const f = createUploadthing();

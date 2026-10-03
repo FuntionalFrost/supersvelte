@@ -1,6 +1,5 @@
-<!-- src/routes/+layout.svelte -->
 <script lang="ts">
-	import { browser } from '$app/environment';
+	import { browser } from '$app/env';
 	import { onNavigate } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import type { Snippet } from 'svelte';
@@ -28,7 +27,7 @@
 			id: 'dashboard',
 			label: 'Dashboard',
 			description: 'Overview & metrics',
-			href: resolve('/dashboard'),
+			href: resolve('dashboard'),
 			group: 'Navigation',
 			icon: 'home' as const,
 			shortcut: 'D'
@@ -37,7 +36,7 @@
 			id: 'billing',
 			label: 'Billing & Plan',
 			description: 'Manage subscriptions & Polar licenses',
-			href: resolve('/dashboard/billing'),
+			href: resolve('dashboard/billing'),
 			group: 'Navigation',
 			icon: 'credit-card' as const,
 			shortcut: 'B'
@@ -46,7 +45,7 @@
 			id: 'team',
 			label: 'Team & Workspaces',
 			description: 'Manage workspace members',
-			href: resolve('/settings/team'),
+			href: resolve('settings/team'),
 			group: 'Navigation',
 			icon: 'users' as const
 		},
@@ -54,7 +53,7 @@
 			id: 'admin',
 			label: 'Admin Console',
 			description: 'Auto-introspecting Drizzle CRUD',
-			href: resolve('/admin'),
+			href: resolve('admin'),
 			group: 'Administration',
 			icon: 'shield' as const,
 			shortcut: 'A'
@@ -63,7 +62,7 @@
 			id: 'diagnostics',
 			label: 'Diagnostics & Sandbox',
 			description: 'Test S3, Email, Auth, Rate limits',
-			href: resolve('/test'),
+			href: resolve('test'),
 			group: 'Developer',
 			icon: 'sparkles' as const,
 			shortcut: 'T'
@@ -72,7 +71,7 @@
 			id: 'docs',
 			label: 'Documentation',
 			description: 'Read SuperSvelte architecture guides',
-			href: resolve('/docs'),
+			href: resolve('docs'),
 			group: 'Developer',
 			icon: 'document' as const
 		},
@@ -80,7 +79,7 @@
 			id: 'contact',
 			label: 'Contact & Support',
 			description: 'Maintainer email & help inquiries',
-			href: resolve('/contact'),
+			href: resolve('contact'),
 			group: 'Help',
 			icon: 'mail' as const
 		},
@@ -96,6 +95,7 @@
 
 	// Smooth page navigation with native View Transitions API
 	onNavigate((navigation) => {
+		if (navigation.shallow) return;
 		if (!document.startViewTransition) return;
 		return new Promise((resolve) => {
 			document.startViewTransition(async () => {
@@ -105,6 +105,8 @@
 		});
 	});
 </script>
+
+<!-- src/routes/+layout.svelte -->
 
 <YaxaApp config={siteConfig} user={data.user}>
 	<!-- Global Command Palette (Cmd+K / Ctrl+K) -->

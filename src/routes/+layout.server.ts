@@ -1,6 +1,6 @@
 // src/routes/+layout.server.ts
-import { db } from '$lib/server/db';
-import { purchases as purchasesTable } from '$lib/server/db/schema';
+import { db } from '#lib/server/db/index.js';
+import { purchases as purchasesTable } from '#lib/server/db/schema.js';
 import { and, eq } from 'drizzle-orm';
 import type { LayoutServerLoad } from './$types';
 

@@ -1,12 +1,11 @@
 // src/hooks.server.ts
-import { building } from '$app/environment';
-import { auth } from '$lib/server/auth';
-import { checkRateLimit } from '$lib/server/ratelimit';
-import type { Handle } from '@sveltejs/kit';
+import { building } from '$app/env';
+import { docsRegistry } from '#lib/docs/index.js';
+import { auth } from '#lib/server/auth/index.js';
+import { checkRateLimit } from '#lib/server/ratelimit.js';
 import { error, redirect } from '@sveltejs/kit';
-import { sequence } from '@sveltejs/kit/hooks';
+import { sequence, type Handle, type HandleServerError } from '@sveltejs/kit/hooks';
 import { svelteKitHandler } from 'better-auth/svelte-kit';
-import { docsRegistry } from '$lib/docs';
 import { createYaxaHook } from 'yaxa-svelte/server';
 import { siteConfig } from './site.config';
 
@@ -108,7 +107,7 @@ const appHandle: Handle = async ({ event, resolve }) => {
 export { yaxaHook, appHandle };
 export const handle = sequence(yaxaHook, appHandle);
 
-export const handleError: import('@sveltejs/kit').HandleServerError = ({ error, event }) => {
+export const handleError: HandleServerError = ({ error, event }) => {
 	console.error('[Server Error]', event.url.pathname, error);
 	// Never expose raw error internals to the client
 	return { message: 'An unexpected error occurred. Please try again.' };

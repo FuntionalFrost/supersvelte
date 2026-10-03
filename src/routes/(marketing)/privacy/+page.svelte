@@ -1,6 +1,6 @@
 <!-- src/routes/(marketing)/privacy/+page.svelte -->
 <script lang="ts">
-	import ContactEmailBadge from '$lib/components/ContactEmailBadge.svelte';
+	import ContactEmailBadge from '#lib/components/ContactEmailBadge.svelte';
 	import { Seo } from 'yaxa-svelte';
 	import { siteConfig } from '../../../site.config';
 </script>

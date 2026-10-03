@@ -1,9 +1,8 @@
-<!-- src/routes/(app)/+layout.svelte -->
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
-	import { authClient } from '$lib/auth-client';
+	import { authClient } from '#lib/auth-client.js';
 	import { Button, Divider, OrgSwitcher } from 'yaxa-svelte';
 	import {
 		Activity,
@@ -20,22 +19,52 @@
 	let { data, children }: { data: LayoutData; children: Snippet } = $props();
 
 	const navItems = $derived([
-		{ href: resolve('/dashboard'), label: 'Dashboard', icon: LayoutDashboard },
-		{ href: resolve('/dashboard/billing'), label: 'Billing & Plan', icon: CreditCard },
-		{ href: resolve('/settings/team'), label: 'Team & Workspaces', icon: Users },
+		{
+			href: resolve('dashboard'),
+			label: 'Dashboard',
+			icon: LayoutDashboard
+		},
+
+		{
+			href: resolve('dashboard/billing'),
+			label: 'Billing & Plan',
+			icon: CreditCard
+		},
+
+		{
+			href: resolve('settings/team'),
+			label: 'Team & Workspaces',
+			icon: Users
+		},
+
 		...(data.user?.role === 'admin'
-			? [{ href: resolve('/admin'), label: 'Admin Console', icon: ShieldAlert, admin: true }]
+			? [
+					{
+						href: resolve('admin'),
+						label: 'Admin Console',
+						icon: ShieldAlert,
+						admin: true
+					}
+				]
 			: []),
-		{ href: resolve('/test'), label: 'Diagnostics (/test)', icon: Activity, accent: true }
+
+		{
+			href: resolve('test'),
+			label: 'Diagnostics (/test)',
+			icon: Activity,
+			accent: true
+		}
 	]);
 </script>
+
+<!-- src/routes/(app)/+layout.svelte -->
 
 {#if data.session?.impersonatedBy}
 	<ImpersonationBanner
 		impersonatedUser={data.user}
 		onstop={async () => {
 			await authClient.admin.stopImpersonating();
-			window.location.href = resolve('/admin');
+			window.location.href = resolve('admin');
 		}}
 	/>
 {/if}
@@ -84,7 +113,8 @@
 				<p class="truncate font-semibold text-foreground">{data.user?.name ?? 'Developer'}</p>
 				<p class="truncate text-muted-foreground">{data.user?.email ?? ''}</p>
 			</div>
-			<form method="POST" action="{resolve('/dashboard')}?/signOut" use:enhance>
+
+			<form method="POST" action="{resolve('dashboard')}?/signOut" use:enhance>
 				<Button
 					variant="ghost"
 					size="sm"

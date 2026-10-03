@@ -41,7 +41,7 @@ export const app = new OpenAPIHono()
   );`,
 	client: `<!-- src/routes/app/+page.svelte -->
 <script lang="ts">
-  import { client } from '$lib/api-client';
+  import { client } from '#lib/api-client.js';
 
   async function create() {
     // 🎯 100% Type-Safe RPC Call + Auto OpenAPI 3.1 Spec + Swagger UI!

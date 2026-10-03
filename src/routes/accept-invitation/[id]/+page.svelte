@@ -1,9 +1,8 @@
-<!-- src/routes/accept-invitation/[id]/+page.svelte -->
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
-	import { authClient } from '$lib/auth-client';
+	import { authClient } from '#lib/auth-client.js';
 	import { Button } from 'yaxa-svelte';
 	import { CircleCheck, CircleX, LogIn } from '@lucide/svelte';
 	import { onMount } from 'svelte';
@@ -54,8 +53,9 @@
 				}
 
 				status = 'success';
+
 				timeoutId = setTimeout(() => {
-					goto(resolve('/dashboard'));
+					goto(resolve('dashboard'));
 				}, 1200);
 			}
 		}
@@ -68,6 +68,7 @@
 	});
 </script>
 
+<!-- src/routes/accept-invitation/[id]/+page.svelte -->
 <div class="flex min-h-screen items-center justify-center bg-background px-4">
 	<div
 		class="w-full max-w-md space-y-4 rounded-2xl border border-border bg-card p-8 text-center shadow-lg"
@@ -98,7 +99,7 @@
 			</p>
 			<div class="mt-6 flex flex-col gap-2">
 				<a
-					href="{resolve('/login')}?callbackUrl={encodeURIComponent(
+					href="{resolve('login')}?callbackUrl={encodeURIComponent(
 						page.url.pathname + page.url.search
 					)}"
 					class="w-full"
@@ -106,7 +107,7 @@
 					<Button class="w-full text-xs font-bold">Sign In to Accept</Button>
 				</a>
 				<a
-					href="{resolve('/signup')}?callbackUrl={encodeURIComponent(
+					href="{resolve('signup')}?callbackUrl={encodeURIComponent(
 						page.url.pathname + page.url.search
 					)}"
 					class="w-full"
@@ -118,7 +119,8 @@
 			<CircleX class="mx-auto size-12 text-destructive" />
 			<h2 class="text-base font-bold">Invitation Failed</h2>
 			<p class="text-xs text-muted-foreground">{errorMessage}</p>
-			<a href={resolve('/dashboard')} class="mt-4 inline-block">
+
+			<a href={resolve('dashboard')} class="mt-4 inline-block">
 				<Button variant="soft" size="sm" class="text-xs font-semibold">Return to Dashboard</Button>
 			</a>
 		{/if}

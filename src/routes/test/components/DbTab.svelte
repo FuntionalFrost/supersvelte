@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { client } from '$lib/api-client';
+	import { client } from '#lib/api-client.js';
 	import { Database, Plus, RefreshCw, Trash2 } from '@lucide/svelte';
 
 	type ProjectItem = { id?: string | number; name: string; slug?: string };

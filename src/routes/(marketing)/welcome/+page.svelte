@@ -1,4 +1,3 @@
-<!-- src/routes/(marketing)/welcome/+page.svelte -->
 <script lang="ts">
 	import { resolve } from '$app/paths';
 	import { Seo, toast } from 'yaxa-svelte';
@@ -25,6 +24,8 @@
 	}
 </script>
 
+<!-- src/routes/(marketing)/welcome/+page.svelte -->
+
 <Seo
 	title="Welcome to SuperSvelte!"
 	description="Getting started with your SuperSvelte license and GitHub repository access."
@@ -42,9 +43,11 @@
 		>
 			<CircleCheck class="size-6" />
 		</div>
+
 		<h1 class="text-3xl font-extrabold tracking-tight text-foreground sm:text-4xl">
 			You're in! Welcome to SuperSvelte 🎉
 		</h1>
+
 		<p class="mx-auto mt-2 max-w-lg text-xs text-muted-foreground sm:text-sm">
 			Your transaction has been confirmed and your lifetime license is active. Download your files
 			and copy your license key below.
@@ -133,7 +136,7 @@
 				</p>
 
 				<a
-					href={resolve('/api/download')}
+					href={resolve('api/download')}
 					class="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-2.5 text-xs font-bold text-white shadow-xs transition hover:bg-emerald-500"
 				>
 					<Download class="size-4" />
@@ -211,7 +214,7 @@
 			</a>
 
 			<a
-				href={resolve('/dashboard')}
+				href={resolve('dashboard')}
 				class="inline-flex items-center gap-2 rounded-xl bg-primary px-6 py-3.5 text-xs font-bold text-primary-foreground shadow-lg transition hover:bg-primary/90"
 			>
 				<span>Go to Dashboard</span>

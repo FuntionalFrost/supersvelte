@@ -1,11 +1,12 @@
 // src/lib/server/ratelimit.ts
-import { env } from '$env/dynamic/private';
+import { UPSTASH_REDIS_REST_URL, UPSTASH_REDIS_REST_TOKEN, NODE_ENV } from '$app/env/private';
 import { Ratelimit } from '@upstash/ratelimit';
 import { Redis } from '@upstash/redis';
 
 // 1. Verify URL is an HTTP/HTTPS endpoint (Not redis://)
-const url = env.UPSTASH_REDIS_REST_URL;
-const token = env.UPSTASH_REDIS_REST_TOKEN;
+const url = UPSTASH_REDIS_REST_URL;
+
+const token = UPSTASH_REDIS_REST_TOKEN;
 const isUpstashConfigured = Boolean(
 	url && token && (url.startsWith('https://') || url.startsWith('http://'))
 );
@@ -33,12 +34,14 @@ const memoryStore = new Map<string, { count: number; reset: number }>();
 
 export async function checkRateLimit(ip: string) {
 	// Bypass rate limiting during automated test / Playwright execution
-	if (
-		process.env.NODE_ENV === 'test' ||
-		process.env.PLAYWRIGHT === 'true' ||
-		env.NODE_ENV === 'test'
-	) {
-		return { success: true, limit: 1000, remaining: 1000, reset: 0, mode: 'Test Bypass' };
+	if (process.env.NODE_ENV === 'test' || process.env.PLAYWRIGHT === 'true' || NODE_ENV === 'test') {
+		return {
+			success: true,
+			limit: 1000,
+			remaining: 1000,
+			reset: 0,
+			mode: 'Test Bypass'
+		};
 	}
 
 	// --- MODE A: Live Upstash Redis Cloud ---

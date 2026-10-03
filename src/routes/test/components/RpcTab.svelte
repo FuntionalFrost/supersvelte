@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { client } from '$lib/api-client';
+	import { client } from '#lib/api-client.js';
 	import { RefreshCw, Terminal, Zap } from '@lucide/svelte';
 	import { onMount } from 'svelte';
 

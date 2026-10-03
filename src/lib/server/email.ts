@@ -1,5 +1,5 @@
 // src/lib/server/email.ts
-import { env } from '$env/dynamic/private';
+import { RESEND_API_KEY, NODE_ENV, EMAIL_FROM } from '$app/env/private';
 import { Resend } from 'resend';
 import { render } from 'svelte/server';
 
@@ -73,16 +73,16 @@ export async function sendEmail({
 	}
 
 	// 1. If in test mode or RESEND_API_KEY is not configured, log to console and return dev fallback
-	if (!env.RESEND_API_KEY || process.env.NODE_ENV === 'test' || env.NODE_ENV === 'test') {
+	if (!RESEND_API_KEY || process.env.NODE_ENV === 'test' || NODE_ENV === 'test') {
 		logDevEmail(emailRecord);
 		return { data: { id: emailRecord.id, mode: 'Console Dev Fallback' }, error: null };
 	}
 
 	// 2. Production Resend delivery
 	try {
-		const resend = new Resend(env.RESEND_API_KEY);
+		const resend = new Resend(RESEND_API_KEY);
 		const res = await resend.emails.send({
-			from: env.EMAIL_FROM || 'SuperSvelte <notifications@yourdomain.com>',
+			from: EMAIL_FROM || 'SuperSvelte <notifications@yourdomain.com>',
 			to,
 			subject,
 			html,
@@ -106,7 +106,7 @@ export async function sendWelcomeEmail({
 	actionUrl: string;
 }) {
 	// Dynamic import avoids crashing CLI tools (like better-auth generate & seed scripts)
-	const { default: WelcomeEmail } = await import('$lib/emails/WelcomeEmail.svelte');
+	const { default: WelcomeEmail } = await import('#lib/emails/WelcomeEmail.svelte');
 
 	const { body: html } = render(WelcomeEmail, {
 		props: { name, actionUrl }

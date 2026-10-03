@@ -1,9 +1,6 @@
 <script lang="ts">
-	import {
-		PUBLIC_POLAR_PRO_PRODUCT_ID,
-		PUBLIC_POLAR_STANDARD_PRODUCT_ID
-	} from '$env/static/public';
-	import PolarCheckout from '$lib/components/PolarCheckout.svelte';
+	import { PUBLIC_POLAR_PRO_PRODUCT_ID, PUBLIC_POLAR_STANDARD_PRODUCT_ID } from '$app/env/public';
+	import PolarCheckout from '#lib/components/PolarCheckout.svelte';
 	import { CreditCard, Sparkles } from '@lucide/svelte';
 
 	let { systemStatus } = $props<{
@@ -22,6 +19,7 @@
 			<CreditCard class="size-4 text-cyan-400" />
 			<span>Polar Billing Diagnostics</span>
 		</div>
+
 		<p class="text-xs leading-relaxed text-muted-foreground">
 			Tests Polar SDK checkout creation and webhook signature verification.
 		</p>

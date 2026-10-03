@@ -1,12 +1,12 @@
 // src/routes/api/dev/last-email/+server.ts
-import { getLatestDevEmail } from '$lib/server/email';
-import { json, type RequestHandler } from '@sveltejs/kit';
+import { getLatestDevEmail } from '#lib/server/email.js';
+import type { RequestHandler } from '@sveltejs/kit';
 
 export const GET: RequestHandler = ({ url }) => {
 	const email = getLatestDevEmail();
 
 	if (url.searchParams.get('format') === 'json') {
-		return json({
+		return Response.json({
 			email: email || null
 		});
 	}

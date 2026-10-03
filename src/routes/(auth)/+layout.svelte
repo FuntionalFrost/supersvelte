@@ -1,7 +1,6 @@
 <!-- src/routes/(auth)/+layout.svelte -->
 <script lang="ts">
-	import { resolve } from '$app/paths';
-	import Logo from '$lib/components/Logo.svelte';
+	import Logo from '#lib/components/Logo.svelte';
 	import type { Snippet } from 'svelte';
 
 	let { children }: { children: Snippet } = $props();
@@ -11,7 +10,7 @@
 	<div class="w-full max-w-sm space-y-6">
 		<!-- Simple Brand Header -->
 		<div class="flex justify-center">
-			<a href={resolve('/')} class="group flex items-center gap-2.5 transition">
+			<a href="/" class="group flex items-center gap-2.5 transition">
 				<Logo size="md" />
 				<span class="text-lg font-black tracking-tight text-foreground">SuperSvelte</span>
 			</a>
