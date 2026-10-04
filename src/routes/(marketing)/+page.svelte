@@ -1,9 +1,9 @@
 <script lang="ts">
-	import { PUBLIC_POLAR_PRO_PRODUCT_ID, PUBLIC_POLAR_STANDARD_PRODUCT_ID } from '$app/env/public';
 	import CodeComparison from '#lib/components/CodeComparison.svelte';
 	import PolarCheckout from '#lib/components/PolarCheckout.svelte';
 	import SuperSvelteVsOthers from '#lib/components/SuperSvelteVsOthers.svelte';
 	import { matrices, type Mode } from '#lib/config/comparison.js';
+	import { pricingPlans } from '#lib/config/pricing.js';
 	import {
 		Check,
 		CircleQuestionMark,
@@ -280,115 +280,56 @@
 			</div>
 
 			<div class="mx-auto mt-16 grid max-w-4xl grid-cols-1 gap-8 md:grid-cols-2">
-				<!-- Starter Tier -->
-				<div
-					class="flex flex-col justify-between rounded-2xl border border-border bg-card p-8 shadow-xs"
-				>
-					<div>
-						<div class="flex items-center justify-between">
-							<h3 class="text-sm font-bold">Standard License</h3>
-							<span
-								class="rounded-md border border-border bg-muted px-2.5 py-0.5 font-mono text-[10px] font-bold"
-							>
-								1 Developer
-							</span>
-						</div>
-						<div class="mt-4 flex items-baseline gap-1">
-							<span class="text-4xl font-extrabold">€99</span>
-							<span class="text-sm text-muted-foreground">/ one-time</span>
-						</div>
-
-						<p class="mt-2 text-sm text-muted-foreground">
-							Perfect for solopreneurs launching a single product.
-						</p>
-
-						<ul class="mt-6 space-y-3 text-sm font-medium text-foreground/90">
-							<li class="flex items-center gap-2">
-								<Check class="size-4 text-emerald-500" /> Full Svelte 5 + Hono Source Code
-							</li>
-							<li class="flex items-center gap-2">
-								<Check class="size-4 text-emerald-500" /> Auto-Introspecting /admin CRUD Dashboard
-							</li>
-							<li class="flex items-center gap-2">
-								<Check class="size-4 text-emerald-500" /> Better Auth (Session + Social Logins)
-							</li>
-							<li class="flex items-center gap-2">
-								<Check class="size-4 text-emerald-500" /> Drizzle ORM + Neon Serverless Postgres
-							</li>
-							<li class="flex items-center gap-2">
-								<Check class="size-4 text-emerald-500" /> Dual Storage (UploadThing & Cloudflare R2 /
-								S3)
-							</li>
-							<li class="flex items-center gap-2">
-								<Check class="size-4 text-emerald-500" /> Resend Mail + Zero-Config Dev Logger
-							</li>
-							<li class="flex items-center gap-2">
-								<Check class="size-4 text-emerald-500" /> Private GitHub Repository Access
-							</li>
-						</ul>
-					</div>
-
-					<div class="mt-8">
-						<PolarCheckout
-							productId={PUBLIC_POLAR_STANDARD_PRODUCT_ID}
-							buttonText="Get Standard License"
-						/>
-					</div>
-				</div>
-
-				<!-- Pro Tier -->
-				<div
-					class="relative flex flex-col justify-between rounded-2xl border-2 border-primary/50 bg-card p-8 shadow-xl ring-1 ring-primary/20"
-				>
+				{#each pricingPlans as plan (plan.id)}
 					<div
-						class="absolute -top-3.5 right-6 rounded-full bg-primary px-3 py-1 text-[10px] font-bold tracking-wider text-primary-foreground uppercase shadow-xs"
+						class="relative flex flex-col justify-between rounded-2xl bg-card p-8 shadow-xs {plan.isPopular
+							? 'border-2 border-primary/50 shadow-xl ring-1 ring-primary/20'
+							: 'border border-border'}"
 					>
-						Most Popular
-					</div>
-					<div>
-						<div class="flex items-center justify-between">
-							<h3 class="text-sm font-bold text-foreground">Unlimited Pro License</h3>
-							<span
-								class="rounded-md border border-border bg-muted px-2.5 py-0.5 font-mono text-[10px] font-bold text-foreground"
+						{#if plan.isPopular}
+							<div
+								class="absolute -top-3.5 right-6 rounded-full bg-primary px-3 py-1 text-[10px] font-bold tracking-wider text-primary-foreground uppercase shadow-xs"
 							>
-								Unlimited Projects
-							</span>
+								Most Popular
+							</div>
+						{/if}
+						<div>
+							<div class="flex items-center justify-between">
+								<h3 class="text-sm font-bold {plan.isPopular ? 'text-foreground' : ''}">
+									{plan.name}
+								</h3>
+								<span
+									class="rounded-md border border-border bg-muted px-2.5 py-0.5 font-mono text-[10px] font-bold {plan.isPopular
+										? 'text-foreground'
+										: ''}"
+								>
+									{plan.badge}
+								</span>
+							</div>
+							<div class="mt-4 flex items-baseline gap-1">
+								<span class="text-4xl font-extrabold">{plan.currency ?? '€'}{plan.price}</span>
+								<span class="text-sm text-muted-foreground">/ one-time</span>
+							</div>
+
+							<p class="mt-2 text-sm text-muted-foreground">
+								{plan.description}
+							</p>
+
+							<ul class="mt-6 space-y-3 text-sm font-medium text-foreground/90">
+								{#each plan.features as feature (feature)}
+									<li class="flex items-center gap-2">
+										<Check class="size-4 text-emerald-500" />
+										<span>{feature}</span>
+									</li>
+								{/each}
+							</ul>
 						</div>
-						<div class="mt-4 flex items-baseline gap-1">
-							<span class="text-4xl font-extrabold">€199</span>
-							<span class="text-sm text-muted-foreground">/ one-time</span>
+
+						<div class="mt-8">
+							<PolarCheckout productId={plan.productId} buttonText={plan.buttonText} />
 						</div>
-
-						<p class="mt-2 text-sm text-muted-foreground">
-							For agencies, serial founders, and team workflows.
-						</p>
-
-						<ul class="mt-6 space-y-3 text-sm font-medium text-foreground/90">
-							<li class="flex items-center gap-2">
-								<Check class="size-4 text-emerald-500" /> Everything in Standard License
-							</li>
-							<li class="flex items-center gap-2">
-								<Check class="size-4 text-emerald-500" /> Unlimited Commercial Projects & Clients
-							</li>
-							<li class="flex items-center gap-2">
-								<Check class="size-4 text-emerald-500" /> Multi-Tenant Team Workspace Module
-							</li>
-							<li class="flex items-center gap-2">
-								<Check class="size-4 text-emerald-500" /> Yaxa Svelte UI Design System & Themes
-							</li>
-							<li class="flex items-center gap-2">
-								<Check class="size-4 text-emerald-500" /> Priority GitHub Issue Support
-							</li>
-							<li class="flex items-center gap-2">
-								<Check class="size-4 text-emerald-500" /> Future SuperSvelte Feature Addons
-							</li>
-						</ul>
 					</div>
-
-					<div class="mt-8">
-						<PolarCheckout productId={PUBLIC_POLAR_PRO_PRODUCT_ID} buttonText="Get Pro License" />
-					</div>
-				</div>
+				{/each}
 			</div>
 
 			<!-- Pricing Trust Guarantee Strip -->

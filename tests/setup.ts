@@ -55,3 +55,8 @@ vi.mock('$app/environment', () => ({
 	building: false,
 	version: '3.0.0'
 }));
+
+vi.mock('$app/env/public', () => ({
+	PUBLIC_POLAR_PRO_PRODUCT_ID: 'prod_polar_pro_test',
+	PUBLIC_POLAR_STANDARD_PRODUCT_ID: 'prod_polar_std_test'
+}));

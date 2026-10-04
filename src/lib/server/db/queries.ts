@@ -1,8 +1,8 @@
-// src/lib/server/db/queries.ts
+import { PUBLIC_POLAR_PRO_PRODUCT_ID } from '$app/env/public';
 import { db } from '#lib/server/db/index.js';
-import { files, projects } from '#lib/server/db/schema.js';
+import { files, projects, purchases } from '#lib/server/db/schema.js';
 import { redis } from '#lib/server/ratelimit.js';
-import { desc, eq } from 'drizzle-orm';
+import { and, desc, eq } from 'drizzle-orm';
 
 /**
  * Fetch projects scoped to an authenticated user or active organization with tenant-isolated Redis caching.
@@ -78,4 +78,56 @@ export async function getUserFiles(userId: string) {
 		.from(files)
 		.where(eq(files.userId, userId))
 		.orderBy(desc(files.createdAt));
+}
+
+/**
+ * Fetch active purchases for a user.
+ */
+export async function getUserPurchases(userId?: string | null) {
+	if (!userId) return [];
+	return await db
+		.select()
+		.from(purchases)
+		.where(and(eq(purchases.userId, userId), eq(purchases.status, 'active')))
+		.orderBy(desc(purchases.createdAt));
+}
+
+/**
+ * Check if a user has access to a required plan tier ('standard' or 'pro').
+ * Admins always have access.
+ */
+export async function hasPlanAccess(
+	user: App.Locals['user'],
+	requiredPlan: 'standard' | 'pro'
+): Promise<boolean> {
+	if (!user) return false;
+	if (user.role === 'admin') return true;
+
+	const userPurchases = await getUserPurchases(user.id);
+	const proProductId = PUBLIC_POLAR_PRO_PRODUCT_ID;
+	const hasPro = userPurchases.some(
+		(p) =>
+			(proProductId && p.productId === proProductId) ||
+			p.productId?.toLowerCase().includes('pro') ||
+			p.priceId?.toLowerCase().includes('pro')
+	);
+	const hasStandard = userPurchases.length > 0;
+
+	return requiredPlan === 'pro' ? hasPro : hasStandard;
+}
+
+/**
+ * Fetch a purchase record by license key.
+ */
+export async function getPurchaseByLicenseKey(licenseKey: string) {
+	const trimmed = licenseKey.trim();
+	if (!trimmed) return null;
+
+	const [found] = await db
+		.select()
+		.from(purchases)
+		.where(eq(purchases.licenseKey, trimmed))
+		.limit(1);
+
+	return found ?? null;
 }

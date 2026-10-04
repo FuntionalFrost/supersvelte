@@ -1,8 +1,5 @@
-import { PUBLIC_POLAR_PRO_PRODUCT_ID } from '$app/env/public';
-import { db } from '#lib/server/db/index.js';
-import { purchases } from '#lib/server/db/schema.js';
 import type { HonoEnv } from '#lib/server/api/index.js';
-import { and, eq } from 'drizzle-orm';
+import { hasPlanAccess } from '#lib/server/db/queries.js';
 import type { MiddlewareHandler } from 'hono';
 
 export type PlanTier = 'standard' | 'pro';
@@ -15,26 +12,7 @@ export function requirePlan(requiredPlan: PlanTier): MiddlewareHandler<HonoEnv> 
 			return c.json({ error: 'Unauthorized', code: 'UNAUTHORIZED' }, 401);
 		}
 
-		if (user.role === 'admin') {
-			return await next();
-		}
-
-		// Query active purchases for the user
-		const userPurchases = await db
-			.select()
-			.from(purchases)
-			.where(and(eq(purchases.userId, user.id), eq(purchases.status, 'active')));
-
-		const proProductId = PUBLIC_POLAR_PRO_PRODUCT_ID;
-		const hasPro = userPurchases.some(
-			(p) =>
-				(proProductId && p.productId === proProductId) ||
-				p.productId?.toLowerCase().includes('pro') ||
-				p.priceId?.toLowerCase().includes('pro')
-		);
-		const hasStandard = userPurchases.length > 0;
-
-		const hasAccess = requiredPlan === 'pro' ? hasPro : hasStandard;
+		const hasAccess = await hasPlanAccess(user, requiredPlan);
 
 		if (!hasAccess) {
 			return c.json(

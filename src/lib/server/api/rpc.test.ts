@@ -1,5 +1,22 @@
-// src/lib/server/api/rpc.test.ts
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+
+vi.mock('#lib/server/db/queries.js', () => ({
+	getProjects: vi.fn().mockResolvedValue({ data: [], source: 'Empty (Unauthenticated)' }),
+	getPurchaseByLicenseKey: vi.fn().mockImplementation(async (key: string) => {
+		if (key === 'VALID-KEY-1234') {
+			return {
+				licenseKey: 'VALID-KEY-1234',
+				status: 'active',
+				priceId: 'price_pro_123',
+				productId: 'prod_polar_pro_test',
+				createdAt: '2026-10-04T12:00:00.000Z'
+			};
+		}
+		return null;
+	}),
+	invalidateProjectsCache: vi.fn().mockResolvedValue(undefined)
+}));
+
 import { app } from './index';
 
 describe('Hono OpenAPI RPC Backend (In-Memory app.request)', () => {
@@ -13,6 +30,8 @@ describe('Hono OpenAPI RPC Backend (In-Memory app.request)', () => {
 		expect(spec.paths).toHaveProperty('/api/projects');
 		expect(spec.paths).toHaveProperty('/api/echo');
 		expect(spec.paths).toHaveProperty('/api/rate-limited-test');
+		expect(spec.paths).toHaveProperty('/api/checkout');
+		expect(spec.paths).toHaveProperty('/api/v1/verify-license');
 	});
 
 	it('serves interactive Swagger UI documentation at /api/docs', async () => {
@@ -20,6 +39,41 @@ describe('Hono OpenAPI RPC Backend (In-Memory app.request)', () => {
 		expect(res.status).toBe(200);
 		const html = await res.text();
 		expect(html).toContain('swagger-ui');
+	});
+
+	it('returns 404 for invalid license key at /api/v1/verify-license', async () => {
+		const res = await app.request('/api/v1/verify-license', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ licenseKey: 'INVALID-KEY-1234' })
+		});
+
+		expect(res.status).toBe(404);
+		const body = await res.json();
+		expect(body).toEqual({
+			valid: false,
+			licenseKey: 'INVALID-KEY-1234',
+			error: 'Invalid or revoked license key'
+		});
+	});
+
+	it('returns 200 for valid license key at /api/v1/verify-license', async () => {
+		const res = await app.request('/api/v1/verify-license', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ licenseKey: 'VALID-KEY-1234' })
+		});
+
+		expect(res.status).toBe(200);
+		const body = await res.json();
+		expect(body).toEqual({
+			valid: true,
+			licenseKey: 'VALID-KEY-1234',
+			status: 'active',
+			priceId: 'price_pro_123',
+			productId: 'prod_polar_pro_test',
+			purchasedAt: '2026-10-04T12:00:00.000Z'
+		});
 	});
 
 	it('executes /api/echo POST route with Zod body schema validation', async () => {

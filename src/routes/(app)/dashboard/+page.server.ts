@@ -1,11 +1,9 @@
 // src/routes/(app)/dashboard/+page.server.ts
 import { resolve } from '$app/paths';
 import { auth } from '#lib/server/auth/index.js';
-import { db } from '#lib/server/db/index.js';
-import { projects } from '#lib/server/db/schema.js';
+import { getProjects } from '#lib/server/db/queries.js';
 import { setCookiesFromResponse } from '#lib/server/utils.js';
 import { redirect } from '@sveltejs/kit';
-import { eq } from 'drizzle-orm';
 import type { Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ locals, request }) => {
@@ -15,30 +13,19 @@ export const load: PageServerLoad = async ({ locals, request }) => {
 
 	const activeOrgId = locals.session.activeOrganizationId;
 
-	if (!activeOrgId) {
-		return {
-			user: locals.user,
-			organization: null,
-			projects: []
-		};
-	}
-
 	let organization = null;
-	try {
-		organization = await auth.api.getFullOrganization({
-			headers: request.headers,
-			query: { organizationId: activeOrgId }
-		});
-	} catch (err) {
-		console.error('Failed to fetch full organization details:', err);
+	if (activeOrgId) {
+		try {
+			organization = await auth.api.getFullOrganization({
+				headers: request.headers,
+				query: { organizationId: activeOrgId }
+			});
+		} catch (err) {
+			console.error('Failed to fetch full organization details:', err);
+		}
 	}
 
-	let orgProjects: Array<typeof projects.$inferSelect> = [];
-	try {
-		orgProjects = await db.select().from(projects).where(eq(projects.userId, locals.user.id));
-	} catch (err) {
-		console.error('Failed to load projects:', err);
-	}
+	const { data: orgProjects } = await getProjects(locals.user.id, activeOrgId);
 
 	return {
 		user: locals.user,

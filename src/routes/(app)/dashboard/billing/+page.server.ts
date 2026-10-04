@@ -1,9 +1,7 @@
 // src/routes/(app)/dashboard/billing/+page.server.ts
 import { resolve } from '$app/paths';
-import { db } from '#lib/server/db/index.js';
-import { purchases } from '#lib/server/db/schema.js';
+import { getUserPurchases } from '#lib/server/db/queries.js';
 import { redirect } from '@sveltejs/kit';
-import { and, desc, eq } from 'drizzle-orm';
 import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ locals }) => {
@@ -11,11 +9,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 		redirect(303, resolve('login'));
 	}
 
-	const userPurchases = await db
-		.select()
-		.from(purchases)
-		.where(and(eq(purchases.userId, locals.user.id), eq(purchases.status, 'active')))
-		.orderBy(desc(purchases.createdAt));
+	const userPurchases = await getUserPurchases(locals.user.id);
 
 	return {
 		user: locals.user,

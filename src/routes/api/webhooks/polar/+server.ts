@@ -2,7 +2,7 @@
 import { POLAR_WEBHOOK_SECRET, ORIGIN } from '$app/env/private';
 import { db } from '#lib/server/db/index.js';
 import { customers, generateLicenseKey, purchases, user } from '#lib/server/db/schema.js';
-import { sendEmail } from '#lib/server/email.js';
+import { sendLicenseConfirmationEmail } from '#lib/server/email.js';
 import { dispatchEvent } from '#lib/server/queue/index.js';
 import { validateEvent } from '@polar-sh/sdk/webhooks';
 import type { RequestHandler } from '@sveltejs/kit';
@@ -129,21 +129,11 @@ export const POST: RequestHandler = async ({ request }) => {
 
 			// 5. Send Transactional Fulfillment Email with License Key
 			if (customerEmail) {
-				await sendEmail({
+				await sendLicenseConfirmationEmail({
 					to: customerEmail,
-					subject: '🎉 Your SuperSvelte License & Access Confirmation',
-					html: `
-						<div style="font-family: sans-serif; padding: 24px; max-width: 540px; margin: auto; border: 1px solid #eaeaea; border-radius: 12px;">
-							<h2>Thank you for getting SuperSvelte!</h2>
-							<p>Your payment has been successfully processed. Here are your purchase details:</p>
-							<div style="background: #f4f4f5; padding: 16px; border-radius: 8px; font-family: monospace; font-size: 14px; margin: 16px 0;">
-								<strong>License Key:</strong> ${licenseKey}<br>
-								<strong>Transaction ID:</strong> ${order.id}
-							</div>
-							<p>You can access your downloads, manage billing, and invite team members on your dashboard:</p>
-							<a href="${ORIGIN || 'https://supersvelte.netlify.app'}/dashboard/billing" style="display: inline-block; background: #000; color: #fff; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: 600;">Open Billing Dashboard</a>
-						</div>
-					`
+					licenseKey,
+					transactionId: order.id,
+					actionUrl: `${ORIGIN || 'https://supersvelte.netlify.app'}/dashboard/billing`
 				});
 			}
 

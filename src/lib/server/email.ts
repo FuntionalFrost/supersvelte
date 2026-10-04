@@ -119,3 +119,30 @@ export async function sendWelcomeEmail({
 		actionUrl
 	});
 }
+
+// Svelte-component-driven license fulfillment email helper
+export async function sendLicenseConfirmationEmail({
+	to,
+	licenseKey,
+	transactionId,
+	actionUrl
+}: {
+	to: string;
+	licenseKey: string;
+	transactionId: string;
+	actionUrl?: string;
+}) {
+	const { default: LicenseConfirmationEmail } =
+		await import('#lib/emails/LicenseConfirmationEmail.svelte');
+
+	const { body: html } = render(LicenseConfirmationEmail, {
+		props: { licenseKey, transactionId, actionUrl }
+	});
+
+	return await sendEmail({
+		to,
+		subject: '🎉 Your SuperSvelte License & Access Confirmation',
+		html,
+		actionUrl
+	});
+}

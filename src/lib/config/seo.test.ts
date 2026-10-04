@@ -1,18 +1,17 @@
 import { describe, expect, it } from 'vitest';
-import { defaultMetaTags, siteConfig } from './seo';
+import { siteConfig } from '../../site.config';
 
-describe('SEO Configuration', () => {
-	it('defines correct site metadata', () => {
+describe('Site Configuration & SEO', () => {
+	it('defines authoritative site metadata', () => {
 		expect(siteConfig.name).toBe('SuperSvelte');
 		expect(siteConfig.title).toContain('SuperSvelte');
 		expect(siteConfig.url).toBe('https://supersvelte.netlify.app');
-		expect(siteConfig.twitterHandle).toBe('@funtionalfrost');
+		expect(siteConfig.socials?.twitter).toBe('@funtionalfrost');
 	});
 
-	it('configures default meta tags with OpenGraph and Twitter cards', () => {
-		expect(defaultMetaTags.title).toBe(siteConfig.title);
-		expect(defaultMetaTags.canonical).toBe(siteConfig.url);
-		expect(defaultMetaTags.openGraph?.siteName).toBe('SuperSvelte');
-		expect(defaultMetaTags.twitter?.cardType).toBe('summary_large_image');
+	it('configures SEO templates and defaults correctly', () => {
+		expect(siteConfig.seo?.titleTemplate).toBe('%s · SuperSvelte');
+		expect(siteConfig.seo?.defaultOgImage).toBe('/api/og');
+		expect(siteConfig.seo?.keywords).toContain('svelte 5');
 	});
 });

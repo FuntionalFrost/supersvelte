@@ -1,5 +1,6 @@
 <!-- src/lib/components/PolarCheckout.svelte -->
 <script lang="ts">
+	import { client } from '#lib/api-client.js';
 	import { LoaderCircle, Rocket } from '@lucide/svelte';
 	import { toast } from 'yaxa-svelte';
 
@@ -16,20 +17,20 @@
 	async function handleCheckout() {
 		try {
 			loading = true;
-			const res = await fetch('/api/checkout', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ productId })
+			const res = await client.api.checkout.$post({
+				json: { productId }
 			});
 
-			const data = await res.json();
-
-			if (!res.ok || !data.url) {
-				throw new Error(data.error || 'Failed to initiate checkout session.');
+			if (!res.ok) {
+				const errData = (await res.json().catch(() => ({}))) as { error?: string };
+				throw new Error(errData.error || 'Failed to initiate checkout session.');
 			}
 
-			// Redirect directly to the secure hosted Polar checkout page
-			window.location.href = data.url;
+			const data = (await res.json()) as { url?: string };
+			if (data.url) {
+				// Redirect directly to the secure hosted Polar checkout page
+				window.location.href = data.url;
+			}
 		} catch (err: unknown) {
 			const message = err instanceof Error ? err.message : 'Checkout failed';
 			toast.error(message);

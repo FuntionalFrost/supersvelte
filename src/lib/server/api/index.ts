@@ -1,11 +1,18 @@
+import { ORIGIN } from '$app/env/private';
 import { auth } from '#lib/server/auth/index.js';
 import { db } from '#lib/server/db/index.js';
-import { getProjects, invalidateProjectsCache } from '#lib/server/db/queries.js';
+import {
+	getProjects,
+	getPurchaseByLicenseKey,
+	invalidateProjectsCache
+} from '#lib/server/db/queries.js';
 import { projects } from '#lib/server/db/schema.js';
+import { polar } from '#lib/server/polar.js';
 import { checkRateLimit } from '#lib/server/ratelimit.js';
 import { swaggerUI } from '@hono/swagger-ui';
 import { createRoute, OpenAPIHono, z } from '@hono/zod-openapi';
 import { and, eq } from 'drizzle-orm';
+import type { Context } from 'hono';
 import { streamSSE } from 'hono/streaming';
 
 // Bindings for SvelteKit locals passed via app.fetch(request, { locals })
@@ -14,6 +21,24 @@ export type HonoEnv = {
 		locals?: App.Locals;
 	};
 };
+
+/**
+ * Resolves the authenticated user and session, prioritizing event.locals passed from SvelteKit
+ * and falling back to Better-Auth session verification via request headers.
+ */
+export async function getAuthContext(c: Context<HonoEnv>): Promise<{
+	user: App.Locals['user'];
+	session: App.Locals['session'];
+}> {
+	if (c.env?.locals?.session && c.env?.locals?.user) {
+		return { user: c.env.locals.user, session: c.env.locals.session };
+	}
+	const sessionData = await auth.api.getSession({ headers: c.req.raw.headers }).catch(() => null);
+	return {
+		user: sessionData?.user ?? null,
+		session: sessionData?.session ?? null
+	};
+}
 
 // 1. ZOD SCHEMAS
 const ProjectSchema = z
@@ -33,6 +58,35 @@ const CreateProjectInputSchema = z
 		slug: z.string().optional().openapi({ example: 'custom-slug-123' })
 	})
 	.openapi('CreateProjectInput');
+
+const CheckoutInputSchema = z
+	.object({
+		productId: z.string().min(1).openapi({ example: 'prod_polar_123' })
+	})
+	.openapi('CheckoutInput');
+
+const CheckoutResponseSchema = z
+	.object({
+		url: z.string().openapi({ example: 'https://polar.sh/checkout/chk_123' })
+	})
+	.openapi('CheckoutResponse');
+
+const VerifyLicenseInputSchema = z
+	.object({
+		licenseKey: z.string().min(1).openapi({ example: 'SS-LIVE-1234-5678-90AB' })
+	})
+	.openapi('VerifyLicenseInput');
+
+const VerifyLicenseResponseSchema = z
+	.object({
+		valid: z.boolean(),
+		licenseKey: z.string(),
+		status: z.string(),
+		priceId: z.string().nullable().optional(),
+		productId: z.string(),
+		purchasedAt: z.string().or(z.date())
+	})
+	.openapi('VerifyLicenseResponse');
 
 // 2. PROJECTS SUB-ROUTER
 const projectsApp = new OpenAPIHono<HonoEnv>()
@@ -56,13 +110,7 @@ const projectsApp = new OpenAPIHono<HonoEnv>()
 			}
 		}),
 		async (c) => {
-			const sessionData = c.env?.locals?.session
-				? { user: c.env.locals.user, session: c.env.locals.session }
-				: await auth.api.getSession({ headers: c.req.raw.headers });
-
-			const user = sessionData?.user;
-			const session = sessionData?.session;
-
+			const { user, session } = await getAuthContext(c);
 			const { data, source } = await getProjects(user?.id, session?.activeOrganizationId);
 			return c.json({ projects: data, source }, 200);
 		}
@@ -106,12 +154,7 @@ const projectsApp = new OpenAPIHono<HonoEnv>()
 			}
 		}),
 		async (c) => {
-			const sessionData = c.env?.locals?.session
-				? { user: c.env.locals.user, session: c.env.locals.session }
-				: await auth.api.getSession({ headers: c.req.raw.headers });
-
-			const user = sessionData?.user;
-			const session = sessionData?.session;
+			const { user, session } = await getAuthContext(c);
 
 			if (!user) {
 				return c.json({ error: 'Unauthorized' }, 401);
@@ -176,12 +219,7 @@ const projectsApp = new OpenAPIHono<HonoEnv>()
 			}
 		}),
 		async (c) => {
-			const sessionData = c.env?.locals?.session
-				? { user: c.env.locals.user, session: c.env.locals.session }
-				: await auth.api.getSession({ headers: c.req.raw.headers });
-
-			const user = sessionData?.user;
-			const session = sessionData?.session;
+			const { user, session } = await getAuthContext(c);
 
 			if (!user) {
 				return c.json({ error: 'Unauthorized' }, 401);
@@ -292,14 +330,139 @@ const routes = api
 			);
 		}
 	)
+	.openapi(
+		createRoute({
+			method: 'post',
+			path: '/checkout',
+			summary: 'Create Polar checkout session',
+			request: {
+				body: {
+					content: {
+						'application/json': {
+							schema: CheckoutInputSchema
+						}
+					}
+				}
+			},
+			responses: {
+				200: {
+					content: {
+						'application/json': {
+							schema: CheckoutResponseSchema
+						}
+					},
+					description: 'Checkout session created'
+				},
+				400: {
+					content: {
+						'application/json': {
+							schema: z.object({ error: z.string() })
+						}
+					},
+					description: 'Bad request'
+				},
+				500: {
+					content: {
+						'application/json': {
+							schema: z.object({ error: z.string() })
+						}
+					},
+					description: 'Internal server error'
+				}
+			}
+		}),
+		async (c) => {
+			const { productId } = c.req.valid('json');
+			const { user } = await getAuthContext(c);
+			const origin = ORIGIN || new URL(c.req.url).origin;
+
+			try {
+				const checkout = await polar.checkouts.create({
+					products: [productId],
+					successUrl: `${origin}/welcome?checkout_id={CHECKOUT_ID}`,
+					customerEmail: user?.email ?? undefined,
+					metadata: {
+						userId: user?.id ?? 'anonymous'
+					}
+				});
+
+				return c.json({ url: checkout.url }, 200);
+			} catch (err: unknown) {
+				console.error('Polar checkout session error:', err);
+				const message = err instanceof Error ? err.message : 'Internal server error';
+				return c.json({ error: message }, 500);
+			}
+		}
+	)
+	.openapi(
+		createRoute({
+			method: 'post',
+			path: '/v1/verify-license',
+			summary: 'Verify active SuperSvelte license key',
+			request: {
+				body: {
+					content: {
+						'application/json': {
+							schema: VerifyLicenseInputSchema
+						}
+					}
+				}
+			},
+			responses: {
+				200: {
+					content: {
+						'application/json': {
+							schema: VerifyLicenseResponseSchema
+						}
+					},
+					description: 'License is valid'
+				},
+				404: {
+					content: {
+						'application/json': {
+							schema: z.object({
+								valid: z.boolean(),
+								licenseKey: z.string(),
+								error: z.string()
+							})
+						}
+					},
+					description: 'Invalid or revoked license'
+				}
+			}
+		}),
+		async (c) => {
+			const { licenseKey } = c.req.valid('json');
+			const foundPurchase = await getPurchaseByLicenseKey(licenseKey);
+
+			if (!foundPurchase || foundPurchase.status !== 'active') {
+				return c.json(
+					{
+						valid: false,
+						licenseKey: licenseKey.trim(),
+						error: 'Invalid or revoked license key'
+					},
+					404
+				);
+			}
+
+			return c.json(
+				{
+					valid: true,
+					licenseKey: foundPurchase.licenseKey!,
+					status: foundPurchase.status,
+					priceId: foundPurchase.priceId,
+					productId: foundPurchase.productId,
+					purchasedAt: foundPurchase.createdAt
+				},
+				200
+			);
+		}
+	)
 	.get('/realtime', async (c) => {
-		const session = c.env?.locals?.session
-			? { user: c.env.locals.user, session: c.env.locals.session }
-			: await auth.api.getSession({ headers: c.req.raw.headers });
+		const { user } = await getAuthContext(c);
 
-		if (!session?.user) return c.json({ error: 'Unauthorized' }, 401);
-
-		const user = session.user; // <-- Narrowed const preserves type safety inside callback
+		if (!user) return c.json({ error: 'Unauthorized' }, 401);
 
 		return streamSSE(c, async (stream) => {
 			let count = 0;
