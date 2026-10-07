@@ -84,12 +84,68 @@
 			icon: 'mail' as const
 		},
 		{
+			id: 'theme-studio',
+			label: 'Theme Studio',
+			description: 'Interactive visual design token editor',
+			href: `${resolve('test')}?tab=theme`,
+			group: 'Developer',
+			icon: 'sparkles' as const
+		},
+		{
 			id: 'toggle-theme',
 			label: 'Toggle Dark / Light Mode',
 			description: 'Switch application color theme',
 			onSelect: () => theme.toggle(),
 			group: 'Preferences',
 			icon: 'sun' as const
+		},
+		{
+			id: 'accent-svelte',
+			label: 'Accent: Svelte Flame',
+			description: 'Signature Svelte fiery orange palette',
+			onSelect: () => theme.setAccent('svelte'),
+			group: 'Preferences',
+			icon: 'sparkles' as const
+		},
+		{
+			id: 'accent-emerald',
+			label: 'Accent: Emerald Mint',
+			description: 'Crisp, modern green palette',
+			onSelect: () => theme.setAccent('emerald'),
+			group: 'Preferences',
+			icon: 'sparkles' as const
+		},
+		{
+			id: 'accent-sky',
+			label: 'Accent: Sky Blue',
+			description: 'Clean, radiant cyan palette',
+			onSelect: () => theme.setAccent('sky'),
+			group: 'Preferences',
+			icon: 'sparkles' as const
+		},
+		{
+			id: 'accent-violet',
+			label: 'Accent: Violet Dream',
+			description: 'Elegant deep purple palette',
+			onSelect: () => theme.setAccent('violet'),
+			group: 'Preferences',
+			icon: 'sparkles' as const
+		},
+		{
+			id: 'accent-amber',
+			label: 'Accent: Sunset Amber',
+			description: 'Warm gold-amber palette',
+			onSelect: () => theme.setAccent('amber'),
+			group: 'Preferences',
+			icon: 'sparkles' as const
+		},
+		{
+			id: 'accent-rose',
+			label: 'Accent: Rose Pink',
+			description: 'Vibrant punchy red-rose palette',
+			onSelect: () => theme.setAccent('rose'),
+			group: 'Preferences',
+			icon: 'sparkles' as const
 		}
 	];
 

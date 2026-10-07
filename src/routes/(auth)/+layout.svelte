@@ -6,7 +6,9 @@
 	let { children }: { children: Snippet } = $props();
 </script>
 
-<div class="flex min-h-screen w-full flex-col items-center justify-center bg-background p-4 sm:p-6">
+<div
+	class="flex min-h-screen w-full flex-col items-center justify-center bg-background yaxa-mesh-glow p-4 sm:p-6"
+>
 	<div class="w-full max-w-sm space-y-6">
 		<!-- Simple Brand Header -->
 		<div class="flex justify-center">

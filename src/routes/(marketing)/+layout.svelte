@@ -18,9 +18,7 @@
 	class="flex min-h-screen flex-col bg-background text-foreground selection:bg-primary selection:text-primary-foreground"
 >
 	<!-- Sticky Marketing Header with increased size and prominence -->
-	<header
-		class="sticky top-0 z-40 w-full border-b border-border/60 bg-background/85 backdrop-blur-md"
-	>
+	<header class="sticky top-0 z-40 w-full border-b border-border/60 yaxa-glass">
 		<div class="container mx-auto flex h-20 max-w-6xl items-center justify-between px-4 sm:px-6">
 			<div class="flex items-center gap-4">
 				<!-- Mobile Menu Toggle Button -->

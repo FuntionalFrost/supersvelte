@@ -43,7 +43,7 @@
 	type="button"
 	onclick={handleCheckout}
 	disabled={loading}
-	class="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3.5 text-sm font-bold text-primary-foreground shadow-md transition hover:scale-[1.02] hover:bg-primary/90 disabled:opacity-50 {className}"
+	class="inline-flex w-full yaxa-press items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3.5 text-sm font-bold text-primary-foreground shadow-md transition hover:scale-[1.02] hover:bg-primary/90 disabled:opacity-50 {className}"
 >
 	{#if loading}
 		<LoaderCircle class="size-4 animate-spin" />

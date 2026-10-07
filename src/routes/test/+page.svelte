@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
+	import { page } from '$app/state';
 	import {
 		ArrowLeft,
 		Cloud,
@@ -7,6 +8,7 @@
 		Database,
 		HardDrive,
 		Mail,
+		Palette,
 		Radio,
 		RefreshCw,
 		ShieldCheck,
@@ -22,13 +24,26 @@
 	import RpcTab from './components/RpcTab.svelte';
 	import S3Tab from './components/S3Tab.svelte';
 	import SseTab from './components/SseTab.svelte';
+	import ThemeTab from './components/ThemeTab.svelte';
 	import UploadTab from './components/UploadTab.svelte';
 
 	let { data }: { data: PageData } = $props();
 
-	let activeTab = $state<'rpc' | 'db' | 'upload' | 's3' | 'email' | 'sse' | 'auth' | 'polar'>(
-		'rpc'
-	);
+	type TabKey = 'rpc' | 'db' | 'upload' | 's3' | 'email' | 'sse' | 'auth' | 'polar' | 'theme';
+	const validTabs: TabKey[] = [
+		'rpc',
+		'db',
+		'upload',
+		's3',
+		'email',
+		'sse',
+		'auth',
+		'polar',
+		'theme'
+	];
+	const initialTab = page.url.searchParams.get('tab') as TabKey | null;
+
+	let activeTab = $state<TabKey>(initialTab && validTabs.includes(initialTab) ? initialTab : 'rpc');
 	let rpcLatency = $state<number | null>(null);
 	let cacheSource = $state<string | null>(null);
 
@@ -42,7 +57,7 @@
 	class="min-h-screen bg-background text-foreground selection:bg-primary selection:text-primary-foreground"
 >
 	<!-- Top Navigation Header -->
-	<header class="sticky top-0 z-40 border-b border-border bg-card/60 backdrop-blur-md">
+	<header class="sticky top-0 z-40 border-b border-border yaxa-glass">
 		<div class="container mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
 			<div class="flex items-center gap-3">
 				<a
@@ -112,7 +127,7 @@
 
 		<!-- Diagnostic Tab Navigation (Fixed Height + Tabular Layout) -->
 		<div
-			class="grid grid-cols-2 gap-1 rounded-2xl border border-border bg-card p-1.5 shadow-xs sm:grid-cols-4 lg:grid-cols-8"
+			class="grid grid-cols-2 gap-1 rounded-2xl border border-border bg-card p-1.5 shadow-xs sm:grid-cols-3 lg:grid-cols-9"
 		>
 			<!-- Tab 1: RPC & Rate Limiter -->
 			<button
@@ -242,6 +257,18 @@
 					Active
 				</span>
 			</button>
+
+			<!-- Tab 9: Theming Studio -->
+			<button
+				onclick={() => (activeTab = 'theme')}
+				class="flex h-9 items-center gap-1.5 truncate rounded-xl px-2.5 text-xs font-semibold transition-all {activeTab ===
+				'theme'
+					? 'bg-primary text-primary-foreground shadow-xs'
+					: 'text-muted-foreground hover:bg-accent hover:text-foreground'}"
+			>
+				<Palette class="size-3.5 shrink-0" />
+				<span class="truncate">Theme</span>
+			</button>
 		</div>
 
 		<!-- Render Selected Tab Panel -->
@@ -272,6 +299,8 @@
 			<AuthTab initialUser={data.user} />
 		{:else if activeTab === 'polar'}
 			<PolarTab systemStatus={data.systemStatus} />
+		{:else if activeTab === 'theme'}
+			<ThemeTab />
 		{/if}
 	</main>
 </div>

@@ -46,7 +46,7 @@
 	class="relative min-h-screen bg-background text-foreground selection:bg-primary selection:text-primary-foreground"
 >
 	<!-- 1. HERO SECTION -->
-	<header class="relative overflow-hidden border-b border-border/40 py-20 sm:py-28">
+	<header class="relative overflow-hidden border-b border-border/40 yaxa-mesh-glow py-20 sm:py-28">
 		<div
 			class="absolute inset-0 bg-linear-to-b from-primary/5 via-transparent to-transparent"
 		></div>

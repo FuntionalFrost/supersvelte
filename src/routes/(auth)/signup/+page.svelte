@@ -52,7 +52,7 @@
 	}
 </script>
 
-<div class="space-y-6 rounded-xl border border-border bg-card p-6 shadow-xs">
+<div class="space-y-6 rounded-xl border border-border bg-card p-6 shadow-xs yaxa-surface-elevated">
 	<div class="space-y-1 text-center">
 		<h1 class="text-2xl font-semibold tracking-tight text-foreground">Create an account</h1>
 		<p class="text-xs text-muted-foreground">Enter your details to get started with SuperSvelte</p>
@@ -73,7 +73,7 @@
 		variant="outline"
 		onclick={signupWithGithub}
 		disabled={githubLoading || emailLoading}
-		class="w-full text-xs font-semibold"
+		class="w-full yaxa-press text-xs font-semibold"
 	>
 		<GithubIcon class="mr-2 size-4" />
 		<span>{githubLoading ? 'Connecting...' : 'Continue with GitHub'}</span>
@@ -120,7 +120,7 @@
 			/>
 		</FormField>
 
-		<Button type="submit" disabled={emailLoading} class="w-full text-xs font-bold">
+		<Button type="submit" disabled={emailLoading} class="w-full yaxa-press text-xs font-bold">
 			{emailLoading ? 'Creating account...' : 'Create Account with Email'}
 		</Button>
 	</form>
