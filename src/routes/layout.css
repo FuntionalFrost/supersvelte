@@ -1,6 +1,7 @@
 @import 'tailwindcss';
+@plugin '@tailwindcss/typography';
 @import 'tw-animate-css';
-@import 'yaxa-svelte/yaxa.css';
+@import 'yaxa-svelte/theme.css';
 @import '@fontsource-variable/inter';
 
 @custom-variant dark (&:where(.dark, .dark *));

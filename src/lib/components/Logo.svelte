@@ -19,7 +19,9 @@
 	};
 </script>
 
-<div class="inline-flex items-center gap-3 font-bold tracking-tight select-none {className}">
+<div
+	class="inline-flex items-center gap-2 font-bold tracking-tight select-none sm:gap-3 {className}"
+>
 	<!-- Icon Tile Matching Favicon -->
 	<div
 		class="relative flex shrink-0 items-center justify-center border border-border/80 bg-neutral-900 text-white shadow-xs transition-transform hover:scale-105 dark:border-white/20 dark:bg-[#0c121e] {sizeConfig[

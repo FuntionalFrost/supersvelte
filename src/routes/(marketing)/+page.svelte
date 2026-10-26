@@ -46,27 +46,27 @@
 	class="relative min-h-screen bg-background text-foreground selection:bg-primary selection:text-primary-foreground"
 >
 	<!-- 1. HERO SECTION -->
-	<header class="relative overflow-hidden border-b border-border/40 yaxa-mesh-glow py-20 sm:py-28">
+	<header class="relative overflow-hidden border-b border-border/40 yaxa-mesh-glow py-14 sm:py-28">
 		<div
 			class="absolute inset-0 bg-linear-to-b from-primary/5 via-transparent to-transparent"
 		></div>
 
 		<div class="relative container mx-auto max-w-5xl px-4 text-center">
 			<div
-				class="mb-6 inline-flex items-center gap-2 rounded-full border border-border/70 bg-card/60 px-4 py-1.5 text-xs font-semibold text-muted-foreground shadow-xs"
+				class="mb-6 inline-flex items-center gap-2 rounded-full border border-border/70 bg-card/60 px-3.5 py-1 text-xs font-semibold text-muted-foreground shadow-xs"
 			>
-				<Sparkles class="size-3.5 text-muted-foreground" />
-				<span>SuperSvelte • Svelte 5 + Hono RPC + Neon</span>
+				<Sparkles class="size-3.5 shrink-0 text-muted-foreground" />
+				<span class="truncate">SuperSvelte • Svelte 5 + Hono RPC + Neon</span>
 			</div>
 
-			<h1 class="text-6xl font-black tracking-tight sm:text-7xl md:text-8xl">
+			<h1 class="text-5xl font-black tracking-tight sm:text-7xl md:text-8xl">
 				<span class="text-foreground">Super</span><span
 					class="bg-linear-to-r from-teal-400 via-cyan-400 to-cyan-300 bg-clip-text text-transparent"
 					>Svelte</span
 				>
 			</h1>
 
-			<p class="mx-auto mt-4 max-w-xl text-lg font-bold text-foreground sm:text-2xl">
+			<p class="mx-auto mt-4 max-w-xl text-base font-bold text-foreground sm:text-2xl">
 				The Batteries-Included Edge TS Framework
 			</p>
 

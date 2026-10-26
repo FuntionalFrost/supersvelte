@@ -3,11 +3,11 @@
 	import { PUBLIC_POLAR_PRO_PRODUCT_ID, PUBLIC_POLAR_STANDARD_PRODUCT_ID } from '$app/env/public';
 	import PolarCheckout from '#lib/components/PolarCheckout.svelte';
 	import { Check, Copy, CreditCard, ExternalLink, ShieldCheck } from '@lucide/svelte';
-	import { toast } from 'yaxa-svelte';
+	import { toast, useClipboard } from 'yaxa-svelte';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
-	let copied = $state(false);
+	const clipboard = useClipboard({ timeout: 2000 });
 
 	const hasActivePlan = $derived(!!data.purchase);
 	const planName = $derived(
@@ -21,10 +21,8 @@
 	);
 
 	function copyLicenseKey(key: string) {
-		navigator.clipboard.writeText(key);
-		copied = true;
+		clipboard.copy(key);
 		toast.success('License key copied to clipboard');
-		setTimeout(() => (copied = false), 2000);
 	}
 </script>
 
@@ -86,7 +84,7 @@
 								class="rounded p-1 text-muted-foreground hover:text-foreground"
 								title="Copy License Key"
 							>
-								{#if copied}
+								{#if clipboard.copied}
 									<Check class="size-3.5 text-emerald-500" />
 								{:else}
 									<Copy class="size-3.5" />

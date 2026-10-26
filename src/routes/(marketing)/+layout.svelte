@@ -17,26 +17,28 @@
 <div
 	class="flex min-h-screen flex-col bg-background text-foreground selection:bg-primary selection:text-primary-foreground"
 >
-	<!-- Sticky Marketing Header with increased size and prominence -->
+	<!-- Sticky Marketing Header with responsive mobile layout -->
 	<header class="sticky top-0 z-40 w-full border-b border-border/60 yaxa-glass">
-		<div class="container mx-auto flex h-20 max-w-6xl items-center justify-between px-4 sm:px-6">
-			<div class="flex items-center gap-4">
+		<div
+			class="container mx-auto flex h-16 max-w-6xl items-center justify-between px-3 sm:h-20 sm:px-6"
+		>
+			<div class="flex min-w-0 items-center gap-1.5 sm:gap-4">
 				<!-- Mobile Menu Toggle Button -->
 				<button
 					type="button"
 					onclick={() => (mobileOpen = !mobileOpen)}
-					class="rounded-lg p-2 text-muted-foreground transition hover:bg-muted md:hidden"
+					class="shrink-0 rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted sm:p-2 md:hidden"
 					aria-label="Toggle navigation"
 				>
 					{#if mobileOpen}
-						<X class="size-6" />
+						<X class="size-5 sm:size-6" />
 					{:else}
-						<Menu class="size-6" />
+						<Menu class="size-5 sm:size-6" />
 					{/if}
 				</button>
 
 				<!-- Brand Logo & Text -->
-				<a href="/" class="flex items-center gap-3 transition hover:opacity-90">
+				<a href="/" class="flex min-w-0 items-center gap-2 transition hover:opacity-90 sm:gap-3">
 					<Logo size="md" showText />
 				</a>
 			</div>
@@ -51,14 +53,14 @@
 			</nav>
 
 			<!-- Header Actions -->
-			<div class="flex items-center gap-4">
+			<div class="flex shrink-0 items-center gap-2 sm:gap-4">
 				<ThemeToggle />
 				{#if user}
 					<a
 						href={resolve('dashboard')}
-						class="inline-flex items-center gap-2 rounded-full bg-foreground px-5 py-2 text-xs font-bold text-background shadow-xs transition hover:bg-foreground/90 sm:text-sm"
+						class="inline-flex items-center gap-1.5 rounded-full bg-foreground px-3.5 py-1.5 text-xs font-bold whitespace-nowrap text-background shadow-xs transition hover:bg-foreground/90 sm:gap-2 sm:px-5 sm:py-2 sm:text-sm"
 					>
-						<LayoutDashboard class="size-4" />
+						<LayoutDashboard class="size-3.5 shrink-0 sm:size-4" />
 						<span>Dashboard</span>
 					</a>
 				{:else}
@@ -70,10 +72,10 @@
 					</a>
 					<a
 						href="/#pricing"
-						class="inline-flex items-center gap-2 rounded-full bg-foreground px-5 py-2 text-xs font-bold text-background shadow-xs transition hover:bg-foreground/90 sm:text-sm"
+						class="inline-flex items-center gap-1.5 rounded-full bg-foreground px-3.5 py-1.5 text-xs font-bold whitespace-nowrap text-background shadow-xs transition hover:bg-foreground/90 sm:gap-2 sm:px-5 sm:py-2 sm:text-sm"
 					>
-						<Rocket class="size-4" />
-						<span>Get SuperSvelte</span>
+						<Rocket class="size-3.5 shrink-0 sm:size-4" />
+						<span>Get<span class="hidden min-[420px]:inline"> SuperSvelte</span></span>
 					</a>
 				{/if}
 			</div>
@@ -81,13 +83,13 @@
 
 		<!-- Mobile Navigation Drawer -->
 		{#if mobileOpen}
-			<div class="border-b border-border/60 bg-background/95 px-6 py-5 backdrop-blur-md md:hidden">
-				<nav class="flex flex-col space-y-3">
+			<div class="border-b border-border/60 bg-background/95 px-5 py-4 backdrop-blur-md md:hidden">
+				<nav class="flex flex-col space-y-2">
 					{#each siteConfig.nav || [] as item (item.href)}
 						<a
 							href={item.href}
 							onclick={() => (mobileOpen = false)}
-							class="rounded-lg px-3 py-2 text-base font-semibold text-muted-foreground transition hover:bg-muted hover:text-foreground"
+							class="rounded-lg px-3 py-2 text-sm font-semibold text-muted-foreground transition hover:bg-muted hover:text-foreground"
 						>
 							{item.label}
 						</a>
@@ -95,16 +97,20 @@
 					<a
 						href="/contact"
 						onclick={() => (mobileOpen = false)}
-						class="rounded-lg px-3 py-2 text-base font-semibold text-muted-foreground transition hover:bg-muted hover:text-foreground"
+						class="rounded-lg px-3 py-2 text-sm font-semibold text-muted-foreground transition hover:bg-muted hover:text-foreground"
 					>
 						Contact & Support
 					</a>
+					<div class="flex items-center justify-between border-t border-border/40 px-3 pt-3">
+						<span class="text-xs font-medium text-muted-foreground">Appearance</span>
+						<ThemeToggle />
+					</div>
 					{#if !user}
 						<div class="border-t border-border/40 pt-3">
 							<a
 								href={resolve('login')}
 								onclick={() => (mobileOpen = false)}
-								class="block rounded-lg px-3 py-2 text-base font-semibold text-muted-foreground hover:bg-muted hover:text-foreground"
+								class="block rounded-lg px-3 py-2 text-sm font-semibold text-muted-foreground hover:bg-muted hover:text-foreground"
 							>
 								Sign In
 							</a>
