@@ -210,8 +210,8 @@ pnpm db:migrate  # Run migration bundle in production`
 					filename: 'src/routes/api/checkout/+server.ts',
 					code: `const checkout = await polar.checkouts.create({
   products: [productId],
-  successUrl: \`\${origin}/welcome?checkout_id={CHECKOUT_ID}\`,
-  customerEmail: locals.user?.email,
+  success_url: \`\${origin}/welcome?checkout_id={CHECKOUT_ID}\`,
+  customer_email: locals.user?.email,
   metadata: { userId: locals.user?.id }
 });`
 				}

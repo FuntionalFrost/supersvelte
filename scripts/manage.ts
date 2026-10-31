@@ -1,7 +1,4 @@
 // scripts/manage.ts
-import { execSync } from 'node:child_process';
-import fs from 'node:fs';
-import path from 'node:path';
 import 'dotenv/config';
 import { neon } from '@neondatabase/serverless';
 import { drizzle } from 'drizzle-orm/neon-http';
@@ -115,22 +112,6 @@ async function main() {
 			break;
 		}
 
-		case 'package':
-		case 'package:zip': {
-			console.log('📦 Packaging SuperSvelte boilerplate for distribution...');
-			const privateDir = path.resolve('private');
-			if (!fs.existsSync(privateDir)) {
-				fs.mkdirSync(privateDir, { recursive: true });
-			}
-
-			const outPath = path.join(privateDir, 'supersvelte-latest.zip');
-			execSync(`git archive --format=zip -o "${outPath}" HEAD`);
-			const stats = fs.statSync(outPath);
-			console.log(`✅ Done! Created "${outPath}" (${Math.round(stats.size / 1024)} KB).`);
-			console.log(`   Ready to be served by /api/download.`);
-			break;
-		}
-
 		default: {
 			console.log(`
 ⚡ SuperSvelte Management CLI (like Django manage.py)
@@ -142,7 +123,6 @@ Available Commands:
   make:admin <email>              Promote user account to admin
   make:license <email> [pro|std]  Generate manual active license key for user
   stats                           Display database metrics & counts
-  package                         Create clean distribution ZIP in private/
 `);
 			break;
 		}

@@ -77,11 +77,13 @@
 
 			<div class="mt-8 flex flex-col justify-center gap-4 sm:flex-row">
 				<a
-					href="#pricing"
+					href="https://github.com/FunctionalFrost/supersvelte"
+					target="_blank"
+					rel="noopener noreferrer"
 					class="inline-flex items-center justify-center gap-2 rounded-xl bg-foreground px-6 py-3 text-sm font-bold text-background shadow-md transition hover:scale-105 hover:bg-foreground/90"
 				>
 					<Rocket class="size-4" />
-					<span>Get SuperSvelte!</span>
+					<span>Get SuperSvelte (Free on GitHub)</span>
 				</a>
 				<a
 					href="#features"
@@ -262,7 +264,7 @@
 		</div>
 	</section>
 
-	<!-- 6. PRICING SECTION -->
+	<!-- 6. PRICING SECTION (MONETIZATION ENGINE SHOWCASE) -->
 	<section id="pricing" class="border-t border-border/40 bg-muted/20 py-24">
 		<div class="container mx-auto max-w-5xl px-4">
 			<div class="text-center">
@@ -270,12 +272,15 @@
 					class="mb-3 inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-sm font-semibold text-primary"
 				>
 					<Zap class="size-3.5" />
-					<span>One-Time Payment • Lifetime Access</span>
+					<span>Turnkey Monetization • Polar.sh Showcase</span>
 				</div>
-				<h2 class="text-3xl font-bold tracking-tight sm:text-5xl">Launch Your SaaS This Weekend</h2>
+				<h2 class="text-3xl font-bold tracking-tight sm:text-5xl">
+					Built-In SaaS Billing & Subscriptions
+				</h2>
 				<p class="mx-auto mt-3 max-w-xl text-sm text-muted-foreground">
-					Save 80+ hours of custom integration work. Get full source code access, automated GitHub
-					repo invites, and lifetime updates.
+					SuperSvelte is 100% free and open-source under the MIT license. This live section
+					demonstrates how effortlessly you can monetize your own SaaS applications with our
+					plug-and-play Polar.sh integration.
 				</p>
 			</div>
 
@@ -338,21 +343,21 @@
 			>
 				<div class="flex items-center gap-2">
 					<ShieldCheck class="size-4 text-emerald-500" />
-					<span>Secure Checkout via Polar</span>
+					<span>Production-Ready Polar SDK</span>
 				</div>
 				<div class="flex items-center gap-2">
 					<Zap class="size-4 text-cyan-400" />
-					<span>Instant GitHub Collaborator Access</span>
+					<span>Webhook Sync & Neon Postgres</span>
 				</div>
 				<div class="flex items-center gap-2">
 					<Check class="size-4 text-emerald-500" />
-					<span>14-Day Money-Back Guarantee</span>
+					<span>Customer Portal & Feature Gating</span>
 				</div>
 			</div>
 		</div>
 	</section>
 
-	<!-- 6. DEVELOPER FAQ SECTION -->
+	<!-- 7. DEVELOPER FAQ SECTION -->
 	<section id="faq" class="border-t border-border/40 py-20">
 		<div class="container mx-auto max-w-4xl px-4">
 			<div class="mb-12 text-center">
@@ -367,34 +372,41 @@
 
 			<div class="grid grid-cols-1 gap-6 text-sm md:grid-cols-2">
 				<div class="space-y-2 rounded-xl border border-border bg-card p-5">
-					<h3 class="text-sm font-bold text-foreground">What happens after I complete payment?</h3>
+					<h3 class="text-sm font-bold text-foreground">
+						Is SuperSvelte really 100% free and open source?
+					</h3>
 					<p class="leading-relaxed text-muted-foreground">
-						You receive an automated GitHub invite to the private SuperSvelte repository, along with
-						a direct ZIP download link and setup documentation.
+						Yes! SuperSvelte is licensed under the permissive MIT License. You have complete freedom
+						to use it for personal projects, commercial products, or client work with zero royalties
+						or restrictions.
 					</p>
 				</div>
 
 				<div class="space-y-2 rounded-xl border border-border bg-card p-5">
-					<h3 class="text-sm font-bold text-foreground">How is EU VAT handled?</h3>
+					<h3 class="text-sm font-bold text-foreground">Why is there a pricing section above?</h3>
 					<p class="leading-relaxed text-muted-foreground">
-						Our checkout automatically calculates local EU VAT at purchase and handles B2B
-						reverse-charge exemptions with valid EU VAT IDs. Tax invoices are emailed immediately.
+						The pricing section is an interactive showcase of SuperSvelte's built-in Polar.sh
+						billing engine. It proves how easily you can set up tiers, test checkouts, and handle
+						webhook fulfillment in your own SaaS.
 					</p>
 				</div>
 
 				<div class="space-y-2 rounded-xl border border-border bg-card p-5">
-					<h3 class="text-sm font-bold text-foreground">Can I use this for client projects?</h3>
+					<h3 class="text-sm font-bold text-foreground">How does billing and checkout work?</h3>
 					<p class="leading-relaxed text-muted-foreground">
-						Yes! The Standard license covers a single client deliverable or personal SaaS, while the
-						Unlimited Pro license covers unlimited client projects.
+						Polar acts as the Merchant of Record, handling global taxes, EU VAT reverse-charge, and
+						payouts. SuperSvelte connects via verified webhooks to provision user entitlements in
+						Neon Postgres.
 					</p>
 				</div>
 
 				<div class="space-y-2 rounded-xl border border-border bg-card p-5">
-					<h3 class="text-sm font-bold text-foreground">Are updates included?</h3>
+					<h3 class="text-sm font-bold text-foreground">
+						Can I use this for client or commercial SaaS?
+					</h3>
 					<p class="leading-relaxed text-muted-foreground">
-						Yes. Both licences grant lifetime access to repository updates, bug fixes, and
-						compatibility patches as Svelte 5 evolves.
+						Absolutely. Build as many apps or client projects as you wish. Clone the repository, add
+						your environment variables, and deploy directly to Netlify in minutes.
 					</p>
 				</div>
 			</div>

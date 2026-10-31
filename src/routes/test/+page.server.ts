@@ -6,8 +6,7 @@ import {
 	POLAR_WEBHOOK_SECRET,
 	POLAR_ACCESS_TOKEN,
 	QSTASH_TOKEN,
-	RESEND_API_KEY,
-	GITHUB_ADMIN_TOKEN
+	RESEND_API_KEY
 } from '$app/env/private';
 
 import { auth } from '#lib/server/auth/index.js';
@@ -17,8 +16,6 @@ import { sendEmail } from '#lib/server/email.js';
 import { setCookiesFromResponse } from '#lib/server/utils.js';
 import { error, fail, redirect } from '@sveltejs/kit';
 import { and, eq } from 'drizzle-orm';
-import { superValidate } from 'sveltekit-superforms';
-import { zod4 as zod } from 'sveltekit-superforms/adapters';
 import type { Actions, PageServerLoad } from './$types';
 
 const MOCK_DEMO_PROJECTS = [
@@ -27,7 +24,6 @@ const MOCK_DEMO_PROJECTS = [
 ];
 
 export const load: PageServerLoad = async ({ locals }) => {
-	const form = await superValidate(zod(insertProjectSchema));
 	let userProjects = MOCK_DEMO_PROJECTS;
 
 	if (locals.user) {
@@ -43,7 +39,6 @@ export const load: PageServerLoad = async ({ locals }) => {
 	}
 
 	return {
-		form,
 		existingProjects: userProjects,
 		user: locals.user ?? null,
 		session: locals.session ?? null,
@@ -52,8 +47,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 			polarSecret: !!POLAR_WEBHOOK_SECRET,
 			polarToken: !!POLAR_ACCESS_TOKEN,
 			qstashToken: !!QSTASH_TOKEN,
-			resendKey: !!RESEND_API_KEY,
-			githubToken: !!GITHUB_ADMIN_TOKEN
+			resendKey: !!RESEND_API_KEY
 		}
 	};
 };
@@ -64,22 +58,28 @@ export const actions: Actions = {
 			throw error(404, 'Not found');
 		}
 
-		const form = await superValidate(event.request, zod(insertProjectSchema));
-		if (!form.valid) return fail(400, { form });
-
 		if (!event.locals.user) {
-			return fail(401, { form, message: 'Sign in to create persistent database records.' });
+			return fail(401, { message: 'Sign in to create persistent database records.' });
+		}
+
+		const formData = await event.request.formData();
+		const name = formData.get('name')?.toString() || '';
+		const slug = formData.get('slug')?.toString() || name.toLowerCase().replace(/\s+/g, '-');
+
+		const parsed = insertProjectSchema.safeParse({ name, slug });
+		if (!parsed.success) {
+			return fail(400, { message: 'Invalid project data', errors: parsed.error.format() });
 		}
 
 		try {
 			await db.insert(projects).values({
-				name: form.data.name,
-				slug: form.data.slug,
+				name: parsed.data.name,
+				slug: parsed.data.slug,
 				userId: event.locals.user.id
 			});
-			return { form };
+			return { success: true };
 		} catch {
-			return fail(500, { form, message: 'Failed to insert project into database.' });
+			return fail(500, { message: 'Failed to insert project into database.' });
 		}
 	},
 

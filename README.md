@@ -3,24 +3,29 @@
 > **The Batteries-Included, Zero-Codegen Full-Stack Svelte 5 Framework.**
 > Built with SvelteKit, Svelte 5 Runes, Runed, OpenAPI 3.1 Hono RPC, Better Auth, Polar Payments, Neon Postgres, Drizzle ORM, and Upstash Redis.
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![GitHub Stars](https://img.shields.io/github/stars/FunctionalFrost/supersvelte?style=social)](https://github.com/FunctionalFrost/supersvelte)
+[![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/FunctionalFrost/supersvelte)
+
 ---
 
 ## 📌 Overview
 
-**SuperSvelte** is an enterprise-grade full-stack boilerplate engineered for speed, type safety, and developer autonomy. It combines the reactivity of **Svelte 5 Runes** and **Runed** utilities with an **OpenAPI 3.1 & Hono RPC** backend, providing instant end-to-end type safety without build watchers or external codegen steps.
+**SuperSvelte** is an enterprise-grade, 100% free and open-source full-stack SaaS boilerplate engineered for speed, type safety, and developer autonomy under the **MIT License**. It combines the fine-grained reactivity of **Svelte 5 Runes** and **Runed** utilities with an **OpenAPI 3.1 & Hono RPC** backend, providing instant end-to-end type safety without build watchers or external codegen steps.
 
 ### ✨ Key Highlights
 
 - **⚡ Svelte 5 Runes & Runed:** Fine-grained reactivity powered by `$state`, `$derived`, `$effect`, and snippets with 0 Virtual DOM overhead, enhanced by `runed` composables (`persistedState`, `Debounced`, `watch`, `useMediaQuery`).
 - **🔥 0-Codegen OpenAPI RPC:** Backend routes written with `@hono/zod-openapi` automatically infer client types (`hc<AppType>`) while generating live OpenAPI 3.1 specs and interactive **Swagger UI** at `/api/docs`.
+- **🎨 Modern UI with Yaxa:** Clean, accessible UI components and design system built with [Yaxa](https://yaxa.vercel.app/) and Tailwind CSS v4.
 - **📚 In-App Documentation Engine:** Built-in documentation portal at `/docs` with server-side Shiki syntax highlighting, responsive navigation drawer, real-time search filtering, and table of contents.
 - **🖼️ Dynamic Social Card Generator:** Zero-binary vector Open Graph image generation at `/api/og` for high-resolution Twitter and LinkedIn previews.
-- **💳 Polar Billing & Automated Fulfillment:** Merchant of Record (MoR) checkout integration, automated GitHub repository invitations, customer license tracking, and signature-verified webhooks.
+- **💳 Turnkey Polar.sh SaaS Billing Engine:** Production-ready Merchant of Record (MoR) integration, checkout sessions, customer portal, and signature-verified webhooks to monetize your SaaS.
 - **🔒 Declarative Feature Gating & RBAC:** Protect frontend UI with `<Gate required="pro">`, secure backend endpoints with `requirePlan('pro')` Hono middleware, and enforce role-based access control (Admin, Owner, Member).
 - **🏢 Multi-Tenant Workspaces:** Organization switching, invitation management via `/accept-invitation/[id]`, and Better Auth session synchronization.
 - **🐘 Serverless Database & Caching:** Neon Postgres paired with Drizzle ORM for type-safe database queries and Upstash Redis for sliding-window rate limiting, QStash background job queues, and SSE streaming.
-- **📦 Unified Management CLI:** Django/Laravel-style management interface (`pnpm manage`) for promoting admins, issuing manual licenses, viewing database analytics, and packaging release ZIPs.
-- **🧪 Colocated Test Bench & E2E:** Modular diagnostic sandbox at `/test` covering live RPC, cache, and SSE, plus automated Playwright E2E and Vitest unit testing.
+- **📦 Unified Management CLI:** Django/Laravel-style management interface (`pnpm manage`) for promoting admins, issuing test licenses, and viewing database analytics.
+- **🧪 Colocated Test Bench & Testing:** Modular diagnostic sandbox at `/test` covering live RPC, cache, and SSE, plus automated Vitest unit and integration testing.
 
 ---
 
@@ -30,7 +35,7 @@
 | ---------------------- | -------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------- |
 | **Frontend**           | [SvelteKit](https://kit.svelte.dev/) & [Svelte 5](https://svelte.dev/)                                               | Runes reactivity, filesystem routing, and hybrid SSR                  |
 | **Reactive Utilities** | [Runed](https://runed.dev/)                                                                                          | Svelte 5 composables (`persistedState`, `Debounced`, `watch`)         |
-| **Styling & UI**       | [Tailwind CSS v4](https://tailwindcss.com/) & [shadcn-svelte](https://shadcn-svelte.com/)                            | Accessible UI primitives with Lucide icons & design tokens            |
+| **Styling & UI**       | [Yaxa UI](https://yaxa.vercel.app/) & [Tailwind CSS v4](https://tailwindcss.com/)                                    | Accessible UI primitives with Lucide icons & design tokens            |
 | **API Layer**          | [Hono](https://hono.dev/) & [@hono/zod-openapi](https://github.com/honojs/middleware/tree/main/packages/zod-openapi) | Type-safe OpenAPI RPC engine + Swagger UI                             |
 | **Payments & MoR**     | [Polar](https://polar.sh/)                                                                                           | Global tax compliance, hosted checkout, customer portal, and webhooks |
 | **Authentication**     | [Better Auth](https://www.better-auth.com/)                                                                          | Sessions, OAuth, Organizations / Multi-tenancy, and Admin plugins     |
@@ -44,8 +49,10 @@
 
 ```text
 supersvelte/
-├── e2e/
-│   └── demo.test.ts                    # Automated Playwright browser smoke test
+├── .github/
+│   ├── ISSUE_TEMPLATE/                 # Bug report template
+│   ├── workflows/ci.yml                # Automated GitHub Actions CI pipeline
+│   └── PULL_REQUEST_TEMPLATE.md
 │
 ├── scripts/
 │   ├── manage.ts                       # Unified Management CLI (pnpm manage)
@@ -56,6 +63,7 @@ supersvelte/
 │   ├── app.d.ts                        # Better Auth session & App.Locals typing
 │   ├── app.html
 │   ├── hooks.server.ts                 # Better Auth handler, route guards & rate limiting
+│   ├── site.config.ts                  # Centralized site, navigation & SEO metadata
 │   │
 │   ├── lib/
 │   │   ├── api-client.ts               # Type-safe Hono RPC client (hc<AppType>)
@@ -75,8 +83,7 @@ supersvelte/
 │   │   │   ├── PolarCheckout.svelte    # Polar hosted checkout launcher
 │   │   │   ├── SuperSvelteVsOthers.svelte
 │   │   │   ├── TeamSwitcher.svelte     # Multi-tenant organization dropdown
-│   │   │   ├── ThemeToggle.svelte      # Dark/light mode switcher
-│   │   │   └── ui/                     # shadcn-svelte UI primitives (Button, Field, Form, Input, Label, Separator)
+│   │   │   └── ThemeToggle.svelte      # Dark/light mode switcher
 │   │   │
 │   │   ├── config/
 │   │   │   ├── code-comparisons.ts     # Code preview matrices
@@ -89,8 +96,7 @@ supersvelte/
 │   │   │
 │   │   └── server/                     # Backend infrastructure & services
 │   │       ├── email.ts                # Resend client & Svelte SSR renderer
-│   │       ├── licences.ts             # GitHub API repository invite logic
-│   │       ├── polar.ts                # Polar Server SDK instance
+│   │       ├── polar/                  # Polar Server SDK & checkout instances
 │   │       ├── ratelimit.ts            # Upstash sliding-window rate limiter
 │   │       ├── uploadthing.ts          # UploadThing file router definition
 │   │       ├── utapi.ts                # UploadThing Server API client
@@ -124,8 +130,6 @@ supersvelte/
 │       │   ├── +layout.svelte          # App sidebar & workspace layout
 │       │   ├── dashboard/              # User Dashboard (/dashboard)
 │       │   │   ├── billing/            # License & billing portal (/dashboard/billing)
-│       │   │   │   ├── +page.server.ts
-│       │   │   │   └── +page.svelte
 │       │   │   ├── +page.server.ts
 │       │   │   └── +page.svelte
 │       │   └── settings/
@@ -135,75 +139,41 @@ supersvelte/
 │       ├── (auth)/                     # Authentication Flow Pages
 │       │   ├── +layout.svelte
 │       │   ├── login/                  # Sign In (/login)
-│       │   │   ├── +page.server.ts
-│       │   │   └── +page.svelte
 │       │   └── signup/                 # Register (/signup)
-│       │       ├── +page.server.ts
-│       │       └── +page.svelte
 │       │
 │       ├── (marketing)/                # Public Landing & Marketing Pages
 │       │   ├── +layout.svelte
-│       │   ├── +page.svelte            # Landing page with checkout triggers (/)
+│       │   ├── +page.svelte            # Landing page with architecture & monetization showcase
 │       │   ├── privacy/+page.svelte    # Privacy policy (/privacy)
 │       │   ├── refunds/+page.svelte    # Refund policy (/refunds)
 │       │   ├── terms/+page.svelte      # Terms of service (/terms)
 │       │   ├── vs/+page.svelte         # Competitor comparison matrix (/vs)
 │       │   └── welcome/                # Post-checkout onboarding (/welcome)
-│       │       ├── +page.server.ts
-│       │       └── +page.svelte
 │       │
 │       ├── accept-invitation/
 │       │   └── [id]/                   # Workspace Invitation Acceptor (/accept-invitation/:id)
-│       │       └── +page.svelte
 │       │
 │       ├── admin/                      # Protected Admin Dashboard (/admin)
-│       │   ├── +layout.server.ts
-│       │   ├── +page.server.ts
-│       │   └── +page.svelte
 │       │
 │       ├── api/                        # Standalone Endpoints & Webhooks
 │       │   ├── checkout/+server.ts     # Polar dynamic checkout session creator
-│       │   ├── download/+server.ts     # Protected binary asset delivery
+│       │   ├── download/+server.ts     # GitHub source ZIP archive redirect
 │       │   ├── og/+server.ts           # Dynamic vector social card generator (1200x630)
 │       │   ├── portal/+server.ts       # Polar customer portal redirect
 │       │   ├── queue/worker/+server.ts # QStash background worker receiver
 │       │   ├── test-queue/+server.ts   # Dev-only queue event dispatcher
 │       │   ├── uploadthing/+server.ts  # UploadThing file upload endpoint
-│       │   ├── v1/verify-licence/      # External license verification API
-│       │   │   └── +server.ts
 │       │   ├── webhooks/polar/         # Polar HMAC-verified webhook receiver
-│       │   │   └── +server.ts
 │       │   └── [...paths]/+server.ts   # Catch-all Hono OpenAPI SvelteKit adapter
 │       │
 │       ├── docs/                       # In-App Documentation Engine (/docs)
-│       │   ├── +layout.server.ts
-│       │   ├── +layout.svelte          # Responsive layout with search & drawer
-│       │   ├── +page.server.ts         # Introduction redirect
-│       │   └── [...slug]/              # Shiki syntax-highlighted guide viewer
-│       │       ├── +page.server.ts
-│       │       └── +page.svelte
 │       │
 │       ├── test/                       # Diagnostic Bench & Infrastructure Suite (/test)
-│       │   ├── components/             # Modular diagnostic subcomponents
-│       │   │   ├── AuthTab.svelte
-│       │   │   ├── DbTab.svelte
-│       │   │   ├── PolarTab.svelte
-│       │   │   ├── RpcTab.svelte
-│       │   │   ├── SseTab.svelte
-│       │   │   └── UploadTab.svelte
-│       │   ├── +page.server.ts         # Dev & admin-protected server actions
-│       │   ├── +page.svelte            # Tabbed diagnostic UI
-│       │   └── +page.ts                # Hono RPC diagnostic client loader
 │       │
 │       └── test-gate/                  # Dev-only Feature Gating Diagnostic (/test-gate)
-│           ├── +page.server.ts
-│           └── +page.svelte
 │
 ├── tests/
 │   └── setup.ts                        # Global Vitest configuration & runtime mocks
-│
-└── playwright.config.ts                # Playwright E2E configuration
-
 ```
 
 ---
@@ -216,7 +186,6 @@ supersvelte/
 git clone https://github.com/FunctionalFrost/supersvelte.git
 cd supersvelte
 pnpm install
-
 ```
 
 ### 2. Configure Environment Variables
@@ -225,14 +194,13 @@ Create a `.env` file based on `.env.example`:
 
 ```bash
 cp .env.example .env
-
 ```
 
 Ensure the following core variables are configured:
 
 - `DATABASE_URL`: Connection string for Neon Postgres.
 - `BETTER_AUTH_SECRET`: 32-byte secret key for session encryption (`openssl rand -hex 32`).
-- `POLAR_ACCESS_TOKEN` & `POLAR_WEBHOOK_SECRET`: Polar API credentials.
+- `POLAR_ACCESS_TOKEN` & `POLAR_WEBHOOK_SECRET`: Polar API credentials for SaaS billing demo.
 - `UPSTASH_REDIS_REST_URL` & `UPSTASH_REDIS_REST_TOKEN`: Upstash Redis cache and rate limiting.
 - `RESEND_API_KEY`: Resend API key for transactional emails.
 - `UPLOADTHING_TOKEN`: UploadThing credentials for direct file uploads.
@@ -242,14 +210,12 @@ Ensure the following core variables are configured:
 ```bash
 pnpm auth:schema
 pnpm db:push
-
 ```
 
 ### 4. Start the Development Server
 
 ```bash
 pnpm dev
-
 ```
 
 - **Application:** `http://localhost:5173`
@@ -264,13 +230,10 @@ pnpm dev
 ## 🛠️ Developer Productivity Commands
 
 ```bash
-# Unified Management CLI (Admins, Licenses, Stats)
-pnpm manage make:admin user@example.com      # Promote user to superadmin
-pnpm manage make:license user@example.com pro # Generate manual license key
-pnpm manage stats                           # View live users, orgs & purchases
-
-# Package release archive for buyer distribution (/api/download)
-pnpm package:zip
+# Unified Management CLI (Admins, Test Licenses, Database Stats)
+pnpm manage make:admin user@example.com       # Promote user to superadmin
+pnpm manage make:license user@example.com pro # Generate manual test license key
+pnpm manage stats                            # View live users, orgs & purchases
 
 # Generate a full CRUD entity slice (Drizzle Schema + OpenAPI Hono RPC Route)
 pnpm make:resource invoice
@@ -279,10 +242,26 @@ pnpm make:resource invoice
 pnpm check
 
 # Run automated tests
-pnpm test          # Vitest unit & component tests
-pnpm test:e2e      # Playwright end-to-end browser test
+pnpm test          # Lightning-fast Vitest unit & integration tests
+pnpm test:coverage # Generate code coverage report
 
 # Format and lint codebase
 pnpm format
 pnpm lint
 ```
+
+---
+
+## 🤝 Contributing
+
+Contributions are warmly welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct, development setup, and pull request process.
+
+- **Bug Reports & Issues:** Please submit an issue using our [Bug Report Template](https://github.com/FunctionalFrost/supersvelte/issues/new?template=bug_report.yml).
+- **Security Vulnerabilities:** Please review our [Security Policy](SECURITY.md) and report issues privately to `devfrost@protonmail.com`.
+
+---
+
+## 📄 License
+
+SuperSvelte is open-source software licensed under the **[MIT License](LICENSE)**.
+Feel free to use it for personal, commercial, or client applications with zero royalties.

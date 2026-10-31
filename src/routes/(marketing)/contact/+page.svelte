@@ -53,8 +53,8 @@
 				>
 			</h1>
 			<p class="text-sm leading-relaxed text-muted-foreground sm:text-base">
-				Have questions about SuperSvelte architecture, your commercial license, or need help
-				integrating with your stack? We are here to help.
+				Have questions about SuperSvelte architecture or need help integrating with your stack? We
+				are here to help.
 			</p>
 		</div>
 
@@ -119,20 +119,21 @@
 			<div class="space-y-2 rounded-xl border border-border bg-card/60 p-5">
 				<div class="flex items-center gap-2 text-xs font-bold text-foreground">
 					<Shield class="size-4 text-teal-400" />
-					<span>License & Billing</span>
+					<span>SaaS Billing Integration</span>
 				</div>
 				<p class="text-xs leading-relaxed text-muted-foreground">
-					Assistance with Polar.sh orders, receipt regeneration, invoices, and license upgrades.
+					Guidance on configuring Polar.sh checkout, webhooks, and customer portals in your own
+					SaaS.
 				</p>
 			</div>
 
 			<div class="space-y-2 rounded-xl border border-border bg-card/60 p-5">
 				<div class="flex items-center gap-2 text-xs font-bold text-foreground">
 					<Sparkles class="size-4 text-cyan-400" />
-					<span>GitHub Repo Access</span>
+					<span>Open Source Collaboration</span>
 				</div>
 				<p class="text-xs leading-relaxed text-muted-foreground">
-					Bought a Pro license? Send us your GitHub username to receive an invite to the private
+					Contributions, pull requests, bug fixes, and feature proposals on our public GitHub
 					repository.
 				</p>
 			</div>
@@ -153,7 +154,7 @@
 		<div
 			class="mt-8 rounded-xl border border-border/60 bg-muted/20 p-4 text-center text-xs text-muted-foreground"
 		>
-			Prefer public discussions? Open an issue on our <a
+			Encountered an issue or bug? Open an issue on our <a
 				href={siteConfig.project?.repositoryUrl || 'https://github.com/FunctionalFrost/supersvelte'}
 				target="_blank"
 				rel="noopener noreferrer"

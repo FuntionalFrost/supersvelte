@@ -18,7 +18,7 @@
 						class="inline-flex items-center gap-1 rounded-full border border-primary/20 bg-primary/10 px-2 py-0.5 text-[10px] font-bold text-primary"
 					>
 						<Sparkles class="size-3" />
-						yaxa-svelte 2.0.3
+						yaxa-svelte 2.1.0
 					</span>
 				</div>
 				<p class="text-xs text-muted-foreground">

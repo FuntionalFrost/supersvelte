@@ -54,9 +54,6 @@ Configure the following variables in `.env`:
 | `RESEND_API_KEY`                   | Resend API key for transactional email delivery                        | [Resend Console](https://resend.com)           |
 | `EMAIL_FROM`                       | Verified sender address (e.g. `App <support@yourdomain.com>`)          | Resend Domains                                 |
 | `UPLOADTHING_TOKEN`                | Direct S3 file storage token                                           | [UploadThing Console](https://uploadthing.com) |
-| `GITHUB_ADMIN_TOKEN`               | GitHub Personal Access Token with repository invite scope              | GitHub Developer Settings                      |
-| `GITHUB_REPO_OWNER`                | GitHub username or organization holding your private template          | GitHub                                         |
-| `GITHUB_REPO_NAME`                 | Private repository name to grant buyer access to                       | GitHub                                         |
 
 ---
 
@@ -105,9 +102,6 @@ pnpm manage make:admin user@example.com      # Promote user to superadmin
 pnpm manage make:license user@example.com pro # Issue a manual license key
 pnpm manage stats                           # View active users, orgs & purchases
 
-# Package release archive for buyer distribution (/api/download)
-pnpm package:zip
-
 # Generate full-stack CRUD slice (Drizzle Schema + OpenAPI Hono Route)
 pnpm make:resource invoice
 
@@ -115,8 +109,8 @@ pnpm make:resource invoice
 pnpm check
 
 # Run automated tests
-pnpm test          # Vitest unit & component tests
-pnpm test:e2e      # Playwright end-to-end browser test
+pnpm test          # Lightning-fast Vitest unit & integration test suite (sub-second)
+pnpm test:coverage # Generate code coverage report
 
 # Format and lint codebase
 pnpm format

@@ -33,8 +33,8 @@ export const ratelimit = redis
 const memoryStore = new Map<string, { count: number; reset: number }>();
 
 export async function checkRateLimit(ip: string) {
-	// Bypass rate limiting during automated test / Playwright execution
-	if (process.env.NODE_ENV === 'test' || process.env.PLAYWRIGHT === 'true' || NODE_ENV === 'test') {
+	// Bypass rate limiting during automated test execution
+	if (process.env.NODE_ENV === 'test' || NODE_ENV === 'test') {
 		return {
 			success: true,
 			limit: 1000,

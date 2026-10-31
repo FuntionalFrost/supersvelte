@@ -1,8 +1,8 @@
 // src/lib/server/polar.ts
 import { POLAR_ACCESS_TOKEN, POLAR_ENVIRONMENT } from '$app/env/private';
-import { Polar } from '@polar-sh/sdk';
+import { createPolar } from '@polar-sh/sdk/2026-10';
 
-export const polar = new Polar({
+export const polar = createPolar({
 	accessToken: POLAR_ACCESS_TOKEN,
-	server: POLAR_ENVIRONMENT === 'sandbox' ? 'sandbox' : 'production'
+	environment: POLAR_ENVIRONMENT === 'sandbox' ? 'sandbox' : 'production'
 });

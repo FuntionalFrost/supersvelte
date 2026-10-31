@@ -176,10 +176,9 @@
 					</svg>
 				</div>
 				<div>
-					<p class="font-semibold text-foreground">GitHub Private Repository</p>
+					<p class="font-semibold text-foreground">GitHub Open Source Repository</p>
 					<p class="mt-0.5 leading-relaxed text-muted-foreground">
-						An invitation to join the private GitHub repository has been dispatched to your email
-						address.
+						Access the complete open-source codebase, star the repo, or contribute on GitHub.
 					</p>
 				</div>
 			</div>

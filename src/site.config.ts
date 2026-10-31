@@ -16,15 +16,15 @@ export const siteConfig = defineSiteConfig({
 	project: {
 		license: 'MIT',
 		type: 'open-source',
-		pricingModel: 'paid',
+		pricingModel: 'open-source',
 		repositoryUrl: 'https://github.com/FunctionalFrost/supersvelte',
-		isAccessibleForFree: false,
-		badge: 'Svelte 5 Boilerplate'
+		isAccessibleForFree: true,
+		badge: 'Free & Open Source Svelte 5 Boilerplate'
 	},
 	nav: [
 		{ label: 'Stack & Specs', href: '/#features' },
 		{ label: 'Matrix', href: '/#comparison' },
-		{ label: 'Pricing', href: '/#pricing' },
+		{ label: 'Billing Demo', href: '/#pricing' },
 		{ label: 'Docs', href: '/docs' },
 		{ label: 'FAQ', href: '/#faq' }
 	],

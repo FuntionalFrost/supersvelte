@@ -71,7 +71,9 @@
 						Sign In
 					</a>
 					<a
-						href="/#pricing"
+						href="https://github.com/FunctionalFrost/supersvelte"
+						target="_blank"
+						rel="noopener noreferrer"
 						class="inline-flex items-center gap-1.5 rounded-full bg-foreground px-3.5 py-1.5 text-xs font-bold whitespace-nowrap text-background shadow-xs transition hover:bg-foreground/90 sm:gap-2 sm:px-5 sm:py-2 sm:text-sm"
 					>
 						<Rocket class="size-3.5 shrink-0 sm:size-4" />

@@ -379,8 +379,8 @@ const routes = api
 			try {
 				const checkout = await polar.checkouts.create({
 					products: [productId],
-					successUrl: `${origin}/welcome?checkout_id={CHECKOUT_ID}`,
-					customerEmail: user?.email ?? undefined,
+					success_url: `${origin}/welcome?checkout_id={CHECKOUT_ID}`,
+					customer_email: user?.email ?? undefined,
 					metadata: {
 						userId: user?.id ?? 'anonymous'
 					}

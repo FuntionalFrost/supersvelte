@@ -2,7 +2,6 @@
 import { dev } from '$app/env';
 import { QSTASH_CURRENT_SIGNING_KEY, QSTASH_NEXT_SIGNING_KEY } from '$app/env/private';
 import { sendEmail } from '#lib/server/email.js';
-import { inviteBuyerToGithub } from '#lib/server/licences.js';
 import type { QueueEvent } from '#lib/server/queue/index.js';
 import type { RequestHandler } from '@sveltejs/kit';
 import { Receiver } from '@upstash/qstash';
@@ -56,10 +55,6 @@ export const POST: RequestHandler = async ({ request, url }) => {
 	console.log(`[Queue Worker] Processing verified event: ${event.type}`);
 
 	switch (event.type) {
-		case 'repo.invite': {
-			const success = await inviteBuyerToGithub(event.payload.githubUsername);
-			return Response.json({ success, processed: event.type });
-		}
 		case 'email.transactional': {
 			const result = await sendEmail({
 				to: event.payload.to,

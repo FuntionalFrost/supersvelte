@@ -3,8 +3,7 @@ import { POLAR_WEBHOOK_SECRET, ORIGIN } from '$app/env/private';
 import { db } from '#lib/server/db/index.js';
 import { customers, generateLicenseKey, purchases, user } from '#lib/server/db/schema.js';
 import { sendLicenseConfirmationEmail } from '#lib/server/email.js';
-import { dispatchEvent } from '#lib/server/queue/index.js';
-import { validateEvent } from '@polar-sh/sdk/webhooks';
+import { webhooks } from '@polar-sh/sdk/2026-10';
 import type { RequestHandler } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
 
@@ -13,10 +12,14 @@ interface OrderData {
 	customer?: { id?: string; email?: string };
 	email?: string;
 	customerId?: string;
+	customer_id?: string;
 	productId?: string;
+	product_id?: string;
 	productPriceId?: string;
+	product_price_id?: string;
 	priceId?: string;
 	subscriptionId?: string | null;
+	subscription_id?: string | null;
 	metadata?: {
 		userId?: string;
 		githubUsername?: string;
@@ -42,7 +45,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
 	let event;
 	try {
-		event = validateEvent(rawBody, headers, webhookSecret);
+		event = await webhooks.validateEvent(rawBody, headers, webhookSecret);
 	} catch (err) {
 		console.error('Polar Webhook Signature Verification Failed:', err);
 		return Response.json({ error: 'Invalid signature' }, { status: 400 });
@@ -53,8 +56,8 @@ export const POST: RequestHandler = async ({ request }) => {
 		case 'order.created': {
 			const order = event.data as unknown as OrderData;
 			const customerEmail = order.customer?.email ?? order.email ?? '';
-			const customerId = order.customerId ?? order.customer?.id ?? order.id;
-			const productId = order.productId ?? '';
+			const customerId = order.customerId ?? order.customer_id ?? order.customer?.id ?? order.id;
+			const productId = order.productId ?? order.product_id ?? '';
 			let resolvedUserId: string | null =
 				order.metadata?.userId && order.metadata.userId !== 'anonymous'
 					? order.metadata.userId
@@ -100,8 +103,8 @@ export const POST: RequestHandler = async ({ request }) => {
 					transactionId: order.id,
 					customerId,
 					userId: resolvedUserId,
-					subscriptionId: order.subscriptionId ?? null,
-					priceId: order.productPriceId ?? order.priceId ?? null,
+					subscriptionId: order.subscriptionId ?? order.subscription_id ?? null,
+					priceId: order.productPriceId ?? order.product_price_id ?? order.priceId ?? null,
 					productId,
 					licenseKey,
 					status: 'active'
@@ -118,16 +121,7 @@ export const POST: RequestHandler = async ({ request }) => {
 				`[Polar] Order fulfilled: ${order.id} for ${customerEmail} (License: ${licenseKey})`
 			);
 
-			// 4. Trigger GitHub Repository Collaborator Invite if username provided
-			const githubUsername = order.metadata?.githubUsername;
-			if (githubUsername) {
-				await dispatchEvent({
-					type: 'repo.invite',
-					payload: { githubUsername, email: customerEmail }
-				});
-			}
-
-			// 5. Send Transactional Fulfillment Email with License Key
+			// 4. Send Transactional Fulfillment Email with License Key
 			if (customerEmail) {
 				await sendLicenseConfirmationEmail({
 					to: customerEmail,

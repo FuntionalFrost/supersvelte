@@ -28,7 +28,7 @@
 				<span
 					class="rounded-full border border-teal-500/30 bg-teal-500/10 px-3 py-1 font-mono text-xs font-semibold text-teal-400"
 				>
-					Commercial Licensing
+					Open Source (MIT)
 				</span>
 			</div>
 
@@ -64,48 +64,46 @@
 			<section class="space-y-3 pt-6 first:pt-0">
 				<h2 class="text-lg font-bold text-foreground">1. Acceptance of Terms</h2>
 				<p>
-					By purchasing, accessing, downloading, or using <strong class="text-foreground"
+					By accessing, cloning, downloading, or using <strong class="text-foreground"
 						>SuperSvelte</strong
 					>
 					(<a href={siteConfig.url} class="text-foreground underline hover:text-primary"
 						>{siteConfig.url}</a
-					>), you agree to be bound by these Terms of Service. If you do not agree to all terms, do
-					not purchase or use the codebase.
+					>), you agree to be bound by these Terms of Service and the accompanying MIT License.
 				</p>
 			</section>
 
 			<!-- 2. License Grant -->
 			<section class="space-y-3 pt-8">
-				<h2 class="text-lg font-bold text-foreground">2. License Grant & Acceptable Use</h2>
+				<h2 class="text-lg font-bold text-foreground">2. Open Source License (MIT)</h2>
+				<p>
+					SuperSvelte is licensed under the permissive <strong class="text-foreground"
+						>MIT License</strong
+					>. You are granted full permission, free of charge, to deal in the software without
+					restriction, including the rights to use, copy, modify, merge, publish, distribute,
+					sublicense, and sell copies.
+				</p>
 				<ul class="list-disc space-y-2 pl-5">
 					<li>
-						<strong class="text-foreground">Standard License:</strong> Grants a worldwide, non-exclusive,
-						non-transferable lifetime license for one (1) developer to build and deploy one (1) commercial
-						SaaS application or client deliverable.
+						<strong class="text-foreground">Commercial & Client Usage:</strong> You may build and deploy
+						unlimited personal apps, commercial SaaS products, and client deliverables with zero royalties.
 					</li>
 					<li>
-						<strong class="text-foreground">Pro Unlimited License:</strong> Grants a worldwide, non-exclusive
-						lifetime license for unlimited personal SaaS projects, agency client deliverables, and commercial
-						applications.
-					</li>
-					<li>
-						<strong class="text-foreground">Strict Restrictions:</strong> You may
-						<span class="font-semibold text-foreground">not</span> redistribute, re-license, sublicense,
-						or resell the SuperSvelte source code or components as a boilerplate, starter kit, template,
-						or UI library under any circumstances.
+						<strong class="text-foreground">License Notice:</strong> The copyright notice and permission
+						notice shall be included in substantial portions of the software as set forth in the MIT License.
 					</li>
 				</ul>
 			</section>
 
 			<!-- 3. Payments & Taxes -->
 			<section class="space-y-3 pt-8">
-				<h2 class="text-lg font-bold text-foreground">3. Payments, Invoicing & Taxes</h2>
+				<h2 class="text-lg font-bold text-foreground">3. SaaS Billing Engine & Demo Payments</h2>
 				<p>
-					All order processing and recurring billing is conducted by our online reseller and
-					Merchant of Record, <strong class="text-foreground"
+					All order processing and subscription billing showcased within SuperSvelte is conducted by
+					the online reseller and Merchant of Record, <strong class="text-foreground"
 						>Polar Payments Inc. ("Polar.sh")</strong
-					>. Polar handles all payments, sales tax calculation, EU VAT compliance, and VAT invoice
-					delivery.
+					>. When test or live orders are processed, Polar handles payment execution, sales tax
+					calculation, EU VAT compliance, and VAT invoice delivery.
 				</p>
 			</section>
 
@@ -138,10 +136,10 @@
 		>
 			<div>
 				<h3 class="text-xs font-bold tracking-wider text-foreground uppercase">
-					Commercial Licensing Inquiries
+					Questions & Inquiries
 				</h3>
 				<p class="mt-1 text-xs text-muted-foreground">
-					For enterprise procurement, custom billing terms, or licensing assistance.
+					For architecture guidance, enterprise questions, or contributor inquiries.
 				</p>
 			</div>
 			<ContactEmailBadge />

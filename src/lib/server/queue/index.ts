@@ -6,10 +6,6 @@ const qstash = new Client({ token: QSTASH_TOKEN || 'mock_token' });
 
 export type QueueEvent =
 	| {
-			type: 'repo.invite';
-			payload: { githubUsername: string; email: string };
-	  }
-	| {
 			type: 'email.transactional';
 			payload: { to: string; subject: string; template: string };
 	  }

@@ -11,10 +11,11 @@ export const GET: RequestHandler = async () => {
 
 	try {
 		const res = await dispatchEvent({
-			type: 'repo.invite',
+			type: 'analytics.sync',
 			payload: {
-				githubUsername: 'octocat',
-				email: 'octocat@github.com'
+				userId: 'usr_dev_test',
+				event: 'diagnostic.queue.ping',
+				timestamp: Date.now()
 			}
 		});
 

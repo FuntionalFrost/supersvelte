@@ -26,7 +26,7 @@ export const GET: RequestHandler = async ({ locals }) => {
 			const customerList = await polar.customers.list({
 				email: user.email
 			});
-			customerId = customerList.result.items[0]?.id;
+			customerId = customerList.items[0]?.id;
 		}
 
 		if (!customerId) {
@@ -35,10 +35,10 @@ export const GET: RequestHandler = async ({ locals }) => {
 
 		// 3. Create the customer portal session
 		const session = await polar.customerSessions.create({
-			customerId
+			customer_id: customerId
 		});
 
-		throw redirect(303, session.customerPortalUrl);
+		throw redirect(303, session.customer_portal_url);
 	} catch (err) {
 		if (
 			err &&
