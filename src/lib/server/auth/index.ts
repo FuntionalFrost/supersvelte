@@ -1,4 +1,4 @@
-import { dev } from '$app/env';
+import { building, dev } from '$app/env';
 import { getRequestEvent } from '$app/server';
 
 import {
@@ -29,7 +29,7 @@ export const auth = betterAuth({
 		ORIGIN,
 		BETTER_AUTH_URL
 	].filter(Boolean) as string[],
-	secret: BETTER_AUTH_SECRET,
+	secret: BETTER_AUTH_SECRET || (building ? 'build_dummy_secret_32_characters_12345' : ''),
 	database: drizzleAdapter(db, { provider: 'pg', schema }),
 	advanced: {
 		useSecureCookies: !dev
