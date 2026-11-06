@@ -5,7 +5,7 @@
 	import { siteConfig } from '../../../site.config';
 
 	let copied = $state(false);
-	const email = 'devfrost@protonmail.com';
+	const email = siteConfig.email || 'devfrost@protonmail.com';
 
 	async function copyEmail() {
 		try {
@@ -23,7 +23,7 @@
 
 <Seo
 	title="Contact & Support — SuperSvelte"
-	description="Get in touch with the SuperSvelte core team for technical support, licensing inquiries, and repository access."
+	description="Get in touch with the SuperSvelte maintainers for architecture questions, bug reports, and open-source contributions."
 	ogImage={{
 		title: 'Contact & Support',
 		description: 'Reach out to the SuperSvelte maintainers',

@@ -57,7 +57,7 @@
 	class="min-h-screen bg-background text-foreground selection:bg-primary selection:text-primary-foreground"
 >
 	<!-- Top Navigation Header -->
-	<header class="sticky top-0 z-40 border-b border-border yaxa-glass">
+	<header class="sticky top-0 z-40 border-b border-border bg-background">
 		<div class="container mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
 			<div class="flex items-center gap-3">
 				<a

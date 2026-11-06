@@ -100,7 +100,7 @@
 		<!-- Support Help -->
 		<div class="border-t border-border/40 pt-4 text-[11px] text-muted-foreground">
 			<span>Need assistance? </span>
-			<a href="mailto:support@supersvelte.dev" class="font-semibold text-primary hover:underline">
+			<a href={resolve('contact')} class="font-semibold text-primary hover:underline">
 				Contact Support
 			</a>
 		</div>

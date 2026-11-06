@@ -54,6 +54,21 @@
 					></span
 				>
 			</div>
+
+			<!-- Builder Template Notice -->
+			<div
+				class="rounded-xl border border-teal-500/20 bg-teal-500/5 p-4 text-xs text-muted-foreground"
+			>
+				<p>
+					<strong class="font-semibold text-foreground">💡 Template Notice for Builders:</strong>
+					This cancellation and refund policy is provided as a turnkey, EU-compliant boilerplate template
+					for SaaS applications monetized with Polar.sh. Configure your own refund window and legal entity
+					in
+					<code class="rounded bg-muted px-1.5 py-0.5 font-mono text-[11px] text-foreground"
+						>site.config.ts</code
+					>.
+				</p>
+			</div>
 		</div>
 
 		<!-- Legal Clauses Content -->

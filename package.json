@@ -32,7 +32,7 @@
 		"db:seed": "tsx scripts/seed.ts",
 		"db:reset": "drizzle-kit drop && drizzle-kit push && pnpm db:seed",
 		"db:drop": "drizzle-kit drop",
-		"auth:schema": "better-auth generate --config src/lib/server/auth.ts --output src/lib/server/db/auth.schema.ts --yes",
+		"auth:schema": "better-auth generate --config src/lib/server/auth/index.ts --output src/lib/server/db/auth.schema.ts --yes",
 		"make:resource": "tsx scripts/scaffold-resource.ts",
 		"manage": "tsx scripts/manage.ts"
 	},
@@ -91,7 +91,7 @@
 		"resend": "^6.34.1",
 		"tailwind-merge": "^3.7.0",
 		"uploadthing": "^7.7.4",
-		"yaxa-svelte": "^2.1.0",
+		"yaxa-svelte": "^2.6.0",
 		"zod": "^4.6.5"
 	},
 	"imports": {

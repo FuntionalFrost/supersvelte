@@ -18,7 +18,7 @@
 	class="flex min-h-screen flex-col bg-background text-foreground selection:bg-primary selection:text-primary-foreground"
 >
 	<!-- Sticky Marketing Header with responsive mobile layout -->
-	<header class="sticky top-0 z-40 w-full border-b border-border/60 yaxa-glass">
+	<header class="sticky top-0 z-40 w-full border-b border-border bg-background">
 		<div
 			class="container mx-auto flex h-16 max-w-6xl items-center justify-between px-3 sm:h-20 sm:px-6"
 		>
@@ -85,7 +85,7 @@
 
 		<!-- Mobile Navigation Drawer -->
 		{#if mobileOpen}
-			<div class="border-b border-border/60 bg-background/95 px-5 py-4 backdrop-blur-md md:hidden">
+			<div class="border-b border-border bg-background px-5 py-4 md:hidden">
 				<nav class="flex flex-col space-y-2">
 					{#each siteConfig.nav || [] as item (item.href)}
 						<a

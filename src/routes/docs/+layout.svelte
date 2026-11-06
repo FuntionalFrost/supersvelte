@@ -41,9 +41,7 @@
 
 <div class="flex min-h-screen flex-col bg-background text-foreground">
 	<!-- Top Documentation Header -->
-	<header
-		class="sticky top-0 z-40 w-full border-b border-border/60 bg-background/95 backdrop-blur-md"
-	>
+	<header class="sticky top-0 z-40 w-full border-b border-border bg-background">
 		<div class="container mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6">
 			<div class="flex items-center gap-3">
 				<!-- Mobile Menu Button -->
