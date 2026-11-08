@@ -21,7 +21,7 @@
 - **⚡ Svelte 5 Runes & Runed:** Fine-grained reactivity powered by `$state`, `$derived`, `$effect`, and snippets with 0 Virtual DOM overhead, enhanced by `runed` composables (`persistedState`, `Debounced`, `watch`, `useMediaQuery`).
 - **🔥 0-Codegen OpenAPI RPC:** Backend routes written with `@hono/zod-openapi` automatically infer client types (`hc<AppType>`) while generating live OpenAPI 3.1 specs and interactive **Swagger UI** at `/api/docs`.
 - **🎨 Modern UI with Yaxa:** Clean, accessible UI components and design system built with [Yaxa](https://yaxa.vercel.app/) and Tailwind CSS v4.
-- **📚 In-App Documentation Engine:** Built-in documentation portal at `/docs` with server-side Shiki syntax highlighting, responsive navigation drawer, real-time search filtering, and table of contents.
+- **📚 In-App Documentation Engine:** Built-in documentation portal at `/docs` with Yaxa-powered reactive syntax highlighting, responsive navigation drawer, real-time search filtering, and table of contents.
 - **🖼️ Dynamic Social Card Generator:** Zero-binary vector Open Graph image generation at `/api/og` for high-resolution Twitter and LinkedIn previews.
 - **💳 Turnkey Polar.sh SaaS Billing Engine:** Production-ready Merchant of Record (MoR) integration, checkout sessions, customer portal, and signature-verified webhooks to monetize your SaaS.
 - **🔒 Declarative Feature Gating & RBAC:** Protect frontend UI with `<Gate required="pro">`, secure backend endpoints with `requirePlan('pro')` Hono middleware, and enforce role-based access control (Admin, Owner, Member).

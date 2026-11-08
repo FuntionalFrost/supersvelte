@@ -126,12 +126,12 @@ pnpm lint
 
 - Import your repository on the Netlify dashboard.
 - **Build Command:** `pnpm build`
-- **Publish Directory:** `.svelte-kit/netlify` (handled automatically via `@sveltejs/adapter-netlify`).
+- **Publish Directory:** `build` (configured in `netlify.toml` and output by `@sveltejs/adapter-netlify`).
 
 3. **Configure Environment Variables:**
 
 - Copy all key-value pairs from your production `.env` into **Netlify Site Configuration → Environment Variables**.
-- Set `SECRETS_SCAN_OMIT_KEYS = "ORIGIN, PUBLIC_POLAR_STANDARD_PRODUCT_ID, PUBLIC_POLAR_PRO_PRODUCT_ID"` in `netlify.toml` to prevent false-positive build flags.
+- Ensure `SECRETS_SCAN_OMIT_KEYS = "ORIGIN, POLAR_ENVIRONMENT, PUBLIC_POLAR_STANDARD_PRODUCT_ID, PUBLIC_POLAR_PRO_PRODUCT_ID, GITHUB_REPO_NAME, GITHUB_REPO_OWNER, EMAIL_FROM, GITHUB_CLIENT_ID"` is maintained in `netlify.toml` to prevent false-positive secret scanner alerts on non-secret public values.
 
 4. **Configure Polar Webhooks:**
 

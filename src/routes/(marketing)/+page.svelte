@@ -18,9 +18,6 @@
 		Zap
 	} from '@lucide/svelte';
 	import { Seo } from 'yaxa-svelte';
-	import type { PageData } from './$types';
-
-	let { data }: { data: PageData } = $props();
 
 	let mode = $state<Mode>('saas-starters');
 	let currentMatrix = $derived(matrices[mode]);
@@ -255,7 +252,7 @@
 	</section>
 
 	<!-- 4. CODE COMPARISON SHOWCASE -->
-	<CodeComparison snippets={data.comparisonSnippets} />
+	<CodeComparison />
 
 	<!-- 5. BENCHMARKS -->
 	<section class="border-t border-border/60 bg-muted/20 py-20">

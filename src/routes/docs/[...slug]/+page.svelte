@@ -1,35 +1,11 @@
 <!-- src/routes/docs/[...slug]/+page.svelte -->
 <script lang="ts">
-	import {
-		ArrowLeft,
-		ArrowRight,
-		Check,
-		ChevronRight,
-		Copy,
-		FileCode,
-		Hash,
-		Terminal
-	} from '@lucide/svelte';
-	import { Seo, generateBreadcrumbSchema, toast } from 'yaxa-svelte';
+	import { ArrowLeft, ArrowRight, ChevronRight, Hash } from '@lucide/svelte';
+	import { CodeBlock, Seo, generateBreadcrumbSchema } from 'yaxa-svelte';
 	import { siteConfig } from '../../../site.config';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
-
-	let copiedSectionId = $state<string | null>(null);
-
-	async function copyCode(code: string, id: string) {
-		try {
-			await navigator.clipboard.writeText(code.trim());
-			copiedSectionId = id;
-			toast.success('Code copied to clipboard!');
-			setTimeout(() => {
-				if (copiedSectionId === id) copiedSectionId = null;
-			}, 2000);
-		} catch {
-			toast.error('Failed to copy code');
-		}
-	}
 
 	const breadcrumbSchema = $derived(
 		generateBreadcrumbSchema(siteConfig, [
@@ -98,61 +74,13 @@
 						{section.body}
 					</p>
 
-					{#if section.code && section.highlightedCode}
-						{@const isTerminal = ['bash', 'sh', 'zsh', 'shell'].includes(
-							section.code.lang.toLowerCase()
-						)}
-						<div
-							class="my-4 overflow-hidden rounded-xl border border-zinc-800 bg-[#0d1117] shadow-md"
-						>
-							<!-- Code Header -->
-							<div
-								class="flex items-center justify-between border-b border-zinc-800/80 bg-zinc-900/60 px-4 py-2 text-xs"
-							>
-								<div class="flex items-center gap-2 font-mono text-[11px]">
-									{#if isTerminal}
-										<Terminal class="size-3.5 text-teal-400" />
-									{:else}
-										<FileCode class="size-3.5 text-primary" />
-									{/if}
-									<span class="font-semibold text-zinc-300">
-										{section.code.filename || section.code.lang}
-									</span>
-								</div>
-
-								<div class="flex items-center gap-2">
-									{#if section.code.filename && section.code.lang}
-										<span
-											class="rounded bg-zinc-800/80 px-1.5 py-0.5 font-mono text-[10px] font-bold tracking-wider text-zinc-400 uppercase"
-										>
-											{section.code.lang}
-										</span>
-									{/if}
-									<button
-										type="button"
-										onclick={() => copyCode(section.code!.code, section.id)}
-										class="inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-[11px] font-medium text-zinc-400 transition hover:bg-zinc-800 hover:text-white active:scale-95"
-										title="Copy Code"
-										aria-label="Copy code to clipboard"
-									>
-										{#if copiedSectionId === section.id}
-											<Check class="size-3.5 text-emerald-400" />
-											<span class="font-semibold text-emerald-400">Copied</span>
-										{:else}
-											<Copy class="size-3.5" />
-											<span>Copy</span>
-										{/if}
-									</button>
-								</div>
-							</div>
-
-							<!-- Pre-highlighted Shiki Output -->
-							<div
-								class="overflow-x-auto p-4 font-mono text-xs leading-relaxed text-zinc-200 [&>pre]:m-0! [&>pre]:bg-transparent! [&>pre]:p-0!"
-							>
-								{@html section.highlightedCode}
-							</div>
-						</div>
+					{#if section.code}
+						<CodeBlock
+							code={section.code.code}
+							language={section.code.lang}
+							filename={section.code.filename}
+							themeMode="dark"
+						/>
 					{/if}
 				</section>
 			{/each}

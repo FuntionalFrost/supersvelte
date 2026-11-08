@@ -5,23 +5,13 @@
 		superSvelteExample,
 		type CompetitorKey
 	} from '#lib/config/code-comparisons.js';
-	import { Check, CodeXml, Copy, FileCode, Layers, ShieldCheck, Zap } from '@lucide/svelte';
-
-	interface Props {
-		snippets?: {
-			superSvelte: { server: string; client: string };
-			nextjs: { server: string; client: string };
-			nestjs: { server: string; client: string };
-		};
-	}
-
-	let { snippets }: Props = $props();
+	import { Check, CodeXml, Copy, FileCode, Layers, Zap } from '@lucide/svelte';
+	import { CodeBlock } from 'yaxa-svelte';
 
 	let activeCompetitor = $state<CompetitorKey>('nextjs');
 	let copiedSnippet = $state<string | null>(null);
 
 	let currentCompetitor = $derived(competitorExamples[activeCompetitor]);
-	let currentCompetitorSnippet = $derived(snippets?.[activeCompetitor]);
 
 	function copyCode(key: string, text: string) {
 		navigator.clipboard.writeText(text.trim());
@@ -48,8 +38,10 @@
 		</div>
 
 		<!-- Competitor Switcher Tabs -->
-		<div class="mb-6 flex justify-center">
-			<div class="inline-flex rounded-xl border border-border bg-card p-1 shadow-xs">
+		<div class="mb-8 flex justify-center">
+			<div
+				class="inline-flex items-center gap-1 rounded-xl border border-border bg-card p-1.5 shadow-xs"
+			>
 				<button
 					onclick={() => (activeCompetitor = 'nextjs')}
 					class="flex items-center gap-2 rounded-lg px-3.5 py-1.5 text-xs font-semibold transition-all {activeCompetitor ===
@@ -116,15 +108,12 @@
 							<span class="size-1.5 rounded-full bg-emerald-400"></span>
 							1. OpenAPI Route Definition
 						</div>
-						<div
-							class="overflow-hidden rounded-lg border border-border/80 bg-[#0d1117] p-3 font-mono text-xs [&>pre]:m-0! [&>pre]:bg-transparent! [&>pre]:p-0!"
-						>
-							{#if snippets?.superSvelte.server}
-								{@html snippets.superSvelte.server}
-							{:else}
-								<pre><code>{superSvelteExample.server}</code></pre>
-							{/if}
-						</div>
+						<CodeBlock
+							code={superSvelteExample.server}
+							language="typescript"
+							themeMode="dark"
+							class="my-0! rounded-lg border-border/80"
+						/>
 					</div>
 
 					<div class="space-y-1.5">
@@ -134,15 +123,12 @@
 							<span class="size-1.5 rounded-full bg-emerald-400"></span>
 							2. Client RPC Call
 						</div>
-						<div
-							class="overflow-hidden rounded-lg border border-border/80 bg-[#0d1117] p-3 font-mono text-xs [&>pre]:m-0! [&>pre]:bg-transparent! [&>pre]:p-0!"
-						>
-							{#if snippets?.superSvelte.client}
-								{@html snippets.superSvelte.client}
-							{:else}
-								<pre><code>{superSvelteExample.client}</code></pre>
-							{/if}
-						</div>
+						<CodeBlock
+							code={superSvelteExample.client}
+							language="svelte"
+							themeMode="dark"
+							class="my-0! rounded-lg border-border/80"
+						/>
 					</div>
 				</div>
 
@@ -196,15 +182,12 @@
 							<span class="size-1.5 rounded-full bg-muted-foreground"></span>
 							Server Implementation
 						</div>
-						<div
-							class="overflow-hidden rounded-lg border border-border/60 bg-[#0d1117] p-3 font-mono text-xs [&>pre]:m-0! [&>pre]:bg-transparent! [&>pre]:p-0!"
-						>
-							{#if currentCompetitorSnippet?.server}
-								{@html currentCompetitorSnippet.server}
-							{:else}
-								<pre><code>{currentCompetitor.server}</code></pre>
-							{/if}
-						</div>
+						<CodeBlock
+							code={currentCompetitor.server}
+							language="typescript"
+							themeMode="dark"
+							class="my-0! rounded-lg border-border/60"
+						/>
 					</div>
 
 					<div class="space-y-1.5">
@@ -214,44 +197,26 @@
 							<span class="size-1.5 rounded-full bg-muted-foreground"></span>
 							Client Consumption
 						</div>
-						<div
-							class="overflow-hidden rounded-lg border border-border/60 bg-[#0d1117] p-3 font-mono text-xs [&>pre]:m-0! [&>pre]:bg-transparent! [&>pre]:p-0!"
-						>
-							{#if currentCompetitorSnippet?.client}
-								{@html currentCompetitorSnippet.client}
-							{:else}
-								<pre><code>{currentCompetitor.client}</code></pre>
-							{/if}
-						</div>
+						<CodeBlock
+							code={currentCompetitor.client}
+							language="typescript"
+							themeMode="dark"
+							class="my-0! rounded-lg border-border/60"
+						/>
 					</div>
 				</div>
 
 				<div
 					class="flex flex-wrap gap-2 border-t border-border bg-card px-4 py-2.5 text-[10px] text-muted-foreground"
 				>
-					<span class="inline-flex items-center gap-1 font-medium text-amber-500">
-						⚠️ Manual Type Mapping
+					<span class="inline-flex items-center gap-1">
+						<span class="size-1.5 rounded-full bg-muted-foreground"></span>
+						Framework-specific patterns
 					</span>
-					<span class="inline-flex items-center gap-1 font-medium text-amber-500">
-						⚠️ Extra Boilerplate Files
+					<span class="inline-flex items-center gap-1">
+						<span class="size-1.5 rounded-full bg-muted-foreground"></span>
+						Manual client contracts
 					</span>
-				</div>
-			</div>
-		</div>
-
-		<!-- Summary Callout Banner -->
-		<div
-			class="mt-8 flex flex-col items-center justify-between gap-3 rounded-xl border border-primary/20 bg-primary/5 p-4 md:flex-row"
-		>
-			<div class="flex items-center gap-3">
-				<ShieldCheck class="size-6 shrink-0 text-primary" />
-				<div class="space-y-0.5">
-					<h4 class="text-xs font-bold">Why OpenAPI Hono RPC Beats Codegen Toolchains</h4>
-					<p class="text-[11px] text-muted-foreground">
-						TypeScript infers route contracts at edit time, while generating standard OpenAPI 3.1
-						JSON schemas & Swagger UI docs at <code>/api/docs</code>. Zero build steps, zero codegen
-						binaries.
-					</p>
 				</div>
 			</div>
 		</div>
