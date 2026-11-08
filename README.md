@@ -3,9 +3,12 @@
 > **The Batteries-Included, Zero-Codegen Full-Stack Svelte 5 Framework.**
 > Built with SvelteKit, Svelte 5 Runes, Runed, OpenAPI 3.1 Hono RPC, Better Auth, Polar Payments, Neon Postgres, Drizzle ORM, and Upstash Redis.
 
+[![Live Demo](https://img.shields.io/badge/Live_Demo-supersvelte.netlify.app-00C7B7?style=flat&logo=netlify&logoColor=white)](https://supersvelte.netlify.app)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![GitHub Stars](https://img.shields.io/github/stars/FunctionalFrost/supersvelte?style=social)](https://github.com/FunctionalFrost/supersvelte)
 [![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/FunctionalFrost/supersvelte)
+
+[🌐 **Live Demo**](https://supersvelte.netlify.app) &nbsp;•&nbsp; [📖 **Documentation**](https://supersvelte.netlify.app/docs) &nbsp;•&nbsp; [🧪 **Diagnostic Sandbox**](https://supersvelte.netlify.app/test) &nbsp;•&nbsp; [⚡ **API Swagger Docs**](https://supersvelte.netlify.app/api/docs) &nbsp;•&nbsp; [🚀 **1-Click Deploy**](https://app.netlify.com/start/deploy?repository=https://github.com/FunctionalFrost/supersvelte)
 
 ---
 

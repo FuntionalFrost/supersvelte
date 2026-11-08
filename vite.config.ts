@@ -1,4 +1,3 @@
-/// <reference types="vitest/config" />
 import adapterNetlify from '@sveltejs/adapter-netlify';
 import { sveltekit } from '@sveltejs/kit/vite';
 import tailwindcss from '@tailwindcss/vite';
