@@ -17,7 +17,7 @@
 		Terminal,
 		Zap
 	} from '@lucide/svelte';
-	import { Seo } from 'yaxa-svelte';
+	import { Seo, generateFaqSchema } from 'yaxa-svelte/seo';
 
 	let mode = $state<Mode>('saas-starters');
 	let currentMatrix = $derived(matrices[mode]);
@@ -25,6 +25,29 @@
 	function getCellValue(row: Record<string, unknown>, key: string): string {
 		return String(row[key] ?? '');
 	}
+
+	const faqSchema = generateFaqSchema([
+		{
+			question: 'Is SuperSvelte really 100% free and open source?',
+			answer:
+				'Yes! SuperSvelte is licensed under the permissive MIT License. You have complete freedom to use it for personal projects, commercial products, or client work with zero royalties or restrictions.'
+		},
+		{
+			question: 'Why is there a pricing section above?',
+			answer:
+				"The pricing section is an interactive showcase of SuperSvelte's built-in Polar.sh billing engine. It proves how easily you can set up tiers, test checkouts, and handle webhook fulfillment in your own SaaS."
+		},
+		{
+			question: 'How does billing and checkout work?',
+			answer:
+				'Polar acts as the Merchant of Record, handling global taxes, EU VAT reverse-charge, and payouts. SuperSvelte connects via verified webhooks to provision user entitlements in Neon Postgres.'
+		},
+		{
+			question: 'Can I use this for client or commercial SaaS?',
+			answer:
+				'Absolutely. Build as many apps or client projects as you wish. Clone the repository, add your environment variables, and deploy directly to Netlify in minutes.'
+		}
+	]);
 </script>
 
 <!-- src/routes/(marketing)/+page.svelte -->
@@ -37,6 +60,7 @@
 		description: 'Ship Svelte 5 SaaS Apps at Light Speed',
 		badge: 'Svelte 5 + Hono RPC'
 	}}
+	schema={faqSchema}
 />
 
 <div

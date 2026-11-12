@@ -1,7 +1,8 @@
 <!-- src/routes/docs/[...slug]/+page.svelte -->
 <script lang="ts">
 	import { ArrowLeft, ArrowRight, ChevronRight, Hash } from '@lucide/svelte';
-	import { CodeBlock, Seo, generateBreadcrumbSchema } from 'yaxa-svelte';
+	import { CodeBlock } from 'yaxa-svelte';
+	import { Seo, generateBreadcrumbSchema } from 'yaxa-svelte/seo';
 	import { siteConfig } from '../../../site.config';
 	import type { PageData } from './$types';
 

@@ -1,7 +1,7 @@
 // tests/unit/hooks.test.ts
 import { describe, expect, it, vi } from 'vitest';
 import type { RequestEvent } from '@sveltejs/kit';
-import { createRobotsHandler } from 'yaxa-svelte/server';
+import { createRobotsHandler } from 'yaxa-svelte/seo';
 import { siteConfig } from '../../src/site.config';
 import { userFixture } from '../fixtures/auth';
 
@@ -86,6 +86,20 @@ describe('SvelteKit Server Hooks & Route Protection (hooks.server.ts)', () => {
 		expect(res.headers.get('content-type')).toContain('application/xml');
 		const xml = await res.text();
 		expect(xml).toContain('/docs/getting-started/introduction');
+		expect(resolve).not.toHaveBeenCalled();
+	});
+
+	it('serves llms.txt via yaxaHook with structured documentation links', async () => {
+		const event = createMockEvent('/llms.txt');
+		const resolve = vi.fn();
+
+		const res = await yaxaHook({ event, resolve });
+		expect(res.status).toBe(200);
+		expect(res.headers.get('content-type')).toContain('text/plain');
+		const text = await res.text();
+		expect(text).toContain('# SuperSvelte');
+		expect(text).toContain('## Documentation');
+		expect(text).toContain('/docs/getting-started/introduction');
 		expect(resolve).not.toHaveBeenCalled();
 	});
 

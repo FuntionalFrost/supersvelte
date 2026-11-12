@@ -65,7 +65,7 @@ supersvelte/
 ├── src/
 │   ├── app.d.ts                        # Better Auth session & App.Locals typing
 │   ├── app.html
-│   ├── hooks.server.ts                 # Better Auth handler, route guards & rate limiting
+│   ├── hooks.server.ts                 # Yaxa SEO/sitemap/robots/llms hook, Better Auth & rate limiting
 │   ├── site.config.ts                  # Centralized site, navigation & SEO metadata
 │   │
 │   ├── lib/
@@ -126,7 +126,6 @@ supersvelte/
 │       ├── +layout.server.ts           # Root session & purchase loader
 │       ├── +layout.svelte              # Root shell with global styles
 │       ├── layout.css
-│       ├── sitemap.xml/+server.ts      # Dynamic XML sitemap generator
 │       │
 │       ├── (app)/                      # Authenticated Application Shell
 │       │   ├── +layout.server.ts

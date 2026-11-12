@@ -6,10 +6,10 @@ import { checkRateLimit } from '#lib/server/ratelimit.js';
 import { error, redirect } from '@sveltejs/kit';
 import { sequence, type Handle, type HandleServerError } from '@sveltejs/kit/hooks';
 import { svelteKitHandler } from 'better-auth/svelte-kit';
-import { createYaxaHook } from 'yaxa-svelte/server';
+import { createYaxaHook } from 'yaxa-svelte/seo';
 import { siteConfig } from './site.config';
 
-// 1. All-in-one Yaxa Hook for /robots.txt, /sitemap.xml, /sitemap.xsl, /site.webmanifest, and /api/og
+// 1. All-in-one Yaxa Hook for /robots.txt, /sitemap.xml, /sitemap.xsl, /site.webmanifest, /api/og, and /llms.txt
 const yaxaHook = createYaxaHook({
 	config: siteConfig,
 	sitemap: {
@@ -20,6 +20,20 @@ const yaxaHook = createYaxaHook({
 				changefreq: 'weekly' as const,
 				priority: 0.8
 			}))
+	},
+	llms: {
+		config: siteConfig,
+		sections: [
+			{
+				title: 'Documentation',
+				description: 'Official SuperSvelte documentation guides and API tutorials',
+				links: docsRegistry.map((doc) => ({
+					title: doc.title,
+					url: `/docs/${doc.slug}`,
+					description: doc.description
+				}))
+			}
+		]
 	}
 });
 
