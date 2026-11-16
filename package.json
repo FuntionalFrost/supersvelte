@@ -87,7 +87,7 @@
 		"hono": "^4.13.12",
 		"resend": "^6.34.1",
 		"uploadthing": "^7.7.4",
-		"yaxa-svelte": "^2.8.1",
+		"yaxa-svelte": "^2.10.0",
 		"zod": "^4.6.5"
 	},
 	"imports": {

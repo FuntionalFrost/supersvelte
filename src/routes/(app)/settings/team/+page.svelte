@@ -12,8 +12,7 @@
 		UserPlus,
 		Users
 	} from '@lucide/svelte';
-	import { onMount } from 'svelte';
-	import { toast } from 'yaxa-svelte';
+	import { createMutation, createQuery, toast } from 'yaxa-svelte';
 
 	const activeOrg = useActiveOrganization();
 
@@ -21,11 +20,22 @@
 	let newOrgSlug = $state('');
 	let inviteEmail = $state('');
 	let inviteRole = $state<'admin' | 'member'>('member');
-	let isCreatingOrg = $state(false);
-	let isSendingInvite = $state(false);
 	let actionLoadingId = $state<string | null>(null);
 
-	let userOrgs = $state<Array<{ id: string; name: string; slug: string }>>([]);
+	// Query user organizations with automatic caching & focus re-fetching
+	const orgsQuery = createQuery(
+		'user-organizations',
+		async () => {
+			const res = await authClient.organization.list();
+			return res.data || [];
+		},
+		{
+			staleTimeMs: 15_000,
+			refetchOnWindowFocus: true
+		}
+	);
+
+	let userOrgs = $derived(orgsQuery.data ?? []);
 
 	// Auto-generate URL-friendly slug from organization name
 	function handleNameInput(e: Event) {
@@ -38,113 +48,176 @@
 			.replace(/\s+/g, '-');
 	}
 
-	async function loadUserOrgs() {
-		try {
-			const res = await authClient.organization.list();
-			if (res.data) {
-				userOrgs = res.data;
+	// Organization creation mutation
+	const createOrgMutation = createMutation(
+		async ({ name, slug }: { name: string; slug: string }) => {
+			const res = await authClient.organization.create({ name, slug });
+			if (res.error) {
+				throw new Error(res.error.message ?? 'Failed to create organization');
 			}
-		} catch (err) {
-			console.error('Failed to load user organizations:', err);
+			return res.data;
+		},
+		{
+			onSuccess: async (data) => {
+				toast.success('Organization created!');
+				newOrgName = '';
+				newOrgSlug = '';
+				if (data?.id) {
+					await authClient.organization.setActive({ organizationId: data.id });
+				}
+				await orgsQuery.refetch();
+			},
+			onError: (err) => {
+				toast.error(err instanceof Error ? err.message : 'Failed to create organization');
+			}
 		}
-	}
+	);
 
-	onMount(() => {
-		loadUserOrgs();
-	});
+	let isCreatingOrg = $derived(createOrgMutation.isPending);
 
-	async function handleCreateOrg(e: SubmitEvent) {
+	function handleCreateOrg(e: SubmitEvent) {
 		e.preventDefault();
 		if (!newOrgName || !newOrgSlug) return;
-
-		isCreatingOrg = true;
-		const res = await authClient.organization.create({
-			name: newOrgName,
-			slug: newOrgSlug
-		});
-
-		isCreatingOrg = false;
-		if (res.error) {
-			toast.error(res.error.message ?? 'Failed to create organization');
-			return;
-		}
-
-		toast.success('Organization created!');
-		newOrgName = '';
-		newOrgSlug = '';
-
-		if (res.data?.id) {
-			await authClient.organization.setActive({ organizationId: res.data.id });
-		}
-		await loadUserOrgs();
+		createOrgMutation.mutate({ name: newOrgName, slug: newOrgSlug });
 	}
 
-	async function handleSwitchOrg(orgId: string) {
-		const res = await authClient.organization.setActive({ organizationId: orgId });
-		if (res.error) {
-			toast.error(res.error.message ?? 'Failed to switch organization');
-			return;
+	// Workspace switch mutation
+	const switchOrgMutation = createMutation(
+		async (organizationId: string) => {
+			const res = await authClient.organization.setActive({ organizationId });
+			if (res.error) {
+				throw new Error(res.error.message ?? 'Failed to switch organization');
+			}
+			return res.data;
+		},
+		{
+			onSuccess: () => {
+				toast.success('Switched workspace');
+			},
+			onError: (err) => {
+				toast.error(err instanceof Error ? err.message : 'Failed to switch organization');
+			}
 		}
-		toast.success('Switched workspace');
+	);
+
+	function handleSwitchOrg(orgId: string) {
+		switchOrgMutation.mutate(orgId);
 	}
 
-	async function handleSendInvite(e: SubmitEvent) {
+	// Invite member mutation
+	const sendInviteMutation = createMutation(
+		async ({
+			email,
+			role,
+			organizationId
+		}: {
+			email: string;
+			role: 'admin' | 'member';
+			organizationId: string;
+		}) => {
+			const res = await authClient.organization.inviteMember({
+				email,
+				role,
+				organizationId
+			});
+			if (res.error) {
+				throw new Error(res.error.message ?? 'Failed to send invite');
+			}
+			return res.data;
+		},
+		{
+			onSuccess: (_, variables) => {
+				toast.success(`Invite sent to ${variables.email}`);
+				inviteEmail = '';
+			},
+			onError: (err) => {
+				toast.error(err instanceof Error ? err.message : 'Failed to send invite');
+			}
+		}
+	);
+
+	let isSendingInvite = $derived(sendInviteMutation.isPending);
+
+	function handleSendInvite(e: SubmitEvent) {
 		e.preventDefault();
 		if (!inviteEmail || !$activeOrg.data?.id) return;
-
-		isSendingInvite = true;
-		const res = await authClient.organization.inviteMember({
+		sendInviteMutation.mutate({
 			email: inviteEmail,
 			role: inviteRole,
 			organizationId: $activeOrg.data.id
 		});
-
-		isSendingInvite = false;
-		if (res.error) {
-			toast.error(res.error.message ?? 'Failed to send invite');
-			return;
-		}
-
-		toast.success(`Invite sent to ${inviteEmail}`);
-		inviteEmail = '';
 	}
 
-	async function handleRemoveMember(memberId: string) {
-		if (!$activeOrg.data?.id) return;
-		actionLoadingId = memberId;
-
-		const res = await authClient.organization.removeMember({
-			memberIdOrEmail: memberId,
-			organizationId: $activeOrg.data.id
-		});
-
-		actionLoadingId = null;
-		if (res.error) {
-			toast.error(res.error.message ?? 'Failed to remove member');
-			return;
+	// Remove member mutation
+	const removeMemberMutation = createMutation(
+		async ({ memberId, organizationId }: { memberId: string; organizationId: string }) => {
+			actionLoadingId = memberId;
+			const res = await authClient.organization.removeMember({
+				memberIdOrEmail: memberId,
+				organizationId
+			});
+			if (res.error) {
+				throw new Error(res.error.message ?? 'Failed to remove member');
+			}
+			return res.data;
+		},
+		{
+			onSuccess: () => {
+				toast.success('Member removed from workspace');
+			},
+			onError: (err) => {
+				toast.error(err instanceof Error ? err.message : 'Failed to remove member');
+			},
+			onSettled: () => {
+				actionLoadingId = null;
+			}
 		}
+	);
 
-		toast.success('Member removed from workspace');
+	function handleRemoveMember(memberId: string) {
+		if (!$activeOrg.data?.id) return;
+		removeMemberMutation.mutate({ memberId, organizationId: $activeOrg.data.id });
 	}
 
-	async function handleUpdateRole(memberId: string, currentRole: string) {
-		if (!$activeOrg.data?.id) return;
-		actionLoadingId = memberId;
-		const nextRole = currentRole === 'admin' ? 'member' : 'admin';
-
-		const res = await authClient.organization.updateMemberRole({
+	// Update role mutation
+	const updateRoleMutation = createMutation(
+		async ({
 			memberId,
-			role: nextRole,
-			organizationId: $activeOrg.data.id
-		});
-
-		actionLoadingId = null;
-		if (res.error) {
-			toast.error(res.error.message ?? 'Failed to update role');
-			return;
+			nextRole,
+			organizationId
+		}: {
+			memberId: string;
+			nextRole: 'admin' | 'member';
+			organizationId: string;
+		}) => {
+			actionLoadingId = memberId;
+			const res = await authClient.organization.updateMemberRole({
+				memberId,
+				role: nextRole,
+				organizationId
+			});
+			if (res.error) {
+				throw new Error(res.error.message ?? 'Failed to update role');
+			}
+			return res.data;
+		},
+		{
+			onSuccess: (_, variables) => {
+				toast.success(`Member role updated to ${variables.nextRole}`);
+			},
+			onError: (err) => {
+				toast.error(err instanceof Error ? err.message : 'Failed to update role');
+			},
+			onSettled: () => {
+				actionLoadingId = null;
+			}
 		}
+	);
 
-		toast.success(`Member role updated to ${nextRole}`);
+	function handleUpdateRole(memberId: string, currentRole: string) {
+		if (!$activeOrg.data?.id) return;
+		const nextRole = currentRole === 'admin' ? 'member' : 'admin';
+		updateRoleMutation.mutate({ memberId, nextRole, organizationId: $activeOrg.data.id });
 	}
 </script>
 

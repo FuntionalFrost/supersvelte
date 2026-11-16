@@ -17,7 +17,8 @@
 		Terminal,
 		Zap
 	} from '@lucide/svelte';
-	import { Seo, generateFaqSchema } from 'yaxa-svelte/seo';
+	import { Seo, generateFaqSchema, generateProductSchema } from 'yaxa-svelte/seo';
+	import { siteConfig } from '../../site.config.js';
 
 	let mode = $state<Mode>('saas-starters');
 	let currentMatrix = $derived(matrices[mode]);
@@ -48,6 +49,16 @@
 				'Absolutely. Build as many apps or client projects as you wish. Clone the repository, add your environment variables, and deploy directly to Netlify in minutes.'
 		}
 	]);
+
+	const productSchemas = pricingPlans.map((plan) =>
+		generateProductSchema(siteConfig, {
+			name: plan.name,
+			description: plan.description,
+			price: plan.price,
+			currency: 'EUR',
+			url: `${siteConfig.url}/#pricing`
+		})
+	);
 </script>
 
 <!-- src/routes/(marketing)/+page.svelte -->
@@ -60,7 +71,7 @@
 		description: 'Ship Svelte 5 SaaS Apps at Light Speed',
 		badge: 'Svelte 5 + Hono RPC'
 	}}
-	schema={faqSchema}
+	schema={[faqSchema, ...productSchemas]}
 />
 
 <div

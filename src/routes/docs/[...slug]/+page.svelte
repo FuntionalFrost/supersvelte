@@ -2,7 +2,7 @@
 <script lang="ts">
 	import { ArrowLeft, ArrowRight, ChevronRight, Hash } from '@lucide/svelte';
 	import { CodeBlock } from 'yaxa-svelte';
-	import { Seo, generateBreadcrumbSchema } from 'yaxa-svelte/seo';
+	import { Seo, generateArticleSchema, generateBreadcrumbSchema } from 'yaxa-svelte/seo';
 	import { siteConfig } from '../../../site.config';
 	import type { PageData } from './$types';
 
@@ -15,6 +15,16 @@
 			{ name: data.doc.title, url: `${siteConfig.url}/docs/${data.doc.slug}` }
 		])
 	);
+
+	const articleSchema = $derived(
+		generateArticleSchema(siteConfig, {
+			title: data.doc.title,
+			description: data.doc.description,
+			url: `${siteConfig.url}/docs/${data.doc.slug}`,
+			datePublished: '2026-01-01T00:00:00Z',
+			authorName: siteConfig.author?.name
+		})
+	);
 </script>
 
 <Seo
@@ -25,7 +35,7 @@
 		description: data.doc.description,
 		badge: data.doc.category
 	}}
-	schema={breadcrumbSchema}
+	schema={[breadcrumbSchema, articleSchema]}
 />
 
 <div class="flex gap-10">
