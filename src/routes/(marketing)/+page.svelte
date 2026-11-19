@@ -165,15 +165,15 @@
 					<span class="text-[11px] text-muted-foreground">Sessions & Social</span>
 				</a>
 				<a
-					href="/docs/architecture/queue-realtime"
+					href="/docs/architecture/billing"
 					class="group flex flex-col items-center gap-2 rounded-xl border border-border/60 bg-card p-4 text-center transition-all duration-300 hover:-translate-y-1 hover:border-red-400/50"
 				>
 					<Cloud class="size-6 text-red-400" />
-					<span class="text-sm font-bold">Upstash Redis</span>
-					<span class="text-[11px] text-muted-foreground">Cache & SSE Queue</span>
+					<span class="text-sm font-bold">Polar Billing</span>
+					<span class="text-[11px] text-muted-foreground">MoR & License Keys</span>
 				</a>
 				<a
-					href="/docs/architecture/storage"
+					href="/docs/features/storage-and-email"
 					class="group flex flex-col items-center gap-2 rounded-xl border border-border/60 bg-card p-4 text-center transition-all duration-300 hover:-translate-y-1 hover:border-pink-400/50"
 				>
 					<Mail class="size-6 text-pink-400" />

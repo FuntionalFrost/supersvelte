@@ -14,6 +14,7 @@ const yaxaHook = createYaxaHook({
 	config: siteConfig,
 	sitemap: {
 		config: siteConfig,
+		staticRoutes: ['/', '/contact', '/privacy', '/refunds', '/support', '/terms', '/vs', '/docs'],
 		dynamicRoutes: () =>
 			docsRegistry.map((doc) => ({
 				loc: `/docs/${doc.slug}`,

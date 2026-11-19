@@ -86,6 +86,8 @@ describe('SvelteKit Server Hooks & Route Protection (hooks.server.ts)', () => {
 		expect(res.headers.get('content-type')).toContain('application/xml');
 		const xml = await res.text();
 		expect(xml).toContain('/docs/getting-started/introduction');
+		expect(xml).toContain('https://supersvelte.netlify.app/privacy');
+		expect(xml).toContain('https://supersvelte.netlify.app/contact');
 		expect(resolve).not.toHaveBeenCalled();
 	});
 

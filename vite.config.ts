@@ -14,6 +14,12 @@ export default defineConfig(({ mode }) => ({
 				// Force runes mode for the project, except for libraries. Can be removed in svelte 6.
 				runes: true
 			},
+			prerender: {
+				handleHttpError: ({ path, message }) => {
+					if (path === '/favicon.ico') return;
+					throw new Error(message);
+				}
+			},
 			adapter: isNode ? adapterNode() : adapterNetlify()
 		})
 	],
