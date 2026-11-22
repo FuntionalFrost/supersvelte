@@ -98,12 +98,17 @@ pnpm dev
 
 ```bash
 # Unified Management CLI (Django/Laravel-style)
-pnpm manage make:admin user@example.com      # Promote user to superadmin
+pnpm manage                                  # Launch interactive CLI menu
+pnpm manage createsuperuser                  # Create a new admin user interactively
+pnpm manage make:admin user@example.com      # Promote existing user to admin
 pnpm manage make:license user@example.com pro # Issue a manual license key
 pnpm manage stats                           # View active users, orgs & purchases
 
 # Generate full-stack CRUD slice (Drizzle Schema + OpenAPI Hono Route)
-pnpm make:resource invoice
+pnpm make:resource invoice                   # Omit argument for interactive prompt
+
+# Self-host with Docker / Podman (uses @sveltejs/adapter-node via DEPLOY_TARGET=node)
+docker build -t supersvelte -f Containerfile .
 
 # Run end-to-end type safety checks (Svelte 5 Runes + TypeScript)
 pnpm check

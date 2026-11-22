@@ -15,8 +15,11 @@ import {
 } from '$app/env/private';
 
 import {
+	CreateBucketCommand,
 	DeleteObjectCommand,
 	GetObjectCommand,
+	HeadBucketCommand,
+	ListObjectsV2Command,
 	PutObjectCommand,
 	S3Client
 } from '@aws-sdk/client-s3';
@@ -28,6 +31,7 @@ const endpoint = S3_ENDPOINT || R2_ENDPOINT || undefined;
 const accessKeyId = S3_ACCESS_KEY_ID || R2_ACCESS_KEY_ID || '';
 const secretAccessKey = S3_SECRET_ACCESS_KEY || R2_SECRET_ACCESS_KEY || '';
 const publicDomain = S3_PUBLIC_DOMAIN || R2_PUBLIC_DOMAIN || '';
+const forcePathStyle = process.env.S3_FORCE_PATH_STYLE === 'true';
 
 export function isS3Configured(): boolean {
 	return Boolean(bucket && accessKeyId && secretAccessKey);
@@ -37,6 +41,7 @@ function getS3Client(): S3Client {
 	return new S3Client({
 		region,
 		endpoint,
+		forcePathStyle,
 		credentials: {
 			accessKeyId,
 			secretAccessKey
@@ -126,4 +131,54 @@ export async function deleteS3Object({ key }: { key: string }) {
 	});
 
 	return await client.send(command);
+}
+
+/**
+ * Ensure the configured S3 / MinIO bucket exists (creates it if missing)
+ */
+export async function ensureS3Bucket(): Promise<boolean> {
+	if (!isS3Configured()) return false;
+
+	const client = getS3Client();
+	try {
+		await client.send(new HeadBucketCommand({ Bucket: bucket }));
+		return true;
+	} catch {
+		try {
+			await client.send(new CreateBucketCommand({ Bucket: bucket }));
+			return true;
+		} catch (err) {
+			console.warn('[S3] Could not auto-create bucket:', err);
+			return false;
+		}
+	}
+}
+
+/**
+ * List objects in the configured S3 / R2 / MinIO bucket
+ */
+export async function listS3Objects(
+	prefix = '',
+	maxKeys = 100
+): Promise<Array<{ key: string; size: number; lastModified?: Date }>> {
+	if (!isS3Configured()) {
+		return [];
+	}
+
+	const client = getS3Client();
+	const response = await client.send(
+		new ListObjectsV2Command({
+			Bucket: bucket,
+			Prefix: prefix,
+			MaxKeys: maxKeys
+		})
+	);
+
+	return (
+		response.Contents?.map((item) => ({
+			key: item.Key || '',
+			size: item.Size || 0,
+			lastModified: item.LastModified
+		})) || []
+	);
 }

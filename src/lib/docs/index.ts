@@ -261,13 +261,13 @@ const data = await res.json();`
 				body: 'The /admin console auto-introspects your Drizzle tables (users, organizations, purchases, projects, files), generating searchable data tables and inline record editing modals.'
 			},
 			{
-				heading: 'Scaffolding New Resources',
+				heading: 'Scaffolding New Resources & Admin Users',
 				id: 'scaffold-resources',
-				body: 'Generate full CRUD slices (Drizzle schema + Hono RPC API routes) with a single command:',
+				body: 'Bootstrap an admin account or generate full CRUD slices (Drizzle schema + Hono RPC API routes) from the CLI:',
 				code: {
 					lang: 'bash',
 					filename: 'terminal',
-					code: `pnpm make:resource invoice`
+					code: `pnpm manage createsuperuser\npnpm make:resource invoice`
 				}
 			}
 		]
@@ -281,9 +281,9 @@ const data = await res.json();`
 		badge: 'Cloud & DX',
 		sections: [
 			{
-				heading: 'Zero-Egress S3 & Cloudflare R2',
+				heading: 'Zero-Egress S3, Cloudflare R2 & MinIO',
 				id: 's3-storage',
-				body: 'Direct browser-to-bucket presigned PUT uploads using `@aws-sdk/client-s3` and `@aws-sdk/s3-request-presigner` with real-time percentage progress tracking.'
+				body: 'Direct browser-to-bucket presigned PUT uploads using `@aws-sdk/client-s3` and `@aws-sdk/s3-request-presigner`, with `S3_FORCE_PATH_STYLE="true"` support for MinIO and path-style endpoints.'
 			},
 			{
 				heading: 'Zero-Config Local Email Fallback',

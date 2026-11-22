@@ -1,21 +1,38 @@
 // scripts/scaffold-resource.ts
+import * as p from '@clack/prompts';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import * as process from 'node:process';
 
-const resource = process.argv[2]?.toLowerCase();
+async function main() {
+	let resource = process.argv[2]?.toLowerCase().trim();
 
-if (!resource) {
-	console.error('❌ Please provide a resource name. Example: pnpm make:resource project');
-	process.exit(1);
-}
+	if (!resource) {
+		p.intro('⚡ SuperSvelte — Scaffold Resource');
+		const input = await p.text({
+			message: 'Enter singular resource name (e.g. project, invoice, article):',
+			placeholder: 'project',
+			validate: (val) => {
+				if (!val || !val.trim()) return 'Resource name is required';
+				if (!/^[a-zA-Z][a-zA-Z0-9]*$/.test(val.trim())) {
+					return 'Use alphanumeric characters starting with a letter';
+				}
+				return undefined;
+			}
+		});
+		if (p.isCancel(input)) {
+			p.cancel('Operation cancelled.');
+			process.exit(0);
+		}
+		resource = input.toLowerCase().trim();
+	}
 
-const PascalName = resource.charAt(0).toUpperCase() + resource.slice(1);
-const PluralName = resource.endsWith('s') ? resource : `${resource}s`;
+	const PascalName = resource.charAt(0).toUpperCase() + resource.slice(1);
+	const PluralName = resource.endsWith('s') ? resource : `${resource}s`;
 
-// 1. Generate Drizzle Schema
-const schemaPath = path.resolve(`src/lib/server/db/schema/${PluralName}.ts`);
-const schemaCode = `import { pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
+	// 1. Generate Drizzle Schema
+	const schemaPath = path.resolve(`src/lib/server/db/schema/${PluralName}.ts`);
+	const schemaCode = `import { pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
 import { user } from '../schema';
 
 export const ${PluralName} = pgTable('${PluralName}', {
@@ -31,9 +48,9 @@ export type ${PascalName} = typeof ${PluralName}.$inferSelect;
 export type New${PascalName} = typeof ${PluralName}.$inferInsert;
 `;
 
-// 2. Generate Hono RPC Route
-const routePath = path.resolve(`src/lib/server/api/routes/${PluralName}.ts`);
-const routeCode = `import { Hono } from 'hono';
+	// 2. Generate Hono RPC Route
+	const routePath = path.resolve(`src/lib/server/api/routes/${PluralName}.ts`);
+	const routeCode = `import { Hono } from 'hono';
 import { zValidator } from '@hono/zod-validator';
 import { z } from 'zod';
 import { db } from '$lib/server/db';
@@ -65,11 +82,17 @@ export const ${PluralName}Route = new Hono()
 	});
 `;
 
-fs.mkdirSync(path.dirname(schemaPath), { recursive: true });
-fs.mkdirSync(path.dirname(routePath), { recursive: true });
+	fs.mkdirSync(path.dirname(schemaPath), { recursive: true });
+	fs.mkdirSync(path.dirname(routePath), { recursive: true });
 
-fs.writeFileSync(schemaPath, schemaCode);
-fs.writeFileSync(routePath, routeCode);
+	fs.writeFileSync(schemaPath, schemaCode);
+	fs.writeFileSync(routePath, routeCode);
 
-console.log(`✅ Generated Schema: ${schemaPath}`);
-console.log(`✅ Generated API Route: ${routePath}`);
+	console.log(`✅ Generated Schema: ${schemaPath}`);
+	console.log(`✅ Generated API Route: ${routePath}`);
+}
+
+main().catch((err) => {
+	console.error('Fatal Scaffold Error:', err);
+	process.exit(1);
+});

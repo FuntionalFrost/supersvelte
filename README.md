@@ -233,12 +233,17 @@ pnpm dev
 
 ```bash
 # Unified Management CLI (Admins, Test Licenses, Database Stats)
-pnpm manage make:admin user@example.com       # Promote user to superadmin
+pnpm manage                                  # Launch interactive CLI menu
+pnpm manage createsuperuser                  # Create a new admin user interactively
+pnpm manage make:admin user@example.com      # Promote existing user to admin
 pnpm manage make:license user@example.com pro # Generate manual test license key
 pnpm manage stats                            # View live users, orgs & purchases
 
 # Generate a full CRUD entity slice (Drizzle Schema + OpenAPI Hono RPC Route)
-pnpm make:resource invoice
+pnpm make:resource invoice                   # Omit argument for interactive prompt
+
+# Build production container image (uses @sveltejs/adapter-node via DEPLOY_TARGET=node)
+docker build -t supersvelte -f Containerfile .
 
 # Run end-to-end type safety checks across Svelte 5 Runes and TypeScript
 pnpm check
