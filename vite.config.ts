@@ -3,6 +3,7 @@ import { sveltekit } from '@sveltejs/kit/vite';
 import tailwindcss from '@tailwindcss/vite';
 import adapterNode from '@sveltejs/adapter-node';
 import { defineConfig } from 'vite';
+import { yaxa } from 'yaxa-svelte/vite';
 
 const isNode = process.env.DEPLOY_TARGET === 'node';
 
@@ -21,7 +22,8 @@ export default defineConfig(({ mode }) => ({
 				}
 			},
 			adapter: isNode ? adapterNode() : adapterNetlify()
-		})
+		}),
+		yaxa({ autoDiscoverRoutes: false })
 	],
 	...(mode === 'test' ? { resolve: { conditions: ['browser'] } } : {}),
 	test: {
